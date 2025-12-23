@@ -1,146 +1,255 @@
-<div class="p-6">
+<div class="min-h-screen bg-gray-50">
   <!-- Header -->
-  <div class="flex items-center justify-between mb-6">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-800">Administrar Espacios</h1>
-      <p class="text-gray-600 mt-1">Gestiona los espacios disponibles para reservación</p>
-    </div>
-    <a routerLink="/admin/spaces/new" 
-       class="p-button p-button-primary">
-      <i class="pi pi-plus mr-2"></i>
-      Nuevo Espacio
-    </a>
-  </div>
-
-  <!-- Barra de búsqueda -->
-  <div class="bg-white rounded-lg shadow p-4 mb-6">
-    <div class="flex gap-4">
-      <div class="flex-1">
-        <span class="p-input-icon-left w-full">
-          <i class="pi pi-search"></i>
-          <input type="text" 
-                 pInputText 
-                 placeholder="Buscar por nombre..."
-                 class="w-full"
-                 [(ngModel)]="searchTerm"
-                 (keyup.enter)="onSearch()" />
-        </span>
+  <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-8 px-6">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold">Administrar Espacios</h1>
+        <p class="text-blue-100 mt-1">Gestiona los espacios disponibles para reservación</p>
       </div>
-      <p-button label="Buscar" 
-                icon="pi pi-search" 
-                (onClick)="onSearch()">
-      </p-button>
-      <p-button label="Limpiar" 
-                icon="pi pi-times" 
-                severity="secondary"
-                (onClick)="searchTerm.set(''); loadSpaces()">
-      </p-button>
+      <p-button 
+        label="Nuevo Espacio" 
+        icon="pi pi-plus"
+        routerLink="/admin/spaces/new"
+      />
     </div>
   </div>
 
-  <!-- 
-    MC-Table de @matiascamiletti/mc-kit
-    
-    Uso real (cuando el paquete esté instalado):
-    <mc-table 
-      [data]="spaces()" 
-      [columns]="columns"
-      [loading]="loading()"
-      [paginator]="true"
-      [rows]="10"
-      [rowsPerPageOptions]="[5, 10, 25]"
-      (onRowSelect)="onRowSelect($event)">
-      
-      <ng-template mcTableColumn="is_active" let-rowData>
-        <p-tag [severity]="getStatusSeverity(rowData.is_active)"
-               [value]="getStatusText(rowData.is_active)">
-        </p-tag>
-      </ng-template>
-      
-      <ng-template mcTableColumn="actions" let-rowData>
-        <div class="flex gap-2">
-          <p-button icon="pi pi-pencil" 
-                    [routerLink]="['/admin/spaces', rowData.id, 'edit']"
-                    severity="info" 
-                    [text]="true">
-          </p-button>
-          <p-button icon="pi pi-trash" 
-                    severity="danger" 
-                    [text]="true"
-                    (onClick)="confirmDelete(rowData)">
-          </p-button>
+  <div class="max-w-7xl mx-auto px-6 py-8 -mt-6">
+    <!-- Barra de búsqueda -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+      <div class="flex flex-wrap gap-4">
+        <div class="flex-1 min-w-[250px]">
+          <div class="p-inputgroup">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-search"></i>
+            </span>
+            <input type="text" 
+                   pInputText 
+                   placeholder="Buscar por nombre..."
+                   class="w-full"
+                   [(ngModel)]="searchTerm"
+                   (keyup.enter)="onSearch()" />
+          </div>
         </div>
-      </ng-template>
-    </mc-table>
-  -->
+        <p-button label="Buscar" 
+                  icon="pi pi-search" 
+                  (onClick)="onSearch()">
+        </p-button>
+        <p-button label="Limpiar" 
+                  icon="pi pi-times" 
+                  severity="secondary"
+                  [outlined]="true"
+                  (onClick)="searchTerm.set(''); loadSpaces()">
+        </p-button>
+      </div>
+    </div>
 
-  <!-- Tabla temporal hasta instalar @matiascamiletti/mc-kit -->
-  <div class="bg-white rounded-lg shadow overflow-hidden">
-    @if (loading()) {
-      <div class="flex items-center justify-center p-12">
-        <i class="pi pi-spin pi-spinner text-4xl text-primary"></i>
-      </div>
-    } @else if (spaces().length === 0) {
-      <div class="text-center p-12 text-gray-500">
-        <i class="pi pi-inbox text-4xl mb-4"></i>
-        <p>No hay espacios registrados</p>
-        <a routerLink="/admin/spaces/new" class="text-primary mt-2 inline-block">
-          Crear primer espacio
-        </a>
-      </div>
-    } @else {
-      <table class="w-full">
-        <thead class="bg-gray-50 border-b">
+    <!--
+      ====================================================================
+      MC-TABLE INTEGRATION (@matiascamiletti/mc-kit)
+      ====================================================================
+      
+      Cuando el paquete esté disponible en npm, reemplazar p-table por:
+      
+      <mc-table 
+        [data]="spaces()" 
+        [columns]="columns"
+        [loading]="loading()"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 25]"
+        (onRowSelect)="onRowSelect($event)">
+        
+        <ng-template mcTableColumn="is_active" let-rowData>
+          <p-tag [severity]="getStatusSeverity(rowData.is_active)"
+                 [value]="getStatusText(rowData.is_active)">
+          </p-tag>
+        </ng-template>
+        
+        <ng-template mcTableColumn="actions" let-rowData>
+          <div class="flex gap-2">
+            <p-button icon="pi pi-pencil" 
+                      [routerLink]="['/admin/spaces', rowData.id, 'edit']"
+                      severity="info" 
+                      [text]="true">
+            </p-button>
+            <p-button icon="pi pi-trash" 
+                      severity="danger" 
+                      [text]="true"
+                      (onClick)="confirmDelete(rowData)">
+            </p-button>
+          </div>
+        </ng-template>
+      </mc-table>
+      
+      ====================================================================
+    -->
+
+    <!-- p-table de PrimeNG (Estructura compatible con MC-Table) -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <p-table 
+        [value]="spaces()" 
+        [loading]="loading()"
+        [paginator]="true" 
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 25]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} espacios"
+        styleClass="p-datatable-striped"
+        responsiveLayout="scroll"
+        (onRowSelect)="onRowSelect($event)">
+        
+        <ng-template pTemplate="header">
           <tr>
             @for (col of columns; track col.field) {
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  [style.width]="col.width">
-                {{ col.header }}
-              </th>
+              @if (col.sortable) {
+                <th [pSortableColumn]="col.field" [style.width]="col.width">
+                  {{ col.header }}
+                  <p-sortIcon [field]="col.field" />
+                </th>
+              } @else {
+                <th [style.width]="col.width">{{ col.header }}</th>
+              }
             }
           </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-          @for (space of spaces(); track space.id) {
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4">
-                <div class="font-medium text-gray-900">{{ space.name }}</div>
-                @if (space.description) {
-                  <div class="text-sm text-gray-500 truncate max-w-xs">{{ space.description }}</div>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-space>
+          <tr>
+            <!-- Nombre -->
+            <td>
+              <div class="flex items-center gap-3">
+                @if (space.image_url) {
+                  <img 
+                    [src]="space.image_url" 
+                    [alt]="space.name"
+                    class="w-10 h-10 rounded-lg object-cover"
+                  />
+                } @else {
+                  <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
+                    <i class="pi pi-building text-white text-sm"></i>
+                  </div>
                 }
-              </td>
-              <td class="px-6 py-4 text-gray-700">
-                {{ space.capacity }} personas
-              </td>
-              <td class="px-6 py-4 text-gray-700">
-                {{ space.location || '-' }}
-              </td>
-              <td class="px-6 py-4">
-                <p-tag [severity]="getStatusSeverity(space.is_active)"
-                       [value]="getStatusText(space.is_active)">
-                </p-tag>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex gap-2">
-                  <p-button icon="pi pi-pencil" 
-                            [routerLink]="['/admin/spaces', space.id, 'edit']"
-                            severity="info" 
-                            [text]="true"
-                            pTooltip="Editar">
-                  </p-button>
-                  <p-button icon="pi pi-trash" 
-                            severity="danger" 
-                            [text]="true"
-                            pTooltip="Eliminar"
-                            (onClick)="confirmDelete(space)">
-                  </p-button>
+                <div>
+                  <p class="font-semibold text-gray-800">{{ space.name }}</p>
+                  @if (space.description) {
+                    <p class="text-sm text-gray-500 truncate max-w-[200px]">
+                      {{ space.description }}
+                    </p>
+                  }
                 </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    }
+              </div>
+            </td>
+
+            <!-- Capacidad -->
+            <td>
+              <div class="flex items-center gap-2">
+                <i class="pi pi-users text-gray-400"></i>
+                <span>{{ space.capacity }} personas</span>
+              </div>
+            </td>
+
+            <!-- Ubicación -->
+            <td>
+              @if (space.location) {
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-map-marker text-gray-400"></i>
+                  <span>{{ space.location }}</span>
+                </div>
+              } @else {
+                <span class="text-gray-400">-</span>
+              }
+            </td>
+
+            <!-- Estado -->
+            <td>
+              <p-tag 
+                [severity]="getStatusSeverity(space.is_active)"
+                [value]="getStatusText(space.is_active)"
+                [icon]="space.is_active ? 'pi pi-check' : 'pi pi-times'"
+              />
+            </td>
+
+            <!-- Acciones -->
+            <td>
+              <div class="flex gap-2">
+                <p-button 
+                  icon="pi pi-pencil" 
+                  [routerLink]="['/admin/spaces', space.id, 'edit']"
+                  severity="info" 
+                  [text]="true"
+                  pTooltip="Editar"
+                />
+                <p-button 
+                  icon="pi pi-eye" 
+                  [routerLink]="['/spaces', space.id]"
+                  severity="secondary" 
+                  [text]="true"
+                  pTooltip="Ver público"
+                />
+                <p-button 
+                  icon="pi pi-trash" 
+                  severity="danger" 
+                  [text]="true"
+                  pTooltip="Eliminar"
+                  (onClick)="confirmDelete(space)"
+                />
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td [colSpan]="columns.length" class="text-center py-12">
+              <div class="text-gray-500">
+                <i class="pi pi-inbox text-4xl mb-4"></i>
+                <p class="text-lg font-medium">No hay espacios registrados</p>
+                <p class="text-sm mb-4">Comienza creando tu primer espacio</p>
+                <p-button 
+                  label="Crear Espacio" 
+                  icon="pi pi-plus"
+                  routerLink="/admin/spaces/new"
+                />
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Estadísticas rápidas -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+      <div class="bg-white rounded-lg shadow p-6 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+          <i class="pi pi-building text-2xl text-blue-600"></i>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-gray-800">{{ spaces().length }}</p>
+          <p class="text-gray-500 text-sm">Total Espacios</p>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow p-6 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+          <i class="pi pi-check text-2xl text-green-600"></i>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-gray-800">{{ getActiveCount() }}</p>
+          <p class="text-gray-500 text-sm">Activos</p>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow p-6 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+          <i class="pi pi-times text-2xl text-red-600"></i>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-gray-800">{{ getInactiveCount() }}</p>
+          <p class="text-gray-500 text-sm">Inactivos</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 

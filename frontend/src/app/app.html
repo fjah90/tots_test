@@ -4,11 +4,20 @@
     <div class="flex justify-between h-16">
       <!-- Logo y links principales -->
       <div class="flex items-center gap-8">
+        <!-- Mobile menu button -->
+        <button 
+          class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          (click)="toggleMobileMenu()"
+          aria-label="Abrir menú">
+          <i class="pi pi-bars text-xl text-gray-600"></i>
+        </button>
+
         <a routerLink="/" class="flex items-center gap-2 text-xl font-bold text-primary">
           <i class="pi pi-building text-2xl"></i>
           <span class="hidden sm:inline">Reserva de Espacios</span>
         </a>
         
+        <!-- Desktop Navigation -->
         <div class="hidden md:flex items-center gap-4">
           <a routerLink="/spaces" 
              routerLinkActive="text-primary font-semibold"
@@ -18,7 +27,7 @@
           </a>
           
           @if (isAuthenticated()) {
-            <a routerLink="/reservations" 
+            <a routerLink="/my-reservations" 
                routerLinkActive="text-primary font-semibold"
                class="text-gray-600 hover:text-primary transition-colors">
               <i class="pi pi-calendar mr-1"></i>
@@ -31,20 +40,20 @@
                routerLinkActive="text-primary font-semibold"
                class="text-gray-600 hover:text-primary transition-colors">
               <i class="pi pi-cog mr-1"></i>
-              Administración
+              Admin Panel
             </a>
           }
         </div>
       </div>
 
-      <!-- Auth buttons -->
+      <!-- Auth buttons - Desktop -->
       <div class="flex items-center gap-4">
         @if (isAuthenticated()) {
-          <div class="flex items-center gap-3">
-            <span class="hidden sm:inline text-gray-600">
+          <div class="hidden md:flex items-center gap-3">
+            <span class="text-gray-600">
               {{ currentUser()?.name }}
             </span>
-            <p-avatar [label]="currentUser()?.name?.charAt(0) || 'U'" 
+            <p-avatar [label]="currentUser()?.name?.charAt(0)?.toUpperCase() || 'U'" 
                       shape="circle"
                       styleClass="bg-primary text-white">
             </p-avatar>
@@ -55,17 +64,33 @@
                       (onClick)="logout()">
             </p-button>
           </div>
+          <!-- Mobile: Solo avatar -->
+          <div class="md:hidden">
+            <p-avatar [label]="currentUser()?.name?.charAt(0)?.toUpperCase() || 'U'" 
+                      shape="circle"
+                      styleClass="bg-primary text-white cursor-pointer"
+                      (click)="toggleMobileMenu()">
+            </p-avatar>
+          </div>
         } @else {
-          <a routerLink="/auth/login">
+          <a routerLink="/login" class="hidden md:inline">
             <p-button label="Iniciar Sesión" 
                       icon="pi pi-sign-in"
                       severity="secondary"
                       [outlined]="true">
             </p-button>
           </a>
-          <a routerLink="/auth/register" class="hidden sm:inline">
+          <a routerLink="/register" class="hidden md:inline">
             <p-button label="Registrarse" 
                       icon="pi pi-user-plus">
+            </p-button>
+          </a>
+          <!-- Mobile: Icono login -->
+          <a routerLink="/login" class="md:hidden">
+            <p-button icon="pi pi-sign-in" 
+                      severity="secondary"
+                      [rounded]="true"
+                      [text]="true">
             </p-button>
           </a>
         }
@@ -73,6 +98,103 @@
     </div>
   </nav>
 </header>
+
+<!-- Mobile Drawer Menu -->
+<p-drawer [(visible)]="mobileMenuVisible" 
+          [showCloseIcon]="true"
+          styleClass="w-72">
+  <ng-template #header>
+    <div class="flex items-center gap-3">
+      <i class="pi pi-building text-2xl text-primary"></i>
+      <span class="font-bold text-lg">Menú</span>
+    </div>
+  </ng-template>
+
+  <div class="flex flex-col gap-2 mt-4">
+    <!-- User info si está autenticado -->
+    @if (isAuthenticated()) {
+      <div class="bg-gray-50 rounded-lg p-4 mb-4 flex items-center gap-3">
+        <p-avatar [label]="currentUser()?.name?.charAt(0)?.toUpperCase() || 'U'" 
+                  shape="circle"
+                  size="large"
+                  styleClass="bg-primary text-white">
+        </p-avatar>
+        <div>
+          <p class="font-semibold text-gray-800">{{ currentUser()?.name }}</p>
+          <p class="text-sm text-gray-500">{{ currentUser()?.email }}</p>
+        </div>
+      </div>
+    }
+
+    <!-- Navigation Links -->
+    <a routerLink="/spaces" 
+       (click)="closeMobileMenu()"
+       class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-gray-700">
+      <i class="pi pi-th-large text-xl"></i>
+      <span>Espacios</span>
+    </a>
+
+    @if (isAuthenticated()) {
+      <a routerLink="/my-reservations" 
+         (click)="closeMobileMenu()"
+         class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-gray-700">
+        <i class="pi pi-calendar text-xl"></i>
+        <span>Mis Reservaciones</span>
+      </a>
+    }
+
+    @if (isAdmin()) {
+      <div class="border-t my-2"></div>
+      <p class="text-xs text-gray-400 uppercase px-3">Administración</p>
+      
+      <a routerLink="/admin/spaces" 
+         (click)="closeMobileMenu()"
+         class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-gray-700">
+        <i class="pi pi-building text-xl"></i>
+        <span>Gestionar Espacios</span>
+      </a>
+      
+      <a routerLink="/admin/reservations" 
+         (click)="closeMobileMenu()"
+         class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-gray-700">
+        <i class="pi pi-list text-xl"></i>
+        <span>Gestionar Reservaciones</span>
+      </a>
+      
+      <a routerLink="/admin/stats" 
+         (click)="closeMobileMenu()"
+         class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-gray-700">
+        <i class="pi pi-chart-bar text-xl"></i>
+        <span>Estadísticas</span>
+      </a>
+    }
+
+    <div class="border-t my-2"></div>
+
+    <!-- Auth Actions -->
+    @if (isAuthenticated()) {
+      <button 
+        (click)="logout()"
+        class="flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 transition-colors text-red-600 w-full text-left">
+        <i class="pi pi-sign-out text-xl"></i>
+        <span>Cerrar Sesión</span>
+      </button>
+    } @else {
+      <a routerLink="/login" 
+         (click)="closeMobileMenu()"
+         class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors text-gray-700">
+        <i class="pi pi-sign-in text-xl"></i>
+        <span>Iniciar Sesión</span>
+      </a>
+      <a routerLink="/register" 
+         (click)="closeMobileMenu()"
+         class="flex items-center gap-3 p-3 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors">
+        <i class="pi pi-user-plus text-xl"></i>
+        <span>Crear Cuenta</span>
+      </a>
+    }
+  </div>
+</p-drawer>
 
 <!-- Main Content -->
 <main class="min-h-[calc(100vh-4rem)]">

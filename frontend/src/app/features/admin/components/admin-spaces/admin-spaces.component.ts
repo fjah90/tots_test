@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -9,18 +9,21 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmationService, MessageService } from 'primeng/api';
-
-// MC-Table de @matiascamiletti/mc-kit
-// NOTA: Simularemos el componente ya que es una librería externa
-// En producción, importar: import { McTableComponent, McTableColumn } from '@matiascamiletti/mc-kit';
 
 import { SpacesService } from '../../../../core/services/spaces.service';
 import { Space } from '../../../../shared/interfaces';
 
 /**
- * Definición de columna para MC-Table
- * Basado en la documentación de @matiascamiletti/mc-kit
+ * Definición de columna para MC-Table / p-table
+ * Compatible con @matiascamiletti/mc-kit cuando esté disponible
+ * 
+ * Para migrar a MC-Table:
+ * 1. Instalar: pnpm add @matiascamiletti/mc-kit
+ * 2. Importar: import { McTableComponent, McTableColumn } from '@matiascamiletti/mc-kit';
+ * 3. Reemplazar <p-table> por <mc-table [data]="spaces()" [columns]="columns">
  */
 export interface McTableColumn {
   field: string;
@@ -42,7 +45,8 @@ export interface McTableColumn {
     TagModule,
     ConfirmDialogModule,
     ToastModule,
-    // McTableComponent - Comentado hasta instalar @matiascamiletti/mc-kit
+    TableModule,
+    TooltipModule
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './admin-spaces.component.html',
@@ -57,9 +61,13 @@ export class AdminSpacesComponent implements OnInit {
   loading = signal(false);
   searchTerm = signal('');
 
+  // Computed para estadísticas
+  activeCount = computed(() => this.spaces().filter(s => s.is_active).length);
+  inactiveCount = computed(() => this.spaces().filter(s => !s.is_active).length);
+
   /**
-   * Configuración de columnas para MC-Table
-   * @matiascamiletti/mc-kit usa esta estructura para definir columnas
+   * Configuración de columnas para MC-Table / p-table
+   * Esta estructura es compatible con @matiascamiletti/mc-kit
    */
   columns: McTableColumn[] = [
     { 
@@ -100,9 +108,6 @@ export class AdminSpacesComponent implements OnInit {
     this.loadSpaces();
   }
 
-  /**
-   * Cargar espacios desde el API
-   */
   loadSpaces(): void {
     this.loading.set(true);
     this.spacesService.getSpaces().subscribe({
@@ -121,9 +126,6 @@ export class AdminSpacesComponent implements OnInit {
     });
   }
 
-  /**
-   * Buscar espacios por nombre
-   */
   onSearch(): void {
     const search = this.searchTerm();
     this.spacesService.getSpaces({ search }).subscribe({
@@ -131,9 +133,6 @@ export class AdminSpacesComponent implements OnInit {
     });
   }
 
-  /**
-   * Confirmar eliminación de espacio
-   */
   confirmDelete(space: Space): void {
     this.confirmationService.confirm({
       message: `¿Está seguro de eliminar el espacio "${space.name}"?`,
@@ -141,13 +140,11 @@ export class AdminSpacesComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Sí, eliminar',
       rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.deleteSpace(space.id)
     });
   }
 
-  /**
-   * Eliminar espacio
-   */
   private deleteSpace(id: number): void {
     this.spacesService.deleteSpace(id).subscribe({
       next: () => {
@@ -168,24 +165,23 @@ export class AdminSpacesComponent implements OnInit {
     });
   }
 
-  /**
-   * Handler para selección de fila en MC-Table
-   */
-  onRowSelect(event: { data: Space }): void {
+  onRowSelect(event: any): void {
     console.log('Espacio seleccionado:', event.data);
   }
 
-  /**
-   * Obtener severidad del tag según estado
-   */
   getStatusSeverity(isActive: boolean): 'success' | 'danger' {
     return isActive ? 'success' : 'danger';
   }
 
-  /**
-   * Obtener texto del estado
-   */
   getStatusText(isActive: boolean): string {
     return isActive ? 'Activo' : 'Inactivo';
+  }
+
+  getActiveCount(): number {
+    return this.activeCount();
+  }
+
+  getInactiveCount(): number {
+    return this.inactiveCount();
   }
 }
