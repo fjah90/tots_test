@@ -1,6 +1,6 @@
 <p-toast></p-toast>
 
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
   <!-- Header Section -->
   <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white py-12 px-6">
     <div class="max-w-7xl mx-auto">
@@ -11,12 +11,12 @@
 
   <!-- Filters Section -->
   <div class="max-w-7xl mx-auto px-6 -mt-6">
-    <div class="bg-white rounded-xl shadow-lg p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         
         <!-- Búsqueda por texto -->
         <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-gray-700">Buscar</label>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Buscar</label>
           <input 
             type="text" 
             pInputText 
@@ -29,7 +29,7 @@
 
         <!-- Filtro por fecha -->
         <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-gray-700">Fecha de Reserva</label>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Reserva</label>
           <p-datepicker 
             [ngModel]="selectedDate()"
             (ngModelChange)="selectedDate.set($event)"
@@ -43,7 +43,7 @@
 
         <!-- Filtro por capacidad -->
         <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-gray-700">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
             Capacidad: {{ capacityRange()[0] }} - {{ capacityRange()[1] === 100 ? '100+' : capacityRange()[1] }} personas
           </label>
           <p-slider 
@@ -72,7 +72,7 @@
       <!-- Resultados count -->
       <p-divider />
       <div class="flex justify-between items-center">
-        <span class="text-gray-600">
+        <span class="text-gray-600 dark:text-gray-400">
           <strong>{{ filteredSpaces().length }}</strong> espacios encontrados
         </span>
       </div>
@@ -87,9 +87,9 @@
       </div>
     } @else if (filteredSpaces().length === 0) {
       <div class="text-center py-20">
-        <i class="pi pi-inbox text-6xl text-gray-300 mb-4"></i>
-        <h3 class="text-xl font-semibold text-gray-600 mb-2">No se encontraron espacios</h3>
-        <p class="text-gray-500">Intenta ajustar los filtros de búsqueda</p>
+        <i class="pi pi-inbox text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">No se encontraron espacios</h3>
+        <p class="text-gray-500 dark:text-gray-500">Intenta ajustar los filtros de búsqueda</p>
         <p-button 
           label="Limpiar Filtros" 
           icon="pi pi-refresh" 
@@ -100,38 +100,60 @@
     } @else {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @for (space of filteredSpaces(); track space.id) {
-          <p-card styleClass="hover:shadow-xl transition-shadow duration-300">
-            <!-- Image -->
+          <p-card styleClass="hover:shadow-xl transition-shadow duration-300 dark:bg-gray-800">
+            <!-- Image Carousel or Single Image -->
             <ng-template #header>
-              <div class="relative">
-                @if (space.image_url) {
+              <div class="relative overflow-hidden">
+                @if (getSpaceImages(space).length > 1) {
+                  <!-- Multiple images: Carousel -->
+                  <div class="space-image-carousel">
+                    <p-carousel 
+                      [value]="getSpaceImages(space)" 
+                      [numVisible]="1" 
+                      [numScroll]="1"
+                      [circular]="true"
+                      [showNavigators]="true"
+                      [showIndicators]="true"
+                      [autoplayInterval]="0">
+                      <ng-template #item let-imageUrl>
+                        <img 
+                          [src]="imageUrl" 
+                          [alt]="space.name"
+                          class="w-full h-48 object-cover block"
+                        />
+                      </ng-template>
+                    </p-carousel>
+                  </div>
+                } @else if (getSpaceImages(space).length === 1) {
+                  <!-- Single image -->
                   <img 
-                    [src]="space.image_url" 
+                    [src]="getSpaceImages(space)[0]" 
                     [alt]="space.name"
-                    class="w-full h-48 object-cover"
+                    class="w-full h-48 object-cover block"
                   />
                 } @else {
-                  <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
+                  <!-- No image: placeholder -->
+                  <div class="w-full h-48 bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center">
                     <i class="pi pi-building text-white text-5xl"></i>
                   </div>
                 }
                 <p-tag 
                   [value]="space.is_active ? 'Disponible' : 'No Disponible'"
                   [severity]="space.is_active ? 'success' : 'danger'"
-                  styleClass="absolute top-3 right-3"
+                  styleClass="absolute top-3 right-3 z-10"
                 />
               </div>
             </ng-template>
 
             <!-- Content -->
             <div class="space-y-3">
-              <h3 class="text-xl font-bold text-gray-800">{{ space.name }}</h3>
+              <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100">{{ space.name }}</h3>
               
               @if (space.description) {
-                <p class="text-gray-600 text-sm line-clamp-2">{{ space.description }}</p>
+                <p class="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">{{ space.description }}</p>
               }
 
-              <div class="flex flex-wrap gap-3 text-sm text-gray-500">
+              <div class="flex flex-wrap gap-3 text-sm text-gray-500 dark:text-gray-400">
                 <span class="flex items-center gap-1">
                   <i [class]="getCapacityIcon(space.capacity)"></i>
                   {{ space.capacity }} personas

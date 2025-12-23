@@ -41,7 +41,7 @@ import { Reservation } from '../../../../shared/interfaces';
     <p-toast></p-toast>
     <p-confirmDialog></p-confirmDialog>
 
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <!-- Header -->
       <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white py-10 px-6">
         <div class="max-w-7xl mx-auto">
@@ -55,7 +55,7 @@ import { Reservation } from '../../../../shared/interfaces';
           <!-- Filtros -->
           <div class="flex flex-wrap gap-4 mb-6">
             <div class="flex-1 min-w-[200px]">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Filtrar por estado</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filtrar por estado</label>
               <p-select 
                 [options]="statusOptions" 
                 [(ngModel)]="selectedStatus"
@@ -84,9 +84,9 @@ import { Reservation } from '../../../../shared/interfaces';
           } @else if (reservations().length === 0) {
             <!-- Empty state -->
             <div class="text-center py-16">
-              <i class="pi pi-calendar-times text-6xl text-gray-300 mb-4"></i>
-              <h3 class="text-xl font-semibold text-gray-600 mb-2">No tienes reservaciones</h3>
-              <p class="text-gray-500 mb-6">Aún no has realizado ninguna reservación de espacios</p>
+              <i class="pi pi-calendar-times text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+              <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">No tienes reservaciones</h3>
+              <p class="text-gray-500 dark:text-gray-500 mb-6">Aún no has realizado ninguna reservación de espacios</p>
               <p-button 
                 label="Explorar Espacios" 
                 icon="pi pi-search"

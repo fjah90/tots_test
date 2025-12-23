@@ -22,14 +22,101 @@
   
   .p-slider {
     .p-slider-range {
-      background: linear-gradient(90deg, #3b82f6, #6366f1);
+      background: linear-gradient(90deg, #2dd4bf, #14b8a6);
     }
     
     .p-slider-handle {
-      border-color: #3b82f6;
+      border-color: #2dd4bf;
       
       &:hover {
-        background: #3b82f6;
+        background: #2dd4bf;
+      }
+    }
+  }
+
+  // Carousel styles para las cards de espacios
+  .space-image-carousel {
+    position: relative;
+    overflow: hidden;
+    
+    .p-carousel {
+      // Remover padding por defecto del carousel
+      .p-carousel-content,
+      .p-carousel-container,
+      .p-carousel-viewport,
+      .p-carousel-item-list,
+      .p-carousel-item {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      
+      .p-carousel-item {
+        flex: 0 0 100% !important;
+        min-width: 100% !important;
+      }
+
+      // Navegadores del carousel - ocultos por defecto, visibles en hover
+      .p-carousel-prev,
+      .p-carousel-next {
+        position: absolute !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.5) !important;
+        color: #ffffff !important;
+        width: 2rem !important;
+        height: 2rem !important;
+        border-radius: 50% !important;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        
+        &:hover {
+          background: rgba(0, 0, 0, 0.8) !important;
+        }
+      }
+
+      .p-carousel-prev {
+        left: 0.5rem !important;
+      }
+
+      .p-carousel-next {
+        right: 0.5rem !important;
+      }
+
+      // Indicadores - ocultos por defecto
+      .p-carousel-indicators {
+        position: absolute !important;
+        bottom: 0.5rem !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        padding: 0.25rem 0.5rem !important;
+        margin: 0 !important;
+        background: transparent !important;
+        gap: 0.25rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+
+        .p-carousel-indicator {
+          button {
+            width: 0.5rem !important;
+            height: 0.5rem !important;
+            border-radius: 50% !important;
+            background: rgba(255, 255, 255, 0.5) !important;
+          }
+
+          &.p-carousel-indicator-active button {
+            background: #ffffff !important;
+          }
+        }
+      }
+    }
+
+    // Mostrar controles solo en hover sobre el contenedor
+    &:hover {
+      .p-carousel-prev,
+      .p-carousel-next,
+      .p-carousel-indicators {
+        opacity: 1;
       }
     }
   }

@@ -29,13 +29,13 @@ import { AuthService } from '../../../../core/services/auth.service';
     DividerModule
   ],
   template: `
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-400 to-teal-600 p-4">
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-400 to-teal-600 dark:from-gray-800 dark:to-gray-900 p-4 transition-colors">
       <p-card styleClass="w-full max-w-md shadow-2xl">
         <ng-template #header>
           <div class="text-center pt-6">
             <img src="logo.svg" alt="SpaceBook" class="h-12 mx-auto mb-4" />
-            <h1 class="text-2xl font-bold text-gray-800">Bienvenido</h1>
-            <p class="text-gray-600">Inicia sesión en tu cuenta</p>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Bienvenido</h1>
+            <p class="text-gray-600 dark:text-gray-400">Inicia sesión en tu cuenta</p>
           </div>
         </ng-template>
 
@@ -46,7 +46,7 @@ import { AuthService } from '../../../../core/services/auth.service';
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
           <!-- Email -->
           <div class="flex flex-col gap-2">
-            <label for="email" class="font-medium text-gray-700">Correo Electrónico</label>
+            <label for="email" class="font-medium text-gray-700 dark:text-gray-300">Correo Electrónico</label>
             <input 
               id="email"
               type="email" 
@@ -68,7 +68,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 
           <!-- Password -->
           <div class="flex flex-col gap-2">
-            <label for="password" class="font-medium text-gray-700">Contraseña</label>
+            <label for="password" class="font-medium text-gray-700 dark:text-gray-300">Contraseña</label>
             <p-password 
               id="password"
               formControlName="password"
@@ -95,7 +95,7 @@ import { AuthService } from '../../../../core/services/auth.service';
         </form>
 
         <p-divider align="center">
-          <span class="text-gray-500 text-sm">¿No tienes cuenta?</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm">¿No tienes cuenta?</span>
         </p-divider>
 
         <p-button 

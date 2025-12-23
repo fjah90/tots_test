@@ -9,6 +9,7 @@ export interface Space {
   location: string | null;
   amenities: string[] | null;
   image_url: string | null;
+  images: string[] | null;  // Array de URLs de imágenes para el carousel
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -25,5 +26,6 @@ export interface SpacePayload {
   location?: string;
   amenities?: string[];
   image_url?: string;
+  images?: string[];
   is_active?: boolean;
 }

@@ -13,6 +13,17 @@
   --primary-color-light: #5eead4;
   --brand-dark: #4b5563;
   --surface-ground: #f8fafc;
+  --surface-card: #ffffff;
+  --text-color: #1f2937;
+  --text-color-secondary: #6b7280;
+}
+
+/* Dark mode variables */
+.dark {
+  --surface-ground: #111827;
+  --surface-card: #1f2937;
+  --text-color: #f9fafb;
+  --text-color-secondary: #9ca3af;
 }
 
 /* Reset básico */
@@ -25,6 +36,8 @@ html, body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   background-color: var(--surface-ground);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Utilidades adicionales */
@@ -79,5 +92,114 @@ html, body {
   .p-drawer-header {
     background: #1f2937 !important;
     border-bottom: 1px solid #374151;
+  }
+}
+
+/* Dark mode - PrimeNG components */
+.dark {
+  .p-card {
+    background: var(--surface-card) !important;
+    color: var(--text-color) !important;
+    border-color: #374151 !important;
+  }
+
+  .p-datatable {
+    .p-datatable-thead > tr > th {
+      background: #1f2937 !important;
+      color: var(--text-color) !important;
+      border-color: #374151 !important;
+    }
+    .p-datatable-tbody > tr {
+      background: var(--surface-card) !important;
+      color: var(--text-color) !important;
+      border-color: #374151 !important;
+      
+      &:hover {
+        background: #374151 !important;
+      }
+    }
+  }
+
+  .p-inputtext, .p-select {
+    background: #374151 !important;
+    color: var(--text-color) !important;
+    border-color: #4b5563 !important;
+  }
+
+  .p-datepicker {
+    .p-datepicker-input {
+      background: #374151 !important;
+      color: var(--text-color) !important;
+      border-color: #4b5563 !important;
+      border-right: none !important;
+    }
+
+    .p-datepicker-dropdown {
+      border-color: #4b5563 !important;
+      border-left: none !important;
+    }
+  }
+
+  .p-select-panel {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+    
+    .p-select-option {
+      color: var(--text-color) !important;
+      
+      &:hover {
+        background: #374151 !important;
+      }
+      
+      &.p-select-option-selected {
+        background: var(--primary-color) !important;
+      }
+    }
+  }
+
+  .p-dialog {
+    .p-dialog-content {
+      background: var(--surface-card) !important;
+      color: var(--text-color) !important;
+    }
+    .p-dialog-header {
+      background: var(--surface-card) !important;
+      color: var(--text-color) !important;
+    }
+  }
+
+  .p-toast-message {
+    background: var(--surface-card) !important;
+  }
+
+  .p-divider {
+    border-color: #374151 !important;
+    
+    .p-divider-content {
+      background: var(--surface-card) !important;
+    }
+  }
+  
+  .p-paginator {
+    background: var(--surface-card) !important;
+    border-color: #374151 !important;
+  }
+
+  .p-carousel {
+    .p-carousel-prev,
+    .p-carousel-next {
+      background: rgba(55, 65, 81, 0.9) !important;
+      color: #f9fafb !important;
+      
+      &:hover {
+        background: #4b5563 !important;
+        color: var(--primary-color) !important;
+      }
+    }
+  }
+
+  .p-tag.p-tag-secondary {
+    background: #374151 !important;
+    color: #d1d5db !important;
   }
 }

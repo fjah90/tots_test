@@ -29,13 +29,13 @@ import { AuthService } from '../../../../core/services/auth.service';
     DividerModule
   ],
   template: `
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-600 to-gray-800 p-4">
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-600 to-gray-800 dark:from-gray-800 dark:to-gray-900 p-4 transition-colors">
       <p-card styleClass="w-full max-w-md shadow-2xl">
         <ng-template #header>
           <div class="text-center pt-6">
             <img src="logo.svg" alt="SpaceBook" class="h-12 mx-auto mb-4" />
-            <h1 class="text-2xl font-bold text-gray-800">Crear Cuenta</h1>
-            <p class="text-gray-600">Regístrate para reservar espacios</p>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Crear Cuenta</h1>
+            <p class="text-gray-600 dark:text-gray-400">Regístrate para reservar espacios</p>
           </div>
         </ng-template>
 
@@ -50,7 +50,7 @@ import { AuthService } from '../../../../core/services/auth.service';
         <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
           <!-- Nombre -->
           <div class="flex flex-col gap-2">
-            <label for="name" class="font-medium text-gray-700">Nombre Completo</label>
+            <label for="name" class="font-medium text-gray-700 dark:text-gray-300">Nombre Completo</label>
             <input 
               id="name"
               type="text" 
@@ -66,7 +66,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 
           <!-- Email -->
           <div class="flex flex-col gap-2">
-            <label for="email" class="font-medium text-gray-700">Correo Electrónico</label>
+            <label for="email" class="font-medium text-gray-700 dark:text-gray-300">Correo Electrónico</label>
             <input 
               id="email"
               type="email" 
@@ -88,7 +88,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 
           <!-- Password -->
           <div class="flex flex-col gap-2">
-            <label for="password" class="font-medium text-gray-700">Contraseña</label>
+            <label for="password" class="font-medium text-gray-700 dark:text-gray-300">Contraseña</label>
             <p-password 
               id="password"
               formControlName="password"
@@ -109,7 +109,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 
           <!-- Confirm Password -->
           <div class="flex flex-col gap-2">
-            <label for="password_confirmation" class="font-medium text-gray-700">Confirmar Contraseña</label>
+            <label for="password_confirmation" class="font-medium text-gray-700 dark:text-gray-300">Confirmar Contraseña</label>
             <p-password 
               id="password_confirmation"
               formControlName="password_confirmation"
@@ -142,7 +142,7 @@ import { AuthService } from '../../../../core/services/auth.service';
         </form>
 
         <p-divider align="center">
-          <span class="text-gray-500 text-sm">¿Ya tienes cuenta?</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm">¿Ya tienes cuenta?</span>
         </p-divider>
 
         <p-button 

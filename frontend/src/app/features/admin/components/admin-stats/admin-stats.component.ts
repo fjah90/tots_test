@@ -45,7 +45,7 @@ interface Stats {
   template: `
     <p-toast></p-toast>
 
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <!-- Header -->
       <div class="bg-gradient-to-r from-teal-600 to-cyan-600 text-white py-8 px-6">
         <div class="max-w-7xl mx-auto">
@@ -56,56 +56,56 @@ interface Stats {
 
       <div class="max-w-7xl mx-auto px-6 py-8 -mt-6">
         @if (loading()) {
-          <div class="flex justify-center items-center py-20 bg-white rounded-lg shadow">
+          <div class="flex justify-center items-center py-20 bg-white dark:bg-gray-800 rounded-lg shadow transition-colors">
             <p-progressSpinner strokeWidth="4" />
           </div>
         } @else {
           <!-- KPIs principales -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-gray-500 text-sm uppercase font-medium">Espacios</p>
-                  <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats()?.total_spaces || 0 }}</p>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm uppercase font-medium">Espacios</p>
+                  <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-1">{{ stats()?.total_spaces || 0 }}</p>
                 </div>
-                <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center">
-                  <i class="pi pi-building text-2xl text-blue-600"></i>
+                <div class="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <i class="pi pi-building text-2xl text-blue-600 dark:text-blue-400"></i>
                 </div>
               </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-gray-500 text-sm uppercase font-medium">Reservaciones</p>
-                  <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats()?.total_reservations || 0 }}</p>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm uppercase font-medium">Reservaciones</p>
+                  <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-1">{{ stats()?.total_reservations || 0 }}</p>
                 </div>
-                <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
-                  <i class="pi pi-calendar text-2xl text-green-600"></i>
+                <div class="w-14 h-14 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                  <i class="pi pi-calendar text-2xl text-green-600 dark:text-green-400"></i>
                 </div>
               </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-gray-500 text-sm uppercase font-medium">Usuarios</p>
-                  <p class="text-3xl font-bold text-gray-800 mt-1">{{ stats()?.total_users || 0 }}</p>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm uppercase font-medium">Usuarios</p>
+                  <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-1">{{ stats()?.total_users || 0 }}</p>
                 </div>
-                <div class="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center">
-                  <i class="pi pi-users text-2xl text-purple-600"></i>
+                <div class="w-14 h-14 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                  <i class="pi pi-users text-2xl text-purple-600 dark:text-purple-400"></i>
                 </div>
               </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-gray-500 text-sm uppercase font-medium">Tasa de Confirmación</p>
-                  <p class="text-3xl font-bold text-gray-800 mt-1">{{ confirmationRate() }}%</p>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm uppercase font-medium">Tasa de Confirmación</p>
+                  <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-1">{{ confirmationRate() }}%</p>
                 </div>
-                <div class="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center">
-                  <i class="pi pi-check-circle text-2xl text-teal-600"></i>
+                <div class="w-14 h-14 rounded-full bg-teal-100 dark:bg-teal-900 flex items-center justify-center">
+                  <i class="pi pi-check-circle text-2xl text-teal-600 dark:text-teal-400"></i>
                 </div>
               </div>
             </div>
@@ -117,14 +117,14 @@ interface Stats {
             <p-card>
               <ng-template #header>
                 <div class="p-4 pb-0">
-                  <h3 class="text-lg font-semibold text-gray-800">Reservaciones por Estado</h3>
+                  <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Reservaciones por Estado</h3>
                 </div>
               </ng-template>
               <div class="h-64 flex items-center justify-center">
                 @if (statusChartData) {
                   <p-chart type="doughnut" [data]="statusChartData" [options]="chartOptions" />
                 } @else {
-                  <p class="text-gray-500">Sin datos disponibles</p>
+                  <p class="text-gray-500 dark:text-gray-400">Sin datos disponibles</p>
                 }
               </div>
             </p-card>
@@ -133,14 +133,14 @@ interface Stats {
             <p-card>
               <ng-template #header>
                 <div class="p-4 pb-0">
-                  <h3 class="text-lg font-semibold text-gray-800">Reservaciones por Mes</h3>
+                  <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Reservaciones por Mes</h3>
                 </div>
               </ng-template>
               <div class="h-64">
                 @if (monthlyChartData) {
                   <p-chart type="bar" [data]="monthlyChartData" [options]="barChartOptions" />
                 } @else {
-                  <p class="text-gray-500 text-center py-20">Sin datos disponibles</p>
+                  <p class="text-gray-500 dark:text-gray-400 text-center py-20">Sin datos disponibles</p>
                 }
               </div>
             </p-card>
@@ -150,7 +150,7 @@ interface Stats {
           <p-card>
             <ng-template #header>
               <div class="p-4 pb-0">
-                <h3 class="text-lg font-semibold text-gray-800">Espacios Más Reservados</h3>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Espacios Más Reservados</h3>
               </div>
             </ng-template>
             
@@ -166,17 +166,17 @@ interface Stats {
                       {{ i + 1 }}
                     </div>
                     <div class="flex-1">
-                      <p class="font-medium text-gray-800">{{ space.name }}</p>
+                      <p class="font-medium text-gray-800 dark:text-gray-100">{{ space.name }}</p>
                     </div>
                     <div class="text-right">
                       <p class="text-2xl font-bold text-primary">{{ space.reservations_count }}</p>
-                      <p class="text-xs text-gray-500">reservaciones</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">reservaciones</p>
                     </div>
                   </div>
                 }
               </div>
             } @else {
-              <p class="text-gray-500 text-center py-8">No hay datos de espacios</p>
+              <p class="text-gray-500 dark:text-gray-400 text-center py-8">No hay datos de espacios</p>
             }
           </p-card>
         }

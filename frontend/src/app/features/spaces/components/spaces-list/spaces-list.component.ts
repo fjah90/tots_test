@@ -14,6 +14,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DividerModule } from 'primeng/divider';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
+import { CarouselModule } from 'primeng/carousel';
 import { MessageService } from 'primeng/api';
 
 // Services & Interfaces
@@ -40,6 +41,7 @@ import { ReservationFormComponent } from '../reservation-form/reservation-form.c
     DividerModule,
     DialogModule,
     ToastModule,
+    CarouselModule,
     // Custom
     ReservationFormComponent
   ],
@@ -156,5 +158,26 @@ export class SpacesListComponent implements OnInit {
     if (capacity <= 5) return 'pi pi-user';
     if (capacity <= 20) return 'pi pi-users';
     return 'pi pi-building';
+  }
+
+  /**
+   * Obtener imágenes del espacio para el carousel
+   * Prioriza el array 'images', luego 'image_url', o retorna array vacío
+   */
+  getSpaceImages(space: Space): string[] {
+    if (space.images && space.images.length > 0) {
+      return space.images;
+    }
+    if (space.image_url) {
+      return [space.image_url];
+    }
+    return [];
+  }
+
+  /**
+   * Verificar si el espacio tiene múltiples imágenes
+   */
+  hasMultipleImages(space: Space): boolean {
+    return this.getSpaceImages(space).length > 1;
   }
 }
