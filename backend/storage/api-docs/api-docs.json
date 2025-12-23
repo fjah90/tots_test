@@ -1,0 +1,1325 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Space Reservation API",
+        "description": "API REST para sistema de reserva de espacios para eventos. Permite a los usuarios explorar espacios disponibles, hacer reservas y gestionarlas.",
+        "contact": {
+            "name": "Soporte API",
+            "email": "admin@espacios.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api",
+            "description": "Servidor de desarrollo"
+        }
+    ],
+    "paths": {
+        "/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registrar nuevo usuario",
+                "operationId": "5d4fa5d5607ed675ba93907e1fc94534",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Juan Pérez"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "juan@ejemplo.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario registrado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuario registrado exitosamente"
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Juan Pérez"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "juan@ejemplo.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "user"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "1|abc123..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Iniciar sesión",
+                "operationId": "67d6d0fdd54fba132e1b6f55ca254183",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@espacios.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login exitoso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login exitoso"
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Admin User"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "admin@espacios.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "admin"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "1|abc123..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciales inválidas"
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Cerrar sesión",
+                "operationId": "28d48c13fca984400ac8de99f54ee13a",
+                "responses": {
+                    "200": {
+                        "description": "Sesión cerrada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sesión cerrada exitosamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/user": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Obtener usuario autenticado",
+                "operationId": "2baab1eeb5fd49516237a38da22e7a07",
+                "responses": {
+                    "200": {
+                        "description": "Información del usuario",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Admin User"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "admin@espacios.com"
+                                        },
+                                        "role": {
+                                            "type": "string",
+                                            "example": "admin"
+                                        },
+                                        "email_verified_at": {
+                                            "type": "string",
+                                            "format": "datetime"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "datetime"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "datetime"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reservations": {
+            "get": {
+                "tags": [
+                    "Reservations"
+                ],
+                "summary": "Listar reservaciones del usuario autenticado",
+                "operationId": "c0ead7ee8da750a341eeff509f3af8b9",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrar por estado",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "confirmed",
+                                "cancelled",
+                                "pending"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "description": "Desde fecha (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "description": "Hasta fecha (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de reservaciones",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Reservation"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Reservations"
+                ],
+                "summary": "Crear nueva reservación",
+                "operationId": "ab4d7952bb3ef1ccd7724e8d862b034b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "space_id",
+                                    "start_time",
+                                    "end_time"
+                                ],
+                                "properties": {
+                                    "space_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "format": "datetime",
+                                        "example": "2025-01-20 09:00:00"
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "format": "datetime",
+                                        "example": "2025-01-20 12:00:00"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "Reunión de equipo de desarrollo"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Reservación creada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Reservación creada exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Reservation"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "409": {
+                        "description": "Conflicto - El espacio no está disponible"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reservations/{id}": {
+            "get": {
+                "tags": [
+                    "Reservations"
+                ],
+                "summary": "Obtener detalle de una reservación",
+                "operationId": "49499ada3f4d3680e147782d33573252",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la reservación",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalle de la reservación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Reservation"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Reservación no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Reservations"
+                ],
+                "summary": "Actualizar reservación",
+                "operationId": "4a219e5cfd9760d12da084929201d042",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la reservación",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "start_time": {
+                                        "type": "string",
+                                        "format": "datetime"
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "format": "datetime"
+                                    },
+                                    "notes": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "confirmed",
+                                            "cancelled",
+                                            "pending"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Reservación actualizada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Reservación actualizada exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Reservation"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Reservación no encontrada"
+                    },
+                    "409": {
+                        "description": "Conflicto de horario"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Reservations"
+                ],
+                "summary": "Cancelar/eliminar reservación",
+                "operationId": "b97e0df7036fa97413d6b819cf61a11e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la reservación",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reservación eliminada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Reservación eliminada exitosamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Reservación no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reservations/{id}/cancel": {
+            "patch": {
+                "tags": [
+                    "Reservations"
+                ],
+                "summary": "Cancelar una reservación (cambiar estado)",
+                "operationId": "70237665fb6d7ef14914c29ac4190d5d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la reservación",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reservación cancelada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Reservación cancelada exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Reservation"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Reservación no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/spaces": {
+            "get": {
+                "tags": [
+                    "Spaces"
+                ],
+                "summary": "Listar todos los espacios",
+                "operationId": "4d73a69d5f22f345d4f45ba91c45f052",
+                "parameters": [
+                    {
+                        "name": "capacity_min",
+                        "in": "query",
+                        "description": "Capacidad mínima",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "capacity_max",
+                        "in": "query",
+                        "description": "Capacidad máxima",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "is_active",
+                        "in": "query",
+                        "description": "Filtrar por estado activo",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Buscar por nombre o ubicación",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de espacios",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Space"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Spaces"
+                ],
+                "summary": "Crear nuevo espacio (Solo Admin)",
+                "operationId": "26f76a00e23873c125497f7651535f8a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "capacity",
+                                    "location"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Nueva Sala de Juntas"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Sala moderna con equipamiento"
+                                    },
+                                    "capacity": {
+                                        "type": "integer",
+                                        "example": 15
+                                    },
+                                    "location": {
+                                        "type": "string",
+                                        "example": "Edificio D - Piso 1"
+                                    },
+                                    "amenities": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "WiFi",
+                                            "Proyector"
+                                        ]
+                                    },
+                                    "image_url": {
+                                        "type": "string",
+                                        "example": "https://example.com/sala.jpg"
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Espacio creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Espacio creado exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Space"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado (solo admin)"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/spaces/{id}": {
+            "get": {
+                "tags": [
+                    "Spaces"
+                ],
+                "summary": "Obtener detalle de un espacio",
+                "operationId": "51263b3f4e4a7c14833461ffcba86833",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del espacio",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalle del espacio",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Space"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Espacio no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Spaces"
+                ],
+                "summary": "Actualizar espacio (Solo Admin)",
+                "operationId": "a2d349d3652a2f3082fc09d61880814e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del espacio",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Sala Actualizada"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "capacity": {
+                                        "type": "integer",
+                                        "example": 20
+                                    },
+                                    "location": {
+                                        "type": "string"
+                                    },
+                                    "amenities": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "image_url": {
+                                        "type": "string"
+                                    },
+                                    "is_active": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Espacio actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Espacio actualizado exitosamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Space"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Espacio no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Spaces"
+                ],
+                "summary": "Eliminar espacio (Solo Admin)",
+                "operationId": "6b10994fdab655b7e3083432631bab0d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del espacio",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Espacio eliminado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Espacio eliminado exitosamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Espacio no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/spaces/{id}/availability": {
+            "get": {
+                "tags": [
+                    "Spaces"
+                ],
+                "summary": "Verificar disponibilidad de un espacio",
+                "operationId": "14637e7343c2aeb5cb33e06b405b09cd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del espacio",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "start_time",
+                        "in": "query",
+                        "description": "Fecha y hora de inicio (Y-m-d H:i:s)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "datetime"
+                        }
+                    },
+                    {
+                        "name": "end_time",
+                        "in": "query",
+                        "description": "Fecha y hora de fin (Y-m-d H:i:s)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "datetime"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Estado de disponibilidad",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "available": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "space_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "start_time": {
+                                            "type": "string",
+                                            "example": "2025-01-15 09:00:00"
+                                        },
+                                        "end_time": {
+                                            "type": "string",
+                                            "example": "2025-01-15 12:00:00"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Espacio no encontrado"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Juan Pérez"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "juan@ejemplo.com"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "admin",
+                            "user"
+                        ],
+                        "example": "user"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2025-01-01T00:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2025-01-01T00:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "Space": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Sala de Conferencias Principal"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Sala amplia con capacidad para 30 personas"
+                    },
+                    "capacity": {
+                        "type": "integer",
+                        "example": 30
+                    },
+                    "location": {
+                        "type": "string",
+                        "example": "Edificio A - Piso 2"
+                    },
+                    "amenities": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "WiFi",
+                            "Proyector",
+                            "Pizarra",
+                            "Aire Acondicionado"
+                        ]
+                    },
+                    "image_url": {
+                        "type": "string",
+                        "example": "https://example.com/sala.jpg",
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "datetime"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "datetime"
+                    }
+                },
+                "type": "object"
+            },
+            "Reservation": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "space_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "start_time": {
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2025-01-20 09:00:00"
+                    },
+                    "end_time": {
+                        "type": "string",
+                        "format": "datetime",
+                        "example": "2025-01-20 12:00:00"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "confirmed",
+                            "cancelled",
+                            "pending"
+                        ],
+                        "example": "confirmed"
+                    },
+                    "notes": {
+                        "type": "string",
+                        "example": "Reunión de equipo",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "datetime"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "datetime"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    },
+                    "space": {
+                        "$ref": "#/components/schemas/Space"
+                    }
+                },
+                "type": "object"
+            },
+            "LoginRequest": {
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "admin@espacios.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "password123"
+                    }
+                },
+                "type": "object"
+            },
+            "RegisterRequest": {
+                "required": [
+                    "name",
+                    "email",
+                    "password",
+                    "password_confirmation"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Nuevo Usuario"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "nuevo@ejemplo.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "minLength": 8,
+                        "example": "password123"
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "example": "password123"
+                    }
+                },
+                "type": "object"
+            },
+            "AuthResponse": {
+                "properties": {
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    },
+                    "token": {
+                        "type": "string",
+                        "example": "1|abcdefghijklmnopqrstuvwxyz123456"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Error message"
+                    },
+                    "errors": {
+                        "type": "object",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Ingrese el token de autenticación",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Endpoints de autenticación"
+        },
+        {
+            "name": "Spaces",
+            "description": "CRUD de espacios"
+        },
+        {
+            "name": "Reservations",
+            "description": "CRUD de reservas"
+        }
+    ]
+}
