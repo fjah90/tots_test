@@ -185,19 +185,6 @@ html, body {
     border-color: #374151 !important;
   }
 
-  .p-carousel {
-    .p-carousel-prev,
-    .p-carousel-next {
-      background: rgba(55, 65, 81, 0.9) !important;
-      color: #f9fafb !important;
-      
-      &:hover {
-        background: #4b5563 !important;
-        color: var(--primary-color) !important;
-      }
-    }
-  }
-
   .p-tag.p-tag-secondary {
     background: #374151 !important;
     color: #d1d5db !important;
