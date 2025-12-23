@@ -1,8 +1,10 @@
-/* TailwindCSS v4 - usando @use en lugar de @import */
-@use "tailwindcss";
+/* TailwindCSS v3 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* PrimeNG Icons */
-@use "primeicons/primeicons.css";
+@import "primeicons/primeicons.css";
 
 /* Variables globales */
 :root {
