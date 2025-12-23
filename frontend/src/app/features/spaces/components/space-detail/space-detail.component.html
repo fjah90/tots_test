@@ -1,0 +1,234 @@
+<p-toast></p-toast>
+
+<div class="min-h-screen bg-gray-50">
+  @if (loading()) {
+    <div class="flex justify-center items-center py-20">
+      <p-progressSpinner strokeWidth="4" />
+    </div>
+  } @else if (space()) {
+    <!-- Header con imagen -->
+    <div class="relative">
+      @if (space()!.image_url) {
+        <img 
+          [src]="space()!.image_url" 
+          [alt]="space()!.name"
+          class="w-full h-64 object-cover"
+        />
+      } @else {
+        <div class="w-full h-64 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+      }
+      <div class="absolute inset-0 bg-black/40"></div>
+      
+      <!-- Back button -->
+      <div class="absolute top-4 left-4">
+        <p-button 
+          icon="pi pi-arrow-left" 
+          label="Volver"
+          [rounded]="true"
+          severity="secondary"
+          routerLink="/spaces"
+        />
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="max-w-6xl mx-auto px-6 -mt-20 relative z-10 pb-10">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Main Info Card -->
+        <div class="lg:col-span-2">
+          <p-card>
+            <div class="space-y-6">
+              <!-- Title & Status -->
+              <div class="flex items-start justify-between">
+                <div>
+                  <h1 class="text-3xl font-bold text-gray-800">{{ space()!.name }}</h1>
+                  @if (space()!.location) {
+                    <p class="text-gray-600 flex items-center gap-2 mt-2">
+                      <i class="pi pi-map-marker"></i>
+                      {{ space()!.location }}
+                    </p>
+                  }
+                </div>
+                <p-tag 
+                  [value]="space()!.is_active ? 'Disponible' : 'No Disponible'"
+                  [severity]="space()!.is_active ? 'success' : 'danger'"
+                />
+              </div>
+
+              <p-divider />
+
+              <!-- Description -->
+              @if (space()!.description) {
+                <div>
+                  <h3 class="font-semibold text-gray-700 mb-2">Descripción</h3>
+                  <p class="text-gray-600">{{ space()!.description }}</p>
+                </div>
+              }
+
+              <!-- Details Grid -->
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="bg-blue-50 p-4 rounded-lg text-center">
+                  <i class="pi pi-users text-2xl text-blue-500 mb-2"></i>
+                  <p class="text-2xl font-bold text-gray-800">{{ space()!.capacity }}</p>
+                  <p class="text-sm text-gray-600">Capacidad</p>
+                </div>
+              </div>
+
+              <!-- Amenities -->
+              @if (space()!.amenities && space()!.amenities!.length > 0) {
+                <div>
+                  <h3 class="font-semibold text-gray-700 mb-3">Amenidades</h3>
+                  <div class="flex flex-wrap gap-2">
+                    @for (amenity of space()!.amenities; track amenity) {
+                      <p-tag [value]="amenity" severity="secondary" />
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </p-card>
+
+          <!-- Calendario de Disponibilidad -->
+          <p-card styleClass="mt-6">
+            <ng-template #header>
+              <div class="p-4 pb-0">
+                <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                  <i class="pi pi-calendar"></i>
+                  Disponibilidad
+                </h2>
+              </div>
+            </ng-template>
+
+            <div class="space-y-4">
+              @if (loadingReservations()) {
+                <div class="flex justify-center py-8">
+                  <p-progressSpinner strokeWidth="4" />
+                </div>
+              } @else {
+                <!-- FullCalendar Integration (BONUS VISUAL) -->
+                <!-- 
+                  Para habilitar FullCalendar, instalar:
+                  pnpm add @fullcalendar/core @fullcalendar/angular @fullcalendar/daygrid @fullcalendar/timegrid @fullcalendar/interaction
+                  
+                  Luego descomentar:
+                  <full-calendar [options]="calendarOptions()" />
+                -->
+                
+                <!-- Vista alternativa: Lista de reservaciones -->
+                <div class="space-y-3">
+                  <div class="flex items-center gap-4 mb-4">
+                    <div class="flex items-center gap-2">
+                      <span class="w-4 h-4 bg-red-500 rounded"></span>
+                      <span class="text-sm text-gray-600">Ocupado</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="w-4 h-4 bg-orange-500 rounded"></span>
+                      <span class="text-sm text-gray-600">Pendiente</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="w-4 h-4 bg-gray-400 rounded"></span>
+                      <span class="text-sm text-gray-600">Cancelada</span>
+                    </div>
+                  </div>
+
+                  @if (reservations().length === 0) {
+                    <div class="text-center py-8 text-gray-500">
+                      <i class="pi pi-calendar-times text-4xl mb-2"></i>
+                      <p>No hay reservaciones próximas</p>
+                      <p class="text-sm">¡Este espacio está disponible!</p>
+                    </div>
+                  } @else {
+                    <div class="space-y-2 max-h-64 overflow-y-auto">
+                      @for (reservation of reservations(); track reservation.id) {
+                        <div 
+                          class="flex items-center justify-between p-3 rounded-lg border"
+                          [class.bg-red-50]="reservation.status === 'confirmed'"
+                          [class.border-red-200]="reservation.status === 'confirmed'"
+                          [class.bg-orange-50]="reservation.status === 'pending'"
+                          [class.border-orange-200]="reservation.status === 'pending'"
+                          [class.bg-gray-50]="reservation.status === 'cancelled'"
+                          [class.border-gray-200]="reservation.status === 'cancelled'"
+                        >
+                          <div>
+                            <p class="font-medium text-gray-800">
+                              {{ reservation.start_time | date:'dd/MM/yyyy' }}
+                            </p>
+                            <p class="text-sm text-gray-600">
+                              {{ reservation.start_time | date:'HH:mm' }} - 
+                              {{ reservation.end_time | date:'HH:mm' }}
+                            </p>
+                          </div>
+                          <p-tag 
+                            [value]="getStatusLabel(reservation.status)"
+                            [severity]="getStatusSeverity(reservation.status)"
+                          />
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </p-card>
+        </div>
+
+        <!-- Sidebar: Reservar -->
+        <div class="lg:col-span-1">
+          <p-card styleClass="sticky top-6">
+            <ng-template #header>
+              <div class="p-4 pb-0 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-t-lg">
+                <h2 class="text-xl font-semibold">Reservar este espacio</h2>
+                <p class="text-blue-100 text-sm mt-1">Asegura tu lugar ahora</p>
+              </div>
+            </ng-template>
+
+            <div class="space-y-4 pt-4">
+              <div class="text-center">
+                <i class="pi pi-calendar-plus text-4xl text-blue-500 mb-3"></i>
+                <p class="text-gray-600 mb-4">
+                  Selecciona fecha y horario para hacer tu reservación
+                </p>
+              </div>
+
+              <p-button 
+                label="Reservar Ahora" 
+                icon="pi pi-calendar-plus"
+                styleClass="w-full"
+                (click)="openReservationModal()"
+                [disabled]="!space()!.is_active"
+              />
+
+              @if (!space()!.is_active) {
+                <p class="text-center text-red-500 text-sm">
+                  Este espacio no está disponible actualmente
+                </p>
+              }
+            </div>
+          </p-card>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Reservation Dialog Modal -->
+<p-dialog 
+  [header]="'Reservar: ' + (space()?.name || '')"
+  [(visible)]="showReservationDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '500px' }"
+  (onHide)="closeReservationModal()"
+>
+  @if (space()) {
+    <app-reservation-form
+      [space]="space()!"
+      (success)="onReservationSuccess()"
+      (error)="onReservationError($event)"
+      (cancel)="closeReservationModal()"
+    />
+  }
+</p-dialog>

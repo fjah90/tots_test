@@ -1,0 +1,36 @@
+:host {
+  display: block;
+}
+
+// Custom styles para el catálogo de espacios
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Override PrimeNG card para mejor hover effect
+:host ::ng-deep {
+  .p-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-4px);
+    }
+  }
+  
+  .p-slider {
+    .p-slider-range {
+      background: linear-gradient(90deg, #3b82f6, #6366f1);
+    }
+    
+    .p-slider-handle {
+      border-color: #3b82f6;
+      
+      &:hover {
+        background: #3b82f6;
+      }
+    }
+  }
+}

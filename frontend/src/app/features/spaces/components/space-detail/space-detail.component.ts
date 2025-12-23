@@ -1,15 +1,267 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+
+// PrimeNG
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { TagModule } from 'primeng/tag';
+import { DividerModule } from 'primeng/divider';
+import { DialogModule } from 'primeng/dialog';
+import { ToastModule } from 'primeng/toast';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { MessageService } from 'primeng/api';
+
+// FullCalendar - BONUS VISUAL
+// Instalar: pnpm add @fullcalendar/core @fullcalendar/daygrid @fullcalendar/timegrid @fullcalendar/interaction
+// import { FullCalendarModule } from '@fullcalendar/angular';
+// import dayGridPlugin from '@fullcalendar/daygrid';
+// import timeGridPlugin from '@fullcalendar/timegrid';
+// import interactionPlugin from '@fullcalendar/interaction';
+
+// Services & Components
+import { SpacesService } from '../../../../core/services/spaces.service';
+import { ReservationsService } from '../../../../core/services/reservations.service';
+import { Space, Reservation } from '../../../../shared/interfaces';
+import { ReservationFormComponent } from '../reservation-form/reservation-form.component';
+
+// Interface para eventos de FullCalendar
+interface CalendarEvent {
+  id: string;
+  title: string;
+  start: string;
+  end: string;
+  backgroundColor: string;
+  borderColor: string;
+  textColor: string;
+  extendedProps?: {
+    status: string;
+    reservationId: number;
+  };
+}
 
 @Component({
   selector: 'app-space-detail',
   standalone: true,
-  imports: [CommonModule],
-  template: `
-    <div class="p-6">
-      <h1 class="text-2xl font-bold">Detalle del Espacio</h1>
-      <p class="text-gray-600">TODO: Implementar detalle con disponibilidad</p>
-    </div>
-  `
+  imports: [
+    CommonModule,
+    RouterLink,
+    ButtonModule,
+    CardModule,
+    TagModule,
+    DividerModule,
+    DialogModule,
+    ToastModule,
+    ProgressSpinnerModule,
+    ReservationFormComponent,
+    // FullCalendarModule, // Descomentar cuando se instale
+  ],
+  providers: [MessageService],
+  templateUrl: './space-detail.component.html',
+  styleUrl: './space-detail.component.scss'
 })
-export class SpaceDetailComponent {}
+export class SpaceDetailComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private spacesService = inject(SpacesService);
+  private reservationsService = inject(ReservationsService);
+  private messageService = inject(MessageService);
+
+  // Estado
+  space = signal<Space | null>(null);
+  reservations = signal<Reservation[]>([]);
+  calendarEvents = signal<CalendarEvent[]>([]);
+  loading = signal(true);
+  loadingReservations = signal(false);
+
+  // Modal
+  showReservationDialog = false;
+
+  // FullCalendar Options (BONUS VISUAL)
+  // Descomentar cuando se instale @fullcalendar/angular
+  /*
+  calendarOptions = signal({
+    plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+    initialView: 'timeGridWeek',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    },
+    slotMinTime: '07:00:00',
+    slotMaxTime: '22:00:00',
+    allDaySlot: false,
+    weekends: true,
+    editable: false,
+    selectable: true,
+    selectMirror: true,
+    dayMaxEvents: true,
+    locale: 'es',
+    events: [] as CalendarEvent[],
+    select: this.handleDateSelect.bind(this),
+    eventClick: this.handleEventClick.bind(this),
+  });
+  */
+
+  ngOnInit(): void {
+    const spaceId = this.route.snapshot.paramMap.get('id');
+    if (spaceId) {
+      this.loadSpace(+spaceId);
+      this.loadReservations(+spaceId);
+    } else {
+      this.router.navigate(['/spaces']);
+    }
+  }
+
+  loadSpace(id: number): void {
+    this.loading.set(true);
+    this.spacesService.getSpace(id).subscribe({
+      next: (space) => {
+        this.space.set(space);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading space:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo cargar el espacio'
+        });
+        this.loading.set(false);
+        this.router.navigate(['/spaces']);
+      }
+    });
+  }
+
+  loadReservations(spaceId: number): void {
+    this.loadingReservations.set(true);
+    
+    // Obtener reservaciones del próximo mes
+    const fromDate = new Date();
+    const toDate = new Date();
+    toDate.setMonth(toDate.getMonth() + 1);
+
+    this.reservationsService.getSpaceReservations(
+      spaceId,
+      this.formatDate(fromDate),
+      this.formatDate(toDate)
+    ).subscribe({
+      next: (reservations) => {
+        this.reservations.set(reservations);
+        this.calendarEvents.set(this.mapReservationsToEvents(reservations));
+        this.loadingReservations.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading reservations:', err);
+        this.loadingReservations.set(false);
+      }
+    });
+  }
+
+  /**
+   * Mapea reservaciones a eventos de FullCalendar
+   * Los bloques ocupados se muestran en ROJO
+   */
+  private mapReservationsToEvents(reservations: Reservation[]): CalendarEvent[] {
+    return reservations.map(reservation => {
+      // Colores según estado
+      let backgroundColor = '#ef4444'; // Rojo por defecto (ocupado)
+      let borderColor = '#dc2626';
+      
+      if (reservation.status === 'cancelled') {
+        backgroundColor = '#9ca3af'; // Gris para canceladas
+        borderColor = '#6b7280';
+      } else if (reservation.status === 'pending') {
+        backgroundColor = '#f59e0b'; // Naranja para pendientes
+        borderColor = '#d97706';
+      }
+
+      return {
+        id: reservation.id.toString(),
+        title: reservation.notes || 'Reservado',
+        start: reservation.start_time,
+        end: reservation.end_time,
+        backgroundColor,
+        borderColor,
+        textColor: '#ffffff',
+        extendedProps: {
+          status: reservation.status,
+          reservationId: reservation.id
+        }
+      };
+    });
+  }
+
+  openReservationModal(): void {
+    this.showReservationDialog = true;
+  }
+
+  closeReservationModal(): void {
+    this.showReservationDialog = false;
+  }
+
+  onReservationSuccess(): void {
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Reservación Creada',
+      detail: '¡Tu reservación ha sido registrada exitosamente!'
+    });
+    this.closeReservationModal();
+    // Recargar reservaciones para actualizar calendario
+    if (this.space()) {
+      this.loadReservations(this.space()!.id);
+    }
+  }
+
+  onReservationError(error: any): void {
+    if (error.status === 409) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Espacio Ocupado',
+        detail: 'El espacio ya está ocupado en ese horario.'
+      });
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Ocurrió un error al crear la reservación.'
+      });
+    }
+  }
+
+  // Handlers para FullCalendar (BONUS)
+  /*
+  handleDateSelect(selectInfo: any): void {
+    // Abrir modal de reservación con fecha preseleccionada
+    this.openReservationModal();
+  }
+
+  handleEventClick(clickInfo: any): void {
+    // Mostrar detalles de la reservación
+    const reservationId = clickInfo.event.extendedProps.reservationId;
+    console.log('Reservation clicked:', reservationId);
+  }
+  */
+
+  private formatDate(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
+  getStatusSeverity(status: string): 'success' | 'warn' | 'danger' | 'secondary' {
+    switch (status) {
+      case 'confirmed': return 'success';
+      case 'pending': return 'warn';
+      case 'cancelled': return 'danger';
+      default: return 'secondary';
+    }
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'confirmed': return 'Confirmada';
+      case 'pending': return 'Pendiente';
+      case 'cancelled': return 'Cancelada';
+      default: return status;
+    }
+  }
+}

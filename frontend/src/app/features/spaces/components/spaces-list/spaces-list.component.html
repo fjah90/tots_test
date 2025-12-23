@@ -1,0 +1,210 @@
+<p-toast></p-toast>
+
+<div class="min-h-screen bg-gray-50">
+  <!-- Header Section -->
+  <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12 px-6">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="text-4xl font-bold mb-2">Encuentra tu Espacio Ideal</h1>
+      <p class="text-blue-100 text-lg">Reserva salas de reuniones, auditorios y espacios de trabajo</p>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="max-w-7xl mx-auto px-6 -mt-6">
+    <div class="bg-white rounded-xl shadow-lg p-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        
+        <!-- Búsqueda por texto -->
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-gray-700">Buscar</label>
+          <div class="p-inputgroup">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-search"></i>
+            </span>
+            <input 
+              type="text" 
+              pInputText 
+              placeholder="Nombre, ubicación..." 
+              [ngModel]="searchTerm()"
+              (ngModelChange)="searchTerm.set($event)"
+            />
+          </div>
+        </div>
+
+        <!-- Filtro por fecha -->
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-gray-700">Fecha de Reserva</label>
+          <p-datepicker 
+            [ngModel]="selectedDate()"
+            (ngModelChange)="selectedDate.set($event)"
+            [showIcon]="true"
+            [minDate]="minDate"
+            dateFormat="dd/mm/yy"
+            placeholder="Seleccionar fecha"
+            styleClass="w-full"
+          />
+        </div>
+
+        <!-- Filtro por capacidad -->
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-gray-700">
+            Capacidad: {{ capacityRange()[0] }} - {{ capacityRange()[1] === 100 ? '100+' : capacityRange()[1] }} personas
+          </label>
+          <p-slider 
+            [ngModel]="capacityRange()"
+            (ngModelChange)="capacityRange.set($event)"
+            [range]="true"
+            [min]="0"
+            [max]="100"
+            [step]="5"
+            styleClass="mt-4"
+          />
+        </div>
+
+        <!-- Botón limpiar filtros -->
+        <div class="flex flex-col justify-end">
+          <p-button 
+            label="Limpiar Filtros" 
+            icon="pi pi-filter-slash" 
+            severity="secondary"
+            [outlined]="true"
+            (click)="clearFilters()"
+          />
+        </div>
+      </div>
+
+      <!-- Resultados count -->
+      <p-divider />
+      <div class="flex justify-between items-center">
+        <span class="text-gray-600">
+          <strong>{{ filteredSpaces().length }}</strong> espacios encontrados
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spaces Grid -->
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    @if (loading()) {
+      <div class="flex justify-center items-center py-20">
+        <p-progressSpinner strokeWidth="4" />
+      </div>
+    } @else if (filteredSpaces().length === 0) {
+      <div class="text-center py-20">
+        <i class="pi pi-inbox text-6xl text-gray-300 mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-600 mb-2">No se encontraron espacios</h3>
+        <p class="text-gray-500">Intenta ajustar los filtros de búsqueda</p>
+        <p-button 
+          label="Limpiar Filtros" 
+          icon="pi pi-refresh" 
+          class="mt-4"
+          (click)="clearFilters()" 
+        />
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (space of filteredSpaces(); track space.id) {
+          <p-card styleClass="hover:shadow-xl transition-shadow duration-300">
+            <!-- Image -->
+            <ng-template #header>
+              <div class="relative">
+                @if (space.image_url) {
+                  <img 
+                    [src]="space.image_url" 
+                    [alt]="space.name"
+                    class="w-full h-48 object-cover"
+                  />
+                } @else {
+                  <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
+                    <i class="pi pi-building text-white text-5xl"></i>
+                  </div>
+                }
+                <p-tag 
+                  [value]="space.is_active ? 'Disponible' : 'No Disponible'"
+                  [severity]="space.is_active ? 'success' : 'danger'"
+                  styleClass="absolute top-3 right-3"
+                />
+              </div>
+            </ng-template>
+
+            <!-- Content -->
+            <div class="space-y-3">
+              <h3 class="text-xl font-bold text-gray-800">{{ space.name }}</h3>
+              
+              @if (space.description) {
+                <p class="text-gray-600 text-sm line-clamp-2">{{ space.description }}</p>
+              }
+
+              <div class="flex flex-wrap gap-3 text-sm text-gray-500">
+                <span class="flex items-center gap-1">
+                  <i [class]="getCapacityIcon(space.capacity)"></i>
+                  {{ space.capacity }} personas
+                </span>
+                @if (space.location) {
+                  <span class="flex items-center gap-1">
+                    <i class="pi pi-map-marker"></i>
+                    {{ space.location }}
+                  </span>
+                }
+              </div>
+
+              @if (space.amenities && space.amenities.length > 0) {
+                <div class="flex flex-wrap gap-1">
+                  @for (amenity of space.amenities.slice(0, 3); track amenity) {
+                    <p-tag [value]="amenity" severity="secondary" />
+                  }
+                  @if (space.amenities.length > 3) {
+                    <p-tag [value]="'+' + (space.amenities.length - 3)" severity="info" />
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Footer -->
+            <ng-template #footer>
+              <div class="flex gap-2">
+                <p-button 
+                  label="Ver Detalles" 
+                  icon="pi pi-eye" 
+                  severity="secondary"
+                  [outlined]="true"
+                  [routerLink]="['/spaces', space.id]"
+                  class="flex-1"
+                />
+                <p-button 
+                  label="Reservar" 
+                  icon="pi pi-calendar-plus"
+                  (click)="openReservationModal(space)"
+                  class="flex-1"
+                  [disabled]="!space.is_active"
+                />
+              </div>
+            </ng-template>
+          </p-card>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Reservation Dialog Modal -->
+<p-dialog 
+  [header]="'Reservar: ' + (selectedSpace()?.name || '')"
+  [(visible)]="showReservationDialogVisible"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '500px' }"
+  (onHide)="closeReservationModal()"
+>
+  @if (selectedSpace()) {
+    <app-reservation-form
+      [space]="selectedSpace()!"
+      [preselectedDate]="selectedDate()"
+      (success)="onReservationSuccess()"
+      (error)="onReservationError($event)"
+      (cancel)="closeReservationModal()"
+    />
+  }
+</p-dialog>
