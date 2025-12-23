@@ -1,0 +1,514 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Space Reservation API",
+		"description": "API REST para sistema de reserva de espacios para eventos.\n\n## Datos de Prueba\n\n### Usuarios\n- **Admin:** admin@espacios.com / password123\n- **User:** juan@ejemplo.com / password123\n\n### Espacios (IDs 1-5)\n- Sala de Conferencias Principal\n- Sala de Reuniones Ejecutiva\n- Auditorio Central\n- Espacio de Coworking Creativo\n- Sala de Capacitación Tech",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"description": "Endpoints de autenticación",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Nuevo Usuario\",\n    \"email\": \"nuevo@ejemplo.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/register",
+							"host": ["{{base_url}}"],
+							"path": ["register"]
+						},
+						"description": "Registrar un nuevo usuario en el sistema"
+					},
+					"response": []
+				},
+				{
+					"name": "Login (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set('token', jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@espacios.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": ["{{base_url}}"],
+							"path": ["login"]
+						},
+						"description": "Iniciar sesión como administrador.\n\nCredenciales:\n- Email: admin@espacios.com\n- Password: password123"
+					},
+					"response": []
+				},
+				{
+					"name": "Login (User)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set('token', jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"juan@ejemplo.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": ["{{base_url}}"],
+							"path": ["login"]
+						},
+						"description": "Iniciar sesión como usuario normal.\n\nCredenciales:\n- Email: juan@ejemplo.com\n- Password: password123"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/logout",
+							"host": ["{{base_url}}"],
+							"path": ["logout"]
+						},
+						"description": "Cerrar sesión del usuario actual"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": ["{{base_url}}"],
+							"path": ["user"]
+						},
+						"description": "Obtener información del usuario autenticado"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Spaces",
+			"description": "CRUD de espacios (Admin para crear/editar/eliminar)",
+			"item": [
+				{
+					"name": "List All Spaces",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/spaces",
+							"host": ["{{base_url}}"],
+							"path": ["spaces"]
+						},
+						"description": "Listar todos los espacios activos.\n\nNo requiere autenticación."
+					},
+					"response": []
+				},
+				{
+					"name": "List Spaces with Filters",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/spaces?capacity_min=20&capacity_max=50&is_active=true",
+							"host": ["{{base_url}}"],
+							"path": ["spaces"],
+							"query": [
+								{
+									"key": "capacity_min",
+									"value": "20",
+									"description": "Capacidad mínima"
+								},
+								{
+									"key": "capacity_max",
+									"value": "50",
+									"description": "Capacidad máxima"
+								},
+								{
+									"key": "is_active",
+									"value": "true",
+									"description": "Solo espacios activos"
+								}
+							]
+						},
+						"description": "Listar espacios con filtros de capacidad y estado"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Space by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/spaces/1",
+							"host": ["{{base_url}}"],
+							"path": ["spaces", "1"]
+						},
+						"description": "Obtener detalle de un espacio específico.\n\nEspacios disponibles: IDs 1-5"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Space (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Nueva Sala de Juntas\",\n    \"description\": \"Sala moderna con equipamiento de videoconferencia\",\n    \"capacity\": 15,\n    \"location\": \"Edificio D - Piso 1\",\n    \"amenities\": [\"WiFi\", \"Proyector\", \"Pizarra\", \"Café\"],\n    \"image_url\": \"https://example.com/sala.jpg\",\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/spaces",
+							"host": ["{{base_url}}"],
+							"path": ["spaces"]
+						},
+						"description": "Crear un nuevo espacio.\n\n⚠️ Requiere autenticación como Admin"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Space (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Sala de Conferencias Principal (Actualizada)\",\n    \"capacity\": 35,\n    \"amenities\": [\"WiFi\", \"Proyector 4K\", \"Videoconferencia HD\", \"Pizarra Digital\", \"Aire Acondicionado\", \"Catering\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/spaces/1",
+							"host": ["{{base_url}}"],
+							"path": ["spaces", "1"]
+						},
+						"description": "Actualizar un espacio existente.\n\n⚠️ Requiere autenticación como Admin"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Space (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/spaces/1",
+							"host": ["{{base_url}}"],
+							"path": ["spaces", "1"]
+						},
+						"description": "Eliminar un espacio (soft delete).\n\n⚠️ Requiere autenticación como Admin"
+					},
+					"response": []
+				},
+				{
+					"name": "Check Space Availability",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/spaces/1/availability?start_time=2025-01-15 09:00:00&end_time=2025-01-15 12:00:00",
+							"host": ["{{base_url}}"],
+							"path": ["spaces", "1", "availability"],
+							"query": [
+								{
+									"key": "start_time",
+									"value": "2025-01-15 09:00:00"
+								},
+								{
+									"key": "end_time",
+									"value": "2025-01-15 12:00:00"
+								}
+							]
+						},
+						"description": "Verificar disponibilidad de un espacio para un rango de fechas"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reservations",
+			"description": "CRUD de reservas (usuario autenticado)",
+			"item": [
+				{
+					"name": "List My Reservations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/reservations",
+							"host": ["{{base_url}}"],
+							"path": ["reservations"]
+						},
+						"description": "Listar las reservas del usuario autenticado.\n\n⚠️ Requiere autenticación"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reservation by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/reservations/1",
+							"host": ["{{base_url}}"],
+							"path": ["reservations", "1"]
+						},
+						"description": "Obtener detalle de una reserva.\n\n⚠️ Solo puedes ver tus propias reservas"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Reservation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"space_id\": 1,\n    \"event_name\": \"Reunión de Planificación Q1 2025\",\n    \"start_time\": \"2025-01-15 09:00:00\",\n    \"end_time\": \"2025-01-15 12:00:00\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/reservations",
+							"host": ["{{base_url}}"],
+							"path": ["reservations"]
+						},
+						"description": "Crear una nueva reserva.\n\n⚠️ Requiere autenticación\n\n**Validaciones:**\n- El espacio debe existir y estar activo\n- start_time debe ser anterior a end_time\n- No puede haber superposición con otras reservas\n- No se pueden crear reservas en el pasado"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Reservation",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event_name\": \"Reunión de Planificación Q1 2025 (Actualizada)\",\n    \"start_time\": \"2025-01-15 10:00:00\",\n    \"end_time\": \"2025-01-15 13:00:00\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/reservations/1",
+							"host": ["{{base_url}}"],
+							"path": ["reservations", "1"]
+						},
+						"description": "Actualizar una reserva existente.\n\n⚠️ Solo puedes modificar tus propias reservas"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Reservation",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/reservations/1",
+							"host": ["{{base_url}}"],
+							"path": ["reservations", "1"]
+						},
+						"description": "Cancelar una reserva.\n\n⚠️ Solo puedes cancelar tus propias reservas"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
