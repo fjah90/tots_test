@@ -29,6 +29,7 @@ Route::prefix('auth')->group(function () {
 Route::get('spaces', [SpaceController::class, 'index']);
 Route::get('spaces/{space}', [SpaceController::class, 'show']);
 Route::get('spaces/{space}/availability', [SpaceController::class, 'availability']);
+Route::get('spaces/{space}/reservations', [SpaceController::class, 'reservations']);
 
 // ============================================================================
 // RUTAS PROTEGIDAS (Requieren autenticación)

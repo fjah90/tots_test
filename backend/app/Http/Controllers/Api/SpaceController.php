@@ -293,4 +293,63 @@ class SpaceController extends Controller
             'end_time' => $validated['end_time'],
         ]);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/spaces/{id}/reservations",
+     *     summary="Obtener reservaciones de un espacio",
+     *     tags={"Spaces"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID del espacio",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="from_date",
+     *         in="query",
+     *         description="Fecha desde (Y-m-d)",
+     *         @OA\Schema(type="string", format="date")
+     *     ),
+     *     @OA\Parameter(
+     *         name="to_date",
+     *         in="query",
+     *         description="Fecha hasta (Y-m-d)",
+     *         @OA\Schema(type="string", format="date")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de reservaciones del espacio",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array",
+     *                 @OA\Items(ref="#/components/schemas/Reservation")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Espacio no encontrado")
+     * )
+     */
+    public function reservations(Request $request, Space $space): JsonResponse
+    {
+        $query = $space->reservations()
+            ->whereIn('status', ['confirmed', 'pending'])
+            ->orderBy('start_time');
+
+        // Filtrar por fecha desde
+        if ($request->has('from_date')) {
+            $query->whereDate('start_time', '>=', $request->from_date);
+        }
+
+        // Filtrar por fecha hasta
+        if ($request->has('to_date')) {
+            $query->whereDate('end_time', '<=', $request->to_date);
+        }
+
+        $reservations = $query->get();
+
+        return response()->json([
+            'data' => $reservations,
+        ]);
+    }
 }
