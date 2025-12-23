@@ -23,6 +23,7 @@ class Space extends Model
         'location',
         'amenities',
         'image_url',
+        'images',
         'is_active',
     ];
 
@@ -35,6 +36,7 @@ class Space extends Model
     {
         return [
             'amenities' => 'array',
+            'images' => 'array',
             'is_active' => 'boolean',
             'capacity' => 'integer',
         ];
