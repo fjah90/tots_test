@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DeleteSpaceRequest;
 use App\Http\Requests\StoreSpaceRequest;
 use App\Http\Requests\UpdateSpaceRequest;
 use App\Models\Space;
@@ -227,7 +228,7 @@ class SpaceController extends Controller
      *     @OA\Response(response=404, description="Espacio no encontrado")
      * )
      */
-    public function destroy(Space $space): JsonResponse
+    public function destroy(DeleteSpaceRequest $request, Space $space): JsonResponse
     {
         $space->delete();
 

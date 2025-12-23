@@ -19,10 +19,10 @@ class Reservation extends Model
     protected $fillable = [
         'user_id',
         'space_id',
-        'event_name',
         'start_time',
         'end_time',
         'status',
+        'notes',
     ];
 
     /**

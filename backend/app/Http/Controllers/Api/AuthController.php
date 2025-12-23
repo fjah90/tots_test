@@ -113,9 +113,9 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($validated)) {
-            throw ValidationException::withMessages([
-                'email' => ['Las credenciales proporcionadas son incorrectas.'],
-            ]);
+            return response()->json([
+                'message' => 'Credenciales incorrectas',
+            ], 401);
         }
 
         $user = User::where('email', $validated['email'])->firstOrFail();
@@ -155,7 +155,14 @@ class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $token = $request->user()->currentAccessToken();
+        
+        if ($token) {
+            $token->delete();
+        } else {
+            // Si no hay token actual, eliminar todos los tokens del usuario
+            $request->user()->tokens()->delete();
+        }
 
         return response()->json([
             'message' => 'Sesión cerrada exitosamente',

@@ -1075,6 +1075,186 @@
                     }
                 }
             }
+        },
+        "/stats/dashboard": {
+            "get": {
+                "tags": [
+                    "Stats"
+                ],
+                "summary": "Obtener estadísticas del dashboard (Solo Admin)",
+                "description": "Funcionalidad adicional: Proporciona métricas clave del sistema para el panel de administración",
+                "operationId": "09dba8957203724ab1f443d629227d91",
+                "responses": {
+                    "200": {
+                        "description": "Estadísticas del sistema",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "summary": {
+                                            "properties": {
+                                                "total_users": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "total_spaces": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "total_reservations": {
+                                                    "type": "integer",
+                                                    "example": 150
+                                                },
+                                                "active_spaces": {
+                                                    "type": "integer",
+                                                    "example": 8
+                                                },
+                                                "confirmed_reservations": {
+                                                    "type": "integer",
+                                                    "example": 120
+                                                },
+                                                "cancelled_reservations": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "top_spaces": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "reservations_count": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "recent_reservations": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Reservation"
+                                            }
+                                        },
+                                        "reservations_by_status": {
+                                            "properties": {
+                                                "confirmed": {
+                                                    "type": "integer"
+                                                },
+                                                "pending": {
+                                                    "type": "integer"
+                                                },
+                                                "cancelled": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado (solo admin)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/stats/space/{id}": {
+            "get": {
+                "tags": [
+                    "Stats"
+                ],
+                "summary": "Obtener estadísticas de un espacio específico (Solo Admin)",
+                "description": "Funcionalidad adicional: Métricas detalladas de uso de un espacio",
+                "operationId": "01e98ad7fc88cea49367b4701c061242",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del espacio",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Estadísticas del espacio",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "space": {
+                                            "$ref": "#/components/schemas/Space"
+                                        },
+                                        "stats": {
+                                            "properties": {
+                                                "total_reservations": {
+                                                    "type": "integer"
+                                                },
+                                                "confirmed_reservations": {
+                                                    "type": "integer"
+                                                },
+                                                "cancelled_reservations": {
+                                                    "type": "integer"
+                                                },
+                                                "occupancy_rate": {
+                                                    "type": "number",
+                                                    "format": "float"
+                                                },
+                                                "unique_users": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "upcoming_reservations": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Reservation"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    },
+                    "404": {
+                        "description": "Espacio no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -1320,6 +1500,10 @@
         {
             "name": "Reservations",
             "description": "CRUD de reservas"
+        },
+        {
+            "name": "Stats",
+            "description": "Stats"
         }
     ]
 }

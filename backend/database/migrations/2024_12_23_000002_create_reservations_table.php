@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('space_id')->constrained()->onDelete('cascade');
-            $table->string('event_name');
             $table->datetime('start_time');
             $table->datetime('end_time');
-            $table->enum('status', ['confirmed', 'cancelled'])->default('confirmed');
+            $table->enum('status', ['confirmed', 'cancelled', 'pending'])->default('confirmed');
+            $table->text('notes')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

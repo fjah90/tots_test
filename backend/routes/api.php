@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\SpaceController;
+use App\Http\Controllers\Api\StatsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -49,4 +50,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Reservaciones - CRUD completo para usuarios autenticados
     Route::apiResource('reservations', ReservationController::class);
     Route::patch('reservations/{reservation}/cancel', [ReservationController::class, 'cancel']);
+
+    // ========================================================================
+    // ESTADÍSTICAS - Funcionalidad Adicional (Solo Admin)
+    // ========================================================================
+    Route::prefix('stats')->group(function () {
+        Route::get('dashboard', [StatsController::class, 'dashboard']);
+        Route::get('space/{space}', [StatsController::class, 'spaceStats']);
+    });
 });
