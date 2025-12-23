@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-		"name": "Space Reservation API",
-		"description": "API REST para sistema de reserva de espacios para eventos.\n\n## Datos de Prueba\n\n### Usuarios\n- **Admin:** admin@espacios.com / password123\n- **User:** juan@ejemplo.com / password123\n\n### Espacios (IDs 1-5)\n- Sala de Conferencias Principal\n- Sala de Reuniones Ejecutiva\n- Auditorio Central\n- Espacio de Coworking Creativo\n- Sala de Capacitación Tech",
+		"name": "SpaceBook API - spacebook-jfah",
+		"description": "API REST para sistema de reserva de espacios para eventos.\n\n## Proyecto: spacebook-jfah\n**Autor:** Fernando Aponte\n\n## Características\n- ✅ Autenticación con Laravel Sanctum\n- ✅ CRUD de Espacios (Admin)\n- ✅ CRUD de Reservas (Usuario)\n- ✅ CRUD Admin de Reservas\n- ✅ Paginación con `page` y `per_page`\n- ✅ Filtros de capacidad y estado\n- ✅ Validación de disponibilidad\n- ✅ Soporte para múltiples imágenes\n\n## Datos de Prueba\n\n### Usuarios\n- **Admin:** admin@espacios.com / password123\n- **User:** juan@ejemplo.com / password123\n\n### Espacios (IDs 1-5)\n- Sala de Conferencias Principal\n- Sala de Reuniones Ejecutiva\n- Auditorio Central\n- Espacio de Coworking Creativo\n- Sala de Capacitación Tech",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"variable": [
@@ -198,7 +198,38 @@
 							"host": ["{{base_url}}"],
 							"path": ["spaces"]
 						},
-						"description": "Listar todos los espacios activos.\n\nNo requiere autenticación."
+						"description": "Listar todos los espacios activos.\n\nNo requiere autenticación.\n\n**Parámetros opcionales de paginación:**\n- `page`: Número de página (default: 1)\n- `per_page`: Elementos por página (default: todos)"
+					},
+					"response": []
+				},
+				{
+					"name": "List Spaces with Pagination",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/spaces?page=1&per_page=12",
+							"host": ["{{base_url}}"],
+							"path": ["spaces"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Número de página"
+								},
+								{
+									"key": "per_page",
+									"value": "12",
+									"description": "Elementos por página"
+								}
+							]
+						},
+						"description": "Listar espacios con paginación.\n\n**Respuesta incluye:**\n```json\n{\n  \"data\": [...],\n  \"meta\": {\n    \"current_page\": 1,\n    \"per_page\": 12,\n    \"total\": 50,\n    \"last_page\": 5\n  }\n}\n```"
 					},
 					"response": []
 				},
@@ -213,7 +244,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/spaces?capacity_min=20&capacity_max=50&is_active=true",
+							"raw": "{{base_url}}/spaces?capacity_min=20&capacity_max=50&is_active=true&page=1&per_page=10",
 							"host": ["{{base_url}}"],
 							"path": ["spaces"],
 							"query": [
@@ -231,10 +262,20 @@
 									"key": "is_active",
 									"value": "true",
 									"description": "Solo espacios activos"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Número de página"
+								},
+								{
+									"key": "per_page",
+									"value": "10",
+									"description": "Elementos por página"
 								}
 							]
 						},
-						"description": "Listar espacios con filtros de capacidad y estado"
+						"description": "Listar espacios con filtros de capacidad, estado y paginación.\n\n**Filtros disponibles:**\n- `capacity_min`: Capacidad mínima\n- `capacity_max`: Capacidad máxima\n- `is_active`: Estado activo (true/false)\n- `page`: Número de página\n- `per_page`: Elementos por página"
 					},
 					"response": []
 				},
@@ -277,14 +318,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Nueva Sala de Juntas\",\n    \"description\": \"Sala moderna con equipamiento de videoconferencia\",\n    \"capacity\": 15,\n    \"location\": \"Edificio D - Piso 1\",\n    \"amenities\": [\"WiFi\", \"Proyector\", \"Pizarra\", \"Café\"],\n    \"image_url\": \"https://example.com/sala.jpg\",\n    \"is_active\": true\n}"
+							"raw": "{\n    \"name\": \"Nueva Sala de Juntas\",\n    \"description\": \"Sala moderna con equipamiento de videoconferencia\",\n    \"capacity\": 15,\n    \"location\": \"Edificio D - Piso 1\",\n    \"amenities\": [\"WiFi\", \"Proyector\", \"Pizarra\", \"Café\"],\n    \"images\": [\n        \"https://example.com/sala1.jpg\",\n        \"https://example.com/sala2.jpg\",\n        \"https://example.com/sala3.jpg\"\n    ],\n    \"is_active\": true\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/spaces",
 							"host": ["{{base_url}}"],
 							"path": ["spaces"]
 						},
-						"description": "Crear un nuevo espacio.\n\n⚠️ Requiere autenticación como Admin"
+						"description": "Crear un nuevo espacio.\n\n⚠️ Requiere autenticación como Admin\n\n**Campos:**\n- `name`: Nombre del espacio (requerido)\n- `description`: Descripción\n- `capacity`: Capacidad máxima (requerido)\n- `location`: Ubicación\n- `amenities`: Array de amenidades\n- `images`: Array de URLs de imágenes (soporta múltiples)\n- `is_active`: Estado activo (default: true)"
 					},
 					"response": []
 				},
@@ -308,14 +349,14 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Sala de Conferencias Principal (Actualizada)\",\n    \"capacity\": 35,\n    \"amenities\": [\"WiFi\", \"Proyector 4K\", \"Videoconferencia HD\", \"Pizarra Digital\", \"Aire Acondicionado\", \"Catering\"]\n}"
+							"raw": "{\n    \"name\": \"Sala de Conferencias Principal (Actualizada)\",\n    \"capacity\": 35,\n    \"amenities\": [\"WiFi\", \"Proyector 4K\", \"Videoconferencia HD\", \"Pizarra Digital\", \"Aire Acondicionado\", \"Catering\"],\n    \"images\": [\n        \"https://example.com/sala-principal-1.jpg\",\n        \"https://example.com/sala-principal-2.jpg\"\n    ]\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/spaces/1",
 							"host": ["{{base_url}}"],
 							"path": ["spaces", "1"]
 						},
-						"description": "Actualizar un espacio existente.\n\n⚠️ Requiere autenticación como Admin"
+						"description": "Actualizar un espacio existente.\n\n⚠️ Requiere autenticación como Admin\n\n**Nota:** El campo `images` reemplaza todas las imágenes existentes."
 					},
 					"response": []
 				},
@@ -505,6 +546,143 @@
 							"path": ["reservations", "1"]
 						},
 						"description": "Cancelar una reserva.\n\n⚠️ Solo puedes cancelar tus propias reservas"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin Reservations",
+			"description": "CRUD de reservas para administradores",
+			"item": [
+				{
+					"name": "List All Reservations (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/reservations",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "reservations"]
+						},
+						"description": "Listar todas las reservas del sistema.\n\n⚠️ Requiere autenticación como Admin"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reservation by ID (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/reservations/1",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "reservations", "1"]
+						},
+						"description": "Obtener detalle de cualquier reserva.\n\n⚠️ Requiere autenticación como Admin"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Reservation (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"space_id\": 1,\n    \"user_id\": 2,\n    \"event_name\": \"Evento creado por Admin\",\n    \"start_time\": \"2025-02-01 09:00:00\",\n    \"end_time\": \"2025-02-01 12:00:00\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/reservations",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "reservations"]
+						},
+						"description": "Crear una reserva para cualquier usuario.\n\n⚠️ Requiere autenticación como Admin\n\n**Campos:**\n- `space_id`: ID del espacio (requerido)\n- `user_id`: ID del usuario (requerido)\n- `event_name`: Nombre del evento (requerido)\n- `start_time`: Fecha/hora inicio (requerido)\n- `end_time`: Fecha/hora fin (requerido)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Reservation (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event_name\": \"Evento actualizado por Admin\",\n    \"start_time\": \"2025-02-01 10:00:00\",\n    \"end_time\": \"2025-02-01 14:00:00\",\n    \"status\": \"confirmed\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/reservations/1",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "reservations", "1"]
+						},
+						"description": "Actualizar cualquier reserva.\n\n⚠️ Requiere autenticación como Admin\n\n**Status disponibles:**\n- `pending`: Pendiente\n- `confirmed`: Confirmada\n- `cancelled`: Cancelada"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Reservation (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admin/reservations/1",
+							"host": ["{{base_url}}"],
+							"path": ["admin", "reservations", "1"]
+						},
+						"description": "Eliminar una reserva del sistema.\n\n⚠️ Requiere autenticación como Admin"
 					},
 					"response": []
 				}

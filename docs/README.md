@@ -1,32 +1,53 @@
-# 📚 Documentación - Sistema de Reserva de Espacios
+# 📚 SpaceBook API - spacebook-jfah
 
 ## 📋 Descripción General
 
-API REST para un sistema de reserva de espacios para eventos. Permite a los usuarios explorar espacios disponibles (salas de reuniones, auditorios, etc.), hacer reservas y gestionarlas.
+**Autor:** Fernando Aponte
+
+API REST para sistema de reserva de espacios para eventos. Permite a los usuarios explorar espacios disponibles (salas de reuniones, auditorios, etc.), hacer reservas y gestionarlas.
+
+### Características de la API
+- ✅ Autenticación con Laravel Sanctum
+- ✅ CRUD de Espacios (Admin)
+- ✅ CRUD de Reservas (Usuario)
+- ✅ CRUD Admin de Reservas
+- ✅ Paginación con `page` y `per_page`
+- ✅ Filtros de capacidad y estado
+- ✅ Validación de disponibilidad
+- ✅ Soporte para múltiples imágenes
 
 ---
 
-## 🏗️ Arquitectura del Proyecto
+## 🏗️ Arquitectura del Backend
 
 ```
-tots_test/
-├── backend/                 # API Laravel
-│   ├── app/
-│   │   ├── Models/
-│   │   │   ├── User.php
-│   │   │   ├── Space.php
-│   │   │   └── Reservation.php
-│   │   └── Http/Controllers/
-│   ├── database/
-│   │   ├── migrations/
-│   │   └── seeders/
-│   └── routes/
-├── docs/                    # Documentación
-│   ├── README.md
-│   └── postman/
-│       └── Space_Reservation_API.postman_collection.json
-└── frontend/                # Angular SPA (pendiente)
+backend/
+├── app/
+│   ├── Models/
+│   │   ├── User.php
+│   │   ├── Space.php
+│   │   └── Reservation.php
+│   └── Http/Controllers/Api/
+│       ├── AuthController.php
+│       ├── SpaceController.php
+│       ├── ReservationController.php
+│       └── AdminReservationController.php
+├── database/
+│   ├── migrations/
+│   └── seeders/
+└── routes/api.php
 ```
+
+---
+
+## 🛠️ Stack Tecnológico
+
+| Tecnología | Versión |
+|------------|---------|
+| Laravel | 12.x |
+| PHP | >= 8.2 |
+| Laravel Sanctum | Auth API |
+| SQLite | Base de datos |
 
 ---
 
@@ -54,7 +75,7 @@ tots_test/
 | capacity | unsigned int | Capacidad máxima |
 | location | string | Ubicación física |
 | amenities | json | Lista de amenidades |
-| image_url | string | URL de imagen |
+| images | json | Array de URLs de imágenes |
 | is_active | boolean | Estado activo/inactivo |
 | created_at | timestamp | Fecha de creación |
 | updated_at | timestamp | Fecha de actualización |
@@ -69,7 +90,7 @@ tots_test/
 | event_name | string | Nombre del evento |
 | start_time | datetime | Inicio de reserva |
 | end_time | datetime | Fin de reserva |
-| status | enum | 'confirmed' o 'cancelled' |
+| status | enum | 'pending', 'confirmed' o 'cancelled' |
 | created_at | timestamp | Fecha de creación |
 | updated_at | timestamp | Fecha de actualización |
 | deleted_at | timestamp | Soft delete |
@@ -99,7 +120,7 @@ tots_test/
 
 ---
 
-## 🚀 API Endpoints (Planificados)
+## 🚀 API Endpoints
 
 ### Autenticación
 | Método | Endpoint | Descripción | Auth |
@@ -113,18 +134,31 @@ tots_test/
 | Método | Endpoint | Descripción | Auth | Rol |
 |--------|----------|-------------|------|-----|
 | GET | `/api/spaces` | Listar espacios | No | - |
+| GET | `/api/spaces?page=1&per_page=12` | Listar con paginación | No | - |
+| GET | `/api/spaces?capacity_min=20&capacity_max=50` | Filtrar por capacidad | No | - |
 | GET | `/api/spaces/{id}` | Detalle de espacio | No | - |
+| GET | `/api/spaces/{id}/availability` | Verificar disponibilidad | No | - |
 | POST | `/api/spaces` | Crear espacio | Sí | Admin |
 | PUT | `/api/spaces/{id}` | Actualizar espacio | Sí | Admin |
 | DELETE | `/api/spaces/{id}` | Eliminar espacio | Sí | Admin |
 
-### Reservas
+### Reservas (Usuario)
 | Método | Endpoint | Descripción | Auth |
 |--------|----------|-------------|------|
 | GET | `/api/reservations` | Mis reservas | Sí |
+| GET | `/api/reservations/{id}` | Detalle de reserva | Sí |
 | POST | `/api/reservations` | Crear reserva | Sí |
 | PUT | `/api/reservations/{id}` | Actualizar reserva | Sí |
 | DELETE | `/api/reservations/{id}` | Cancelar reserva | Sí |
+
+### Reservas (Admin)
+| Método | Endpoint | Descripción | Auth | Rol |
+|--------|----------|-------------|------|-----|
+| GET | `/api/admin/reservations` | Listar todas | Sí | Admin |
+| GET | `/api/admin/reservations/{id}` | Detalle | Sí | Admin |
+| POST | `/api/admin/reservations` | Crear para usuario | Sí | Admin |
+| PUT | `/api/admin/reservations/{id}` | Actualizar | Sí | Admin |
+| DELETE | `/api/admin/reservations/{id}` | Eliminar | Sí | Admin |
 
 ---
 
@@ -133,10 +167,8 @@ tots_test/
 ### Requisitos
 - PHP >= 8.2
 - Composer
-- MySQL/SQLite
-- Node.js >= 18 (para frontend)
 
-### Backend
+### Pasos
 
 ```bash
 cd backend
@@ -153,26 +185,41 @@ php artisan key:generate
 # Ejecutar migraciones y seeders
 php artisan migrate:fresh --seed
 
-# Iniciar servidor
+# Iniciar servidor (puerto 8000)
 php artisan serve
 ```
 
+### URL Base
+- **API:** http://localhost:8000/api
+
 ---
 
-## 📝 Notas de Desarrollo
+## 📝 Reglas de Negocio
 
-### Reglas de Negocio
 1. **Superposición de reservas:** No se permite reservar un espacio en horarios que ya estén ocupados
 2. **Autorización:** Los usuarios solo pueden modificar/cancelar sus propias reservas
-3. **Roles:** Solo administradores pueden gestionar espacios (CRUD)
+3. **Roles:** Solo administradores pueden gestionar espacios (CRUD) y todas las reservas
 
-### Validaciones Adicionales
+### Validaciones
 - Fecha de inicio debe ser anterior a fecha de fin
 - No se pueden crear reservas en el pasado
 - El espacio debe estar activo para poder reservarlo
 
 ---
 
+## 📦 Colección Postman
+
+Importar el archivo `docs/postman/Space_Reservation_API.postman_collection.json` en Postman.
+
+**Variables incluidas:**
+- `base_url`: http://localhost:8000/api
+- `token`: Se auto-completa al hacer login
+
+---
+
 ## 📄 Licencia
 
 Este proyecto es parte de una prueba técnica para TOTS.
+
+**Proyecto:** spacebook-jfah  
+**Autor:** Fernando Aponte
