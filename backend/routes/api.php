@@ -43,9 +43,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Espacios - Solo Admin puede crear, actualizar, eliminar
-    Route::post('spaces', [SpaceController::class, 'store']);
-    Route::put('spaces/{space}', [SpaceController::class, 'update']);
-    Route::delete('spaces/{space}', [SpaceController::class, 'destroy']);
+    Route::middleware('role:admin')->group(function () {
+        Route::post('spaces', [SpaceController::class, 'store']);
+        Route::put('spaces/{space}', [SpaceController::class, 'update']);
+        Route::delete('spaces/{space}', [SpaceController::class, 'destroy']);
+    });
 
     // Reservaciones - CRUD completo para usuarios autenticados
     Route::apiResource('reservations', ReservationController::class);
@@ -54,7 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // ========================================================================
     // ESTADÍSTICAS - Funcionalidad Adicional (Solo Admin)
     // ========================================================================
-    Route::prefix('stats')->group(function () {
+    Route::prefix('stats')->middleware('role:admin')->group(function () {
         Route::get('dashboard', [StatsController::class, 'dashboard']);
         Route::get('space/{space}', [StatsController::class, 'spaceStats']);
     });

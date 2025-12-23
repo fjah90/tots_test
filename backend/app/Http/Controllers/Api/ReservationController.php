@@ -7,12 +7,20 @@ use App\Http\Requests\StoreReservationRequest;
 use App\Http\Requests\UpdateReservationRequest;
 use App\Models\Reservation;
 use App\Models\Space;
+use App\Services\AvailabilityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Annotations as OA;
 
 class ReservationController extends Controller
 {
+    /**
+     * Constructor con inyección de dependencias.
+     */
+    public function __construct(
+        protected AvailabilityService $availabilityService
+    ) {}
+
     /**
      * @OA\Get(
      *     path="/reservations",
@@ -149,20 +157,36 @@ class ReservationController extends Controller
         $validated = $request->validated();
         $space = Space::findOrFail($validated['space_id']);
 
-        // Verificar disponibilidad del espacio
-        if (!$space->isAvailable($validated['start_time'], $validated['end_time'])) {
-            return response()->json([
-                'message' => 'El espacio no está disponible en el horario solicitado',
-                'error' => 'space_not_available',
-            ], 409);
-        }
-
         // Verificar que el espacio esté activo
         if (!$space->is_active) {
             return response()->json([
                 'message' => 'El espacio no está disponible para reservaciones',
                 'error' => 'space_inactive',
             ], 422);
+        }
+
+        // Verificar disponibilidad usando el servicio dedicado
+        if (!$this->availabilityService->isSpaceAvailable(
+            $validated['space_id'],
+            $validated['start_time'],
+            $validated['end_time']
+        )) {
+            // Obtener las reservas en conflicto para información adicional
+            $conflicting = $this->availabilityService->getOverlappingReservations(
+                $validated['space_id'],
+                $validated['start_time'],
+                $validated['end_time']
+            );
+
+            return response()->json([
+                'message' => 'El espacio no está disponible en el horario solicitado',
+                'error' => 'space_not_available',
+                'conflicting_reservations' => $conflicting->map(fn($r) => [
+                    'id' => $r->id,
+                    'start_time' => $r->start_time,
+                    'end_time' => $r->end_time,
+                ]),
+            ], 409);
         }
 
         $reservation = Reservation::create([
@@ -231,7 +255,12 @@ class ReservationController extends Controller
         $endTime = $validated['end_time'] ?? $reservation->end_time;
 
         if (isset($validated['start_time']) || isset($validated['end_time'])) {
-            if (!$reservation->space->isAvailable($startTime, $endTime, $reservation->id)) {
+            if (!$this->availabilityService->isSpaceAvailable(
+                $reservation->space_id,
+                $startTime,
+                $endTime,
+                $reservation->id // Excluir la reserva actual
+            )) {
                 return response()->json([
                     'message' => 'El espacio no está disponible en el nuevo horario solicitado',
                     'error' => 'space_not_available',
