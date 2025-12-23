@@ -9,10 +9,32 @@ interface ApiResponse<T> {
   message?: string;
 }
 
-interface SpaceFilters {
+interface PaginatedApiResponse<T> {
+  data: T;
+  meta?: {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+  };
+}
+
+export interface SpaceFilters {
   capacity?: number;
   search?: string;
   is_active?: boolean;
+  page?: number;
+  per_page?: number;
+}
+
+export interface PaginatedSpaces {
+  data: Space[];
+  meta?: {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+  };
 }
 
 @Injectable({ providedIn: 'root' })
@@ -26,7 +48,7 @@ export class SpacesService {
   readonly selectedSpace = signal<Space | null>(null);
 
   /**
-   * Obtener todos los espacios con filtros opcionales
+   * Obtener todos los espacios con filtros opcionales (sin paginación)
    */
   getSpaces(filters?: SpaceFilters): Observable<Space[]> {
     this.loading.set(true);
@@ -47,6 +69,37 @@ export class SpacesService {
         map(response => response.data),
         tap(spaces => this.spaces.set(spaces)),
         finalize(() => this.loading.set(false))
+      );
+  }
+
+  /**
+   * Obtener espacios con paginación (para infinite scroll)
+   */
+  getSpacesPaginated(filters?: SpaceFilters): Observable<PaginatedSpaces> {
+    let params = new HttpParams();
+    
+    if (filters?.capacity) {
+      params = params.set('capacity', filters.capacity.toString());
+    }
+    if (filters?.search) {
+      params = params.set('search', filters.search);
+    }
+    if (filters?.is_active !== undefined) {
+      params = params.set('is_active', filters.is_active ? '1' : '0');
+    }
+    if (filters?.page) {
+      params = params.set('page', filters.page.toString());
+    }
+    if (filters?.per_page) {
+      params = params.set('per_page', filters.per_page.toString());
+    }
+
+    return this.http.get<PaginatedApiResponse<Space[]>>(this.apiUrl, { params })
+      .pipe(
+        map(response => ({
+          data: response.data,
+          meta: response.meta
+        }))
       );
   }
 

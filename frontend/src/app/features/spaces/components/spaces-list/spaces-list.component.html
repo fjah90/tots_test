@@ -73,7 +73,10 @@
       <p-divider />
       <div class="flex justify-between items-center">
         <span class="text-gray-600 dark:text-gray-400">
-          <strong>{{ filteredSpaces().length }}</strong> espacios encontrados
+          <strong>{{ filteredSpaces().length }}</strong> de <strong>{{ totalItems() }}</strong> espacios
+          @if (hasMore()) {
+            <span class="text-sm text-gray-400"> (scroll para ver más)</span>
+          }
         </span>
       </div>
     </div>
@@ -210,6 +213,22 @@
           </p-card>
         }
       </div>
+
+      <!-- Infinite Scroll Loading Indicator -->
+      @if (loadingMore()) {
+        <div class="flex justify-center items-center py-8">
+          <p-progressSpinner strokeWidth="4" [style]="{ width: '40px', height: '40px' }" />
+          <span class="ml-3 text-gray-600 dark:text-gray-400">Cargando más espacios...</span>
+        </div>
+      }
+
+      <!-- End of Results Message -->
+      @if (!hasMore() && filteredSpaces().length > 0) {
+        <div class="text-center py-6 text-gray-500 dark:text-gray-400">
+          <i class="pi pi-check-circle text-2xl text-teal-500 mb-2"></i>
+          <p>Has visto todos los espacios disponibles</p>
+        </div>
+      }
     }
   </div>
 </div>

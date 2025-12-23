@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -18,7 +18,7 @@ import { CarouselModule } from 'primeng/carousel';
 import { MessageService } from 'primeng/api';
 
 // Services & Interfaces
-import { SpacesService } from '../../../../core/services/spaces.service';
+import { SpacesService, SpaceFilters } from '../../../../core/services/spaces.service';
 import { Space } from '../../../../shared/interfaces';
 import { FilterSpacesPipe, SpaceFilterCriteria } from '../../../../shared/pipes/filter-spaces.pipe';
 import { ReservationFormComponent } from '../reservation-form/reservation-form.component';
@@ -56,6 +56,13 @@ export class SpacesListComponent implements OnInit {
   // Estado
   spaces = signal<Space[]>([]);
   loading = signal(false);
+  loadingMore = signal(false);
+  
+  // Paginación para infinite scroll
+  currentPage = signal(1);
+  perPage = 12; // Elementos por página
+  totalItems = signal(0);
+  hasMore = signal(true);
   
   // Filtros
   searchTerm = signal('');
@@ -67,7 +74,7 @@ export class SpacesListComponent implements OnInit {
   showReservationDialogVisible = false;
   selectedSpace = signal<Space | null>(null);
 
-  // Criterios de filtrado computados
+  // Criterios de filtrado computados (para filtrado adicional del cliente)
   filterCriteria = computed<SpaceFilterCriteria>(() => ({
     search: this.searchTerm(),
     minCapacity: this.capacityRange()[0],
@@ -75,11 +82,25 @@ export class SpacesListComponent implements OnInit {
     isActive: true
   }));
 
-  // Espacios filtrados
+  // Espacios filtrados (filtra los ya cargados)
   filteredSpaces = computed(() => {
     const pipe = new FilterSpacesPipe();
     return pipe.transform(this.spaces(), this.filterCriteria());
   });
+
+  /**
+   * Detectar scroll para cargar más elementos (infinite scroll)
+   */
+  @HostListener('window:scroll')
+  onScroll(): void {
+    // Verificar si estamos cerca del final de la página
+    const scrollPosition = window.innerHeight + window.scrollY;
+    const threshold = document.documentElement.scrollHeight - 300;
+    
+    if (scrollPosition >= threshold && !this.loadingMore() && this.hasMore()) {
+      this.loadMoreSpaces();
+    }
+  }
 
   ngOnInit(): void {
     this.loadSpaces();
@@ -87,9 +108,23 @@ export class SpacesListComponent implements OnInit {
 
   loadSpaces(): void {
     this.loading.set(true);
-    this.spacesService.getSpaces({ is_active: true }).subscribe({
-      next: (spaces) => {
-        this.spaces.set(spaces);
+    this.currentPage.set(1);
+    this.spaces.set([]);
+    this.hasMore.set(true);
+    
+    this.spacesService.getSpacesPaginated({ 
+      is_active: true,
+      page: 1,
+      per_page: this.perPage
+    }).subscribe({
+      next: (response) => {
+        this.spaces.set(response.data);
+        if (response.meta) {
+          this.totalItems.set(response.meta.total);
+          this.hasMore.set(response.meta.current_page < response.meta.last_page);
+        } else {
+          this.hasMore.set(false);
+        }
         this.loading.set(false);
       },
       error: (err) => {
@@ -100,6 +135,40 @@ export class SpacesListComponent implements OnInit {
           detail: 'No se pudieron cargar los espacios'
         });
         this.loading.set(false);
+      }
+    });
+  }
+
+  /**
+   * Cargar más espacios (infinite scroll)
+   */
+  loadMoreSpaces(): void {
+    if (this.loadingMore() || !this.hasMore()) return;
+    
+    this.loadingMore.set(true);
+    const nextPage = this.currentPage() + 1;
+    
+    this.spacesService.getSpacesPaginated({
+      is_active: true,
+      page: nextPage,
+      per_page: this.perPage
+    }).subscribe({
+      next: (response) => {
+        // Agregar nuevos espacios a los existentes
+        this.spaces.update(current => [...current, ...response.data]);
+        this.currentPage.set(nextPage);
+        
+        if (response.meta) {
+          this.totalItems.set(response.meta.total);
+          this.hasMore.set(response.meta.current_page < response.meta.last_page);
+        } else {
+          this.hasMore.set(false);
+        }
+        this.loadingMore.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading more spaces:', err);
+        this.loadingMore.set(false);
       }
     });
   }

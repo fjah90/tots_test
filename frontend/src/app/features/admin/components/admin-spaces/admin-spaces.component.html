@@ -41,176 +41,101 @@
 
     <!--
       ====================================================================
-      MC-TABLE INTEGRATION (@matiascamiletti/mc-kit)
-      ====================================================================
-      
-      Cuando el paquete esté disponible en npm, reemplazar p-table por:
-      
-      <mc-table 
-        [data]="spaces()" 
-        [columns]="columns"
-        [loading]="loading()"
-        [paginator]="true"
-        [rows]="10"
-        [rowsPerPageOptions]="[5, 10, 25]"
-        (onRowSelect)="onRowSelect($event)">
-        
-        <ng-template mcTableColumn="is_active" let-rowData>
-          <p-tag [severity]="getStatusSeverity(rowData.is_active)"
-                 [value]="getStatusText(rowData.is_active)">
-          </p-tag>
-        </ng-template>
-        
-        <ng-template mcTableColumn="actions" let-rowData>
-          <div class="flex gap-2">
-            <p-button icon="pi pi-pencil" 
-                      [routerLink]="['/admin/spaces', rowData.id, 'edit']"
-                      severity="info" 
-                      [text]="true">
-            </p-button>
-            <p-button icon="pi pi-trash" 
-                      severity="danger" 
-                      [text]="true"
-                      (onClick)="confirmDelete(rowData)">
-            </p-button>
-          </div>
-        </ng-template>
-      </mc-table>
-      
+      MC-TABLE INTEGRATION (@mckit/table)
+      Implementación oficial usando la librería de Matías Camiletti
+      https://github.com/matiascamiletti/mc-kit
       ====================================================================
     -->
 
-    <!-- p-table de PrimeNG (Estructura compatible con MC-Table) -->
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-      <p-table 
-        [value]="spaces()" 
-        [loading]="loading()"
-        [paginator]="true" 
-        [rows]="10"
-        [rowsPerPageOptions]="[5, 10, 25]"
-        [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} espacios"
-        styleClass="p-datatable-striped"
-        responsiveLayout="scroll"
-        (onRowSelect)="onRowSelect($event)">
+    <!-- MC-Table de @mckit/table -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow transition-colors">
+      <mc-table 
+        [columns]="columns" 
+        [response]="tableResponse()"
+        [paginator]="true"
+        (onPage)="onPageChange($event)">
         
-        <ng-template pTemplate="header">
-          <tr>
-            @for (col of columns; track col.field) {
-              @if (col.sortable) {
-                <th [pSortableColumn]="col.field" [style.width]="col.width">
-                  {{ col.header }}
-                  <p-sortIcon [field]="col.field" />
-                </th>
-              } @else {
-                <th [style.width]="col.width">{{ col.header }}</th>
-              }
-            }
-          </tr>
-        </ng-template>
-
-        <ng-template pTemplate="body" let-space>
-          <tr>
-            <!-- Nombre -->
-            <td>
-              <div class="flex items-center gap-3">
-                @if (space.image_url) {
-                  <img 
-                    [src]="space.image_url" 
-                    [alt]="space.name"
-                    class="w-10 h-10 rounded-lg object-cover"
-                  />
-                } @else {
-                  <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center">
-                    <i class="pi pi-building text-white text-sm"></i>
-                  </div>
-                }
-                <div>
-                  <p class="font-semibold text-gray-800">{{ space.name }}</p>
-                  @if (space.description) {
-                    <p class="text-sm text-gray-500 truncate max-w-[200px]">
-                      {{ space.description }}
-                    </p>
-                  }
-                </div>
-              </div>
-            </td>
-
-            <!-- Capacidad -->
-            <td>
-              <div class="flex items-center gap-2">
-                <i class="pi pi-users text-gray-400"></i>
-                <span>{{ space.capacity }} personas</span>
-              </div>
-            </td>
-
-            <!-- Ubicación -->
-            <td>
-              @if (space.location) {
-                <div class="flex items-center gap-2">
-                  <i class="pi pi-map-marker text-gray-400"></i>
-                  <span>{{ space.location }}</span>
-                </div>
-              } @else {
-                <span class="text-gray-400">-</span>
-              }
-            </td>
-
-            <!-- Estado -->
-            <td>
-              <p-tag 
-                [severity]="getStatusSeverity(space.is_active)"
-                [value]="getStatusText(space.is_active)"
-                [icon]="space.is_active ? 'pi pi-check' : 'pi pi-times'"
+        <!-- Template personalizado para columna Nombre -->
+        <ng-template mcTdTemplate="name" let-space>
+          <div class="flex items-center gap-3">
+            @if (space.image_url) {
+              <img 
+                [src]="space.image_url" 
+                [alt]="space.name"
+                class="w-10 h-10 rounded-lg object-cover"
               />
-            </td>
-
-            <!-- Acciones -->
-            <td>
-              <div class="flex gap-2">
-                <p-button 
-                  icon="pi pi-pencil" 
-                  [routerLink]="['/admin/spaces', space.id, 'edit']"
-                  severity="info" 
-                  [text]="true"
-                  pTooltip="Editar"
-                />
-                <p-button 
-                  icon="pi pi-eye" 
-                  [routerLink]="['/spaces', space.id]"
-                  severity="secondary" 
-                  [text]="true"
-                  pTooltip="Ver público"
-                />
-                <p-button 
-                  icon="pi pi-trash" 
-                  severity="danger" 
-                  [text]="true"
-                  pTooltip="Eliminar"
-                  (onClick)="confirmDelete(space)"
-                />
+            } @else {
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center">
+                <i class="pi pi-building text-white text-sm"></i>
               </div>
-            </td>
-          </tr>
+            }
+            <div>
+              <p class="font-semibold text-gray-800 dark:text-white">{{ space.name }}</p>
+              @if (space.description) {
+                <p class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[200px]">
+                  {{ space.description }}
+                </p>
+              }
+            </div>
+          </div>
         </ng-template>
 
-        <ng-template pTemplate="emptymessage">
-          <tr>
-            <td [colSpan]="columns.length" class="text-center py-12">
-              <div class="text-gray-500">
-                <i class="pi pi-inbox text-4xl mb-4"></i>
-                <p class="text-lg font-medium">No hay espacios registrados</p>
-                <p class="text-sm mb-4">Comienza creando tu primer espacio</p>
-                <p-button 
-                  label="Crear Espacio" 
-                  icon="pi pi-plus"
-                  routerLink="/admin/spaces/new"
-                />
-              </div>
-            </td>
-          </tr>
+        <!-- Template personalizado para columna Capacidad -->
+        <ng-template mcTdTemplate="capacity" let-space>
+          <div class="flex items-center gap-2">
+            <i class="pi pi-users text-gray-400"></i>
+            <span class="dark:text-gray-300">{{ space.capacity }} personas</span>
+          </div>
         </ng-template>
-      </p-table>
+
+        <!-- Template personalizado para columna Ubicación -->
+        <ng-template mcTdTemplate="location" let-space>
+          @if (space.location) {
+            <div class="flex items-center gap-2">
+              <i class="pi pi-map-marker text-gray-400"></i>
+              <span class="dark:text-gray-300">{{ space.location }}</span>
+            </div>
+          } @else {
+            <span class="text-gray-400">-</span>
+          }
+        </ng-template>
+
+        <!-- Template personalizado para columna Estado -->
+        <ng-template mcTdTemplate="is_active" let-space>
+          <p-tag 
+            [severity]="getStatusSeverity(space.is_active)"
+            [value]="getStatusText(space.is_active)"
+            [icon]="space.is_active ? 'pi pi-check' : 'pi pi-times'"
+          />
+        </ng-template>
+
+        <!-- Template personalizado para columna Acciones -->
+        <ng-template mcTdTemplate="actions" let-space>
+          <div class="flex gap-2">
+            <p-button 
+              icon="pi pi-pencil" 
+              [routerLink]="['/admin/spaces', space.id, 'edit']"
+              severity="info" 
+              [text]="true"
+              pTooltip="Editar"
+            />
+            <p-button 
+              icon="pi pi-eye" 
+              [routerLink]="['/spaces', space.id]"
+              severity="secondary" 
+              [text]="true"
+              pTooltip="Ver público"
+            />
+            <p-button 
+              icon="pi pi-trash" 
+              severity="danger" 
+              [text]="true"
+              pTooltip="Eliminar"
+              (onClick)="confirmDelete(space)"
+            />
+          </div>
+        </ng-template>
+      </mc-table>
     </div>
 
     <!-- Estadísticas rápidas -->

@@ -277,3 +277,41 @@ html, body {
     }
   }
 }
+
+/* ========================================
+   MC-Table & Paginator Dropdown Fix
+   ======================================== */
+
+// Asegurar que los dropdowns del paginador se muestren correctamente
+.p-paginator {
+  overflow: visible !important;
+}
+
+// El contenedor de la tabla no debe cortar el dropdown
+.p-datatable,
+.p-table,
+mc-table {
+  overflow: visible !important;
+}
+
+// Fix para el dropdown del paginador (rows per page selector)
+.p-paginator-rpp-dropdown,
+.p-paginator .p-select,
+.p-paginator .p-dropdown {
+  overflow: visible !important;
+}
+
+// El panel del dropdown debe aparecer sobre todo
+.p-select-overlay,
+.p-dropdown-panel {
+  z-index: 9999 !important;
+}
+
+// El contenedor con shadow no debe cortar el dropdown
+.shadow, .shadow-lg, .rounded-lg {
+  &:has(.p-paginator),
+  &:has(mc-table),
+  &:has(.p-table) {
+    overflow: visible !important;
+  }
+}

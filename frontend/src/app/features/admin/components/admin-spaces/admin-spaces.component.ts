@@ -13,25 +13,12 @@ import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
+// MC-Kit (@mckit) - Librería de tablas de Matías Camiletti
+import { MCTable, MCTdTemplateDirective } from '@mckit/table';
+import { MCColumn, MCListResponse } from '@mckit/core';
+
 import { SpacesService } from '../../../../core/services/spaces.service';
 import { Space } from '../../../../shared/interfaces';
-
-/**
- * Definición de columna para MC-Table / p-table
- * Compatible con @matiascamiletti/mc-kit cuando esté disponible
- * 
- * Para migrar a MC-Table:
- * 1. Instalar: pnpm add @matiascamiletti/mc-kit
- * 2. Importar: import { McTableComponent, McTableColumn } from '@matiascamiletti/mc-kit';
- * 3. Reemplazar <p-table> por <mc-table [data]="spaces()" [columns]="columns">
- */
-export interface McTableColumn {
-  field: string;
-  header: string;
-  sortable?: boolean;
-  type?: 'text' | 'number' | 'boolean' | 'date' | 'template';
-  width?: string;
-}
 
 @Component({
   selector: 'app-admin-spaces',
@@ -46,7 +33,10 @@ export interface McTableColumn {
     ConfirmDialogModule,
     ToastModule,
     TableModule,
-    TooltipModule
+    TooltipModule,
+    // MC-Kit Components
+    MCTable,
+    MCTdTemplateDirective
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './admin-spaces.component.html',
@@ -60,47 +50,69 @@ export class AdminSpacesComponent implements OnInit {
   spaces = signal<Space[]>([]);
   loading = signal(false);
   searchTerm = signal('');
+  
+  // Paginación para MC-Table
+  currentPage = signal(0);
+  rowsPerPage = signal(10);
 
   // Computed para estadísticas
   activeCount = computed(() => this.spaces().filter(s => s.is_active).length);
   inactiveCount = computed(() => this.spaces().filter(s => !s.is_active).length);
 
   /**
-   * Configuración de columnas para MC-Table / p-table
-   * Esta estructura es compatible con @matiascamiletti/mc-kit
+   * MCListResponse para MC-Table con paginación del cliente
+   * Estructura requerida por @mckit/table
    */
-  columns: McTableColumn[] = [
+  tableResponse = computed<MCListResponse<Space>>(() => {
+    const allData = this.spaces();
+    const page = this.currentPage();
+    const perPage = this.rowsPerPage();
+    
+    // Calcular datos paginados
+    const start = page * perPage;
+    const end = start + perPage;
+    const paginatedData = allData.slice(start, end);
+    
+    const response = new MCListResponse<Space>();
+    response.data = paginatedData;
+    response.total = allData.length;
+    response.per_page = perPage;
+    return response;
+  });
+
+  /**
+   * Configuración de columnas para MC-Table (@mckit/table)
+   * Usando MCColumn de @mckit/core
+   */
+  columns: MCColumn[] = [
     { 
       field: 'name', 
-      header: 'Nombre', 
-      sortable: true,
-      type: 'text'
+      title: 'Nombre', 
+      isSortable: true,
+      isShow: true
     },
     { 
       field: 'capacity', 
-      header: 'Capacidad', 
-      sortable: true,
-      type: 'number',
-      width: '120px'
+      title: 'Capacidad', 
+      isSortable: true,
+      isShow: true
     },
     { 
       field: 'location', 
-      header: 'Ubicación', 
-      sortable: true,
-      type: 'text'
+      title: 'Ubicación', 
+      isSortable: true,
+      isShow: true
     },
     { 
       field: 'is_active', 
-      header: 'Estado', 
-      sortable: true,
-      type: 'boolean',
-      width: '100px'
+      title: 'Estado', 
+      isSortable: true,
+      isShow: true
     },
     { 
       field: 'actions', 
-      header: 'Acciones', 
-      type: 'template',
-      width: '150px'
+      title: 'Acciones', 
+      isShow: true
     }
   ];
 
@@ -167,6 +179,16 @@ export class AdminSpacesComponent implements OnInit {
 
   onRowSelect(event: any): void {
     console.log('Espacio seleccionado:', event.data);
+  }
+
+  /**
+   * Maneja el evento de cambio de página de MC-Table
+   */
+  onPageChange(event: any): void {
+    // event contiene first (índice del primer elemento) y rows (elementos por página)
+    const page = Math.floor(event.first / event.rows);
+    this.currentPage.set(page);
+    this.rowsPerPage.set(event.rows);
   }
 
   getStatusSeverity(isActive: boolean): 'success' | 'danger' {
