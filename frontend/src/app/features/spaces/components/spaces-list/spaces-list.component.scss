@@ -45,6 +45,24 @@
     }
   }
 
+  // ============================================
+  // DARK MODE para p-card de PrimeNG
+  // ============================================
+  :host-context(.dark) .p-card,
+  .dark .p-card {
+    background-color: #1f2937 !important; // gray-800
+    border-color: #374151 !important; // gray-700
+    
+    .p-card-body {
+      background-color: #1f2937 !important;
+    }
+    
+    .p-card-footer {
+      background-color: #1f2937 !important;
+      border-color: #374151 !important;
+    }
+  }
+
   // Contenido de la card con alturas fijas
   .card-content {
     display: flex;

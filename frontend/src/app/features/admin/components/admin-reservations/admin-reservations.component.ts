@@ -13,6 +13,9 @@ import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 // Services
@@ -36,14 +39,17 @@ import { environment } from '../../../../../environments/environment';
     SelectModule,
     DatePickerModule,
     TooltipModule,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
+    DialogModule,
+    InputTextModule,
+    InputNumberModule
   ],
   providers: [MessageService, ConfirmationService],
   template: `
     <p-toast></p-toast>
     <p-confirmDialog></p-confirmDialog>
 
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <!-- Header -->
       <div class="bg-gradient-to-r from-gray-700 to-gray-800 text-white py-8 px-6">
         <div class="max-w-7xl mx-auto">
@@ -53,11 +59,11 @@ import { environment } from '../../../../../environments/environment';
       </div>
 
       <div class="max-w-7xl mx-auto px-6 py-8 -mt-6">
-        <!-- Filtros -->
-        <div class="bg-white rounded-lg shadow p-4 mb-6">
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Filtros y Botón Nueva Reserva -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6 transition-colors">
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Estado</label>
               <p-select 
                 [options]="statusOptions" 
                 [(ngModel)]="selectedStatus"
@@ -68,7 +74,7 @@ import { environment } from '../../../../../environments/environment';
               </p-select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Desde</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Desde</label>
               <p-datepicker 
                 [(ngModel)]="fromDate"
                 (onSelect)="loadReservations()"
@@ -78,7 +84,7 @@ import { environment } from '../../../../../environments/environment';
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Hasta</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hasta</label>
               <p-datepicker 
                 [(ngModel)]="toDate"
                 (onSelect)="loadReservations()"
@@ -87,25 +93,32 @@ import { environment } from '../../../../../environments/environment';
                 styleClass="w-full"
               />
             </div>
-            <div class="flex items-end gap-2">
-              <p-button 
-                label="Buscar" 
-                icon="pi pi-search" 
-                (onClick)="loadReservations()"
-              />
-              <p-button 
-                label="Limpiar" 
-                icon="pi pi-times" 
-                severity="secondary"
-                [outlined]="true"
-                (onClick)="clearFilters()"
-              />
-            </div>
+            <p-button 
+              label="Buscar" 
+              icon="pi pi-search" 
+              (onClick)="loadReservations()"
+            />
+            <p-button 
+              label="Nueva Reserva" 
+              icon="pi pi-plus"
+              severity="success"
+              (onClick)="openNewReservationDialog()"
+            />
+          </div>
+          <div class="mt-4">
+            <p-button 
+              label="Limpiar" 
+              icon="pi pi-times" 
+              severity="secondary"
+              [outlined]="true"
+              (onClick)="clearFilters()"
+              [text]="true"
+            />
           </div>
         </div>
 
         <!-- Tabla -->
-        <div class="bg-white rounded-lg shadow">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow transition-colors">
           <p-table 
             [value]="reservations()" 
             [loading]="loading()"
@@ -174,6 +187,16 @@ import { environment } from '../../../../../environments/environment';
 
                 <td>
                   <div class="flex gap-1">
+                    @if (reservation.status !== 'cancelled') {
+                      <p-button 
+                        icon="pi pi-pencil" 
+                        severity="warn"
+                        [text]="true"
+                        pTooltip="Editar"
+                        (onClick)="editReservation(reservation)"
+                        size="small"
+                      />
+                    }
                     @if (reservation.status === 'pending') {
                       <p-button 
                         icon="pi pi-check" 
@@ -194,6 +217,14 @@ import { environment } from '../../../../../environments/environment';
                         size="small"
                       />
                     }
+                    <p-button 
+                      icon="pi pi-trash" 
+                      severity="danger"
+                      [text]="true"
+                      pTooltip="Eliminar permanentemente"
+                      (onClick)="deleteReservation(reservation)"
+                      size="small"
+                    />
                   </div>
                 </td>
               </tr>
@@ -212,45 +243,160 @@ import { environment } from '../../../../../environments/environment';
 
         <!-- Estadísticas -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-          <div class="bg-white rounded-lg shadow p-4 flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <i class="pi pi-list text-blue-600"></i>
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-center gap-4 transition-colors">
+            <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+              <i class="pi pi-list text-blue-600 dark:text-blue-400"></i>
             </div>
             <div>
-              <p class="text-xl font-bold">{{ reservations().length }}</p>
-              <p class="text-gray-500 text-sm">Total</p>
+              <p class="text-xl font-bold dark:text-white">{{ reservations().length }}</p>
+              <p class="text-gray-500 dark:text-gray-400 text-sm">Total</p>
             </div>
           </div>
-          <div class="bg-white rounded-lg shadow p-4 flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-              <i class="pi pi-check text-green-600"></i>
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-center gap-4 transition-colors">
+            <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+              <i class="pi pi-check text-green-600 dark:text-green-400"></i>
             </div>
             <div>
-              <p class="text-xl font-bold">{{ confirmedCount() }}</p>
-              <p class="text-gray-500 text-sm">Confirmadas</p>
+              <p class="text-xl font-bold dark:text-white">{{ confirmedCount() }}</p>
+              <p class="text-gray-500 dark:text-gray-400 text-sm">Confirmadas</p>
             </div>
           </div>
-          <div class="bg-white rounded-lg shadow p-4 flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
-              <i class="pi pi-clock text-yellow-600"></i>
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-center gap-4 transition-colors">
+            <div class="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
+              <i class="pi pi-clock text-yellow-600 dark:text-yellow-400"></i>
             </div>
             <div>
-              <p class="text-xl font-bold">{{ pendingCount() }}</p>
-              <p class="text-gray-500 text-sm">Pendientes</p>
+              <p class="text-xl font-bold dark:text-white">{{ pendingCount() }}</p>
+              <p class="text-gray-500 dark:text-gray-400 text-sm">Pendientes</p>
             </div>
           </div>
-          <div class="bg-white rounded-lg shadow p-4 flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-              <i class="pi pi-times text-red-600"></i>
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-center gap-4 transition-colors">
+            <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
+              <i class="pi pi-times text-red-600 dark:text-red-400"></i>
             </div>
             <div>
-              <p class="text-xl font-bold">{{ cancelledCount() }}</p>
-              <p class="text-gray-500 text-sm">Canceladas</p>
+              <p class="text-xl font-bold dark:text-white">{{ cancelledCount() }}</p>
+              <p class="text-gray-500 dark:text-gray-400 text-sm">Canceladas</p>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Dialog Nueva/Editar Reservación -->
+    <p-dialog 
+      [(visible)]="showReservationDialog"
+      [header]="editingReservation ? 'Editar Reservación' : 'Nueva Reservación'"
+      [modal]="true"
+      [style]="{ width: '500px' }"
+      (onHide)="resetForm()">
+      
+      <div class="space-y-4">
+        <!-- Usuario -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Usuario *</label>
+          <p-select 
+            [(ngModel)]="formData.user_id"
+            [options]="users"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Seleccionar usuario"
+            [showClear]="false"
+            styleClass="w-full">
+            <ng-template let-option pTemplate="item">
+              <div class="flex items-center gap-2">
+                <span>{{ option.name }}</span>
+                <span class="text-xs text-gray-500">({{ option.email }})</span>
+              </div>
+            </ng-template>
+          </p-select>
+        </div>
+
+        <!-- Espacio -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Espacio *</label>
+          <p-select 
+            [(ngModel)]="formData.space_id"
+            [options]="spaces"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Seleccionar espacio"
+            [showClear]="false"
+            styleClass="w-full">
+            <ng-template let-option pTemplate="item">
+              <div class="flex items-center justify-between">
+                <span>{{ option.name }}</span>
+                <span class="text-xs text-gray-500">Cap: {{ option.capacity }}</span>
+              </div>
+            </ng-template>
+          </p-select>
+        </div>
+
+        <!-- Fecha Inicio -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fecha y Hora Inicio *</label>
+          <p-datepicker 
+            [(ngModel)]="formData.start_time"
+            [showTime]="true"
+            dateFormat="dd/mm/yy"
+            timeOnly="false"
+            [showIcon]="true"
+            styleClass="w-full"
+          />
+        </div>
+
+        <!-- Fecha Fin -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fecha y Hora Fin *</label>
+          <p-datepicker 
+            [(ngModel)]="formData.end_time"
+            [showTime]="true"
+            dateFormat="dd/mm/yy"
+            timeOnly="false"
+            [showIcon]="true"
+            styleClass="w-full"
+          />
+        </div>
+
+        <!-- Estado -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Estado *</label>
+          <p-select 
+            [(ngModel)]="formData.status"
+            [options]="statusOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccionar estado"
+            styleClass="w-full">
+          </p-select>
+        </div>
+
+        <!-- Notas -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notas</label>
+          <input 
+            type="text" 
+            pInputText 
+            [(ngModel)]="formData.notes"
+            placeholder="Observaciones adicionales"
+            class="w-full"
+          />
+        </div>
+      </div>
+
+      <ng-template pTemplate="footer">
+        <p-button 
+          label="Cancelar" 
+          severity="secondary"
+          (onClick)="showReservationDialog = false"
+        />
+        <p-button 
+          label="Guardar" 
+          (onClick)="saveReservation()"
+          [loading]="saving()"
+        />
+      </ng-template>
+    </p-dialog>
   `
 })
 export class AdminReservationsComponent implements OnInit {
@@ -260,10 +406,27 @@ export class AdminReservationsComponent implements OnInit {
 
   reservations = signal<Reservation[]>([]);
   loading = signal(false);
+  saving = signal(false);
   
   selectedStatus: string | null = null;
   fromDate: Date | null = null;
   toDate: Date | null = null;
+
+  // Dialog y formulario
+  showReservationDialog = false;
+  editingReservation: Reservation | null = null;
+  
+  formData = {
+    user_id: null as number | null,
+    space_id: null as number | null,
+    start_time: null as Date | null,
+    end_time: null as Date | null,
+    status: 'confirmed' as string,
+    notes: '' as string
+  };
+
+  users: any[] = [];
+  spaces: any[] = [];
 
   statusOptions = [
     { label: 'Confirmadas', value: 'confirmed' },
@@ -277,12 +440,14 @@ export class AdminReservationsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadReservations();
+    this.loadUsers();
+    this.loadSpaces();
   }
 
   loadReservations(): void {
     this.loading.set(true);
     
-    let url = `${environment.apiUrl}/admin/reservations`;
+    let url = `${environment.apiUrl}/reservations`;
     const params = new URLSearchParams();
     
     if (this.selectedStatus) params.append('status', this.selectedStatus);
@@ -305,6 +470,153 @@ export class AdminReservationsComponent implements OnInit {
         });
       }
     });
+  }
+
+  loadUsers(): void {
+    this.http.get<{ data: any[] }>(`${environment.apiUrl}/users`).subscribe({
+      next: (res) => {
+        this.users = res.data || [];
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudieron cargar los usuarios'
+        });
+      }
+    });
+  }
+
+  loadSpaces(): void {
+    this.http.get<{ data: any[] }>(`${environment.apiUrl}/spaces?limit=1000`).subscribe({
+      next: (res) => {
+        this.spaces = res.data || [];
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudieron cargar los espacios'
+        });
+      }
+    });
+  }
+
+  openNewReservationDialog(): void {
+    this.editingReservation = null;
+    this.resetForm();
+    this.showReservationDialog = true;
+  }
+
+  editReservation(reservation: Reservation): void {
+    this.editingReservation = reservation;
+    this.formData = {
+      user_id: reservation.user_id,
+      space_id: reservation.space_id,
+      start_time: new Date(reservation.start_time),
+      end_time: new Date(reservation.end_time),
+      status: reservation.status,
+      notes: reservation.notes || ''
+    };
+    this.showReservationDialog = true;
+  }
+
+  resetForm(): void {
+    this.formData = {
+      user_id: null,
+      space_id: null,
+      start_time: null,
+      end_time: null,
+      status: 'confirmed',
+      notes: ''
+    };
+  }
+
+  saveReservation(): void {
+    if (!this.formData.user_id || !this.formData.space_id || !this.formData.start_time || !this.formData.end_time) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Validación',
+        detail: 'Complete todos los campos requeridos'
+      });
+      return;
+    }
+
+    this.saving.set(true);
+
+    const payload = {
+      user_id: this.formData.user_id,
+      space_id: this.formData.space_id,
+      start_time: this.formatDateTime(this.formData.start_time),
+      end_time: this.formatDateTime(this.formData.end_time),
+      status: this.formData.status,
+      notes: this.formData.notes
+    };
+
+    if (this.editingReservation) {
+      // Actualizar
+      this.http.put(
+        `${environment.apiUrl}/reservations/${this.editingReservation.id}`,
+        payload
+      ).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Reservación actualizada'
+          });
+          this.showReservationDialog = false;
+          this.loadReservations();
+          this.saving.set(false);
+        },
+        error: (err) => {
+          this.saving.set(false);
+          const message = err.error?.message || 'Error al actualizar la reservación';
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: message
+          });
+        }
+      });
+    } else {
+      // Crear nueva
+      this.http.post(
+        `${environment.apiUrl}/reservations`,
+        payload
+      ).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Reservación creada'
+          });
+          this.showReservationDialog = false;
+          this.loadReservations();
+          this.saving.set(false);
+        },
+        error: (err) => {
+          this.saving.set(false);
+          const message = err.error?.message || 'Error al crear la reservación';
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: message
+          });
+        }
+      });
+    }
+  }
+
+  private formatDateTime(date: Date | null): string {
+    if (!date) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
   clearFilters(): void {
@@ -367,6 +679,27 @@ export class AdminReservationsComponent implements OnInit {
             },
             error: () => {
               this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cancelar' });
+            }
+          });
+      }
+    });
+  }
+
+  deleteReservation(reservation: Reservation): void {
+    this.confirmationService.confirm({
+      message: '¿Eliminar permanentemente esta reservación? Esta acción no se puede deshacer.',
+      header: 'Eliminar Reservación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.http.delete(`${environment.apiUrl}/reservations/${reservation.id}`)
+          .subscribe({
+            next: () => {
+              this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Reservación eliminada permanentemente' });
+              this.loadReservations();
+            },
+            error: () => {
+              this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar la reservación' });
             }
           });
       }

@@ -30,6 +30,8 @@ class UpdateSpaceRequest extends FormRequest
             'amenities' => ['nullable', 'array'],
             'amenities.*' => ['string', 'max:100'],
             'image_url' => ['nullable', 'url', 'max:500'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['url', 'max:500'],
             'is_active' => ['boolean'],
         ];
     }

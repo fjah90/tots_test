@@ -15,6 +15,7 @@ import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
 
 // Services
 import { SpacesService } from '../../../../core/services/spaces.service';
@@ -37,13 +38,14 @@ import { Space } from '../../../../shared/interfaces';
     ToastModule,
     DividerModule,
     ProgressSpinnerModule,
-    TagModule
+    TagModule,
+    TooltipModule
   ],
   providers: [MessageService],
   template: `
     <p-toast></p-toast>
 
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <!-- Header -->
       <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white py-8 px-6">
         <div class="max-w-4xl mx-auto">
@@ -69,7 +71,7 @@ import { Space } from '../../../../shared/interfaces';
 
       <div class="max-w-4xl mx-auto px-6 py-8 -mt-6">
         @if (loadingSpace()) {
-          <div class="flex justify-center items-center py-20 bg-white rounded-lg shadow">
+          <div class="flex justify-center items-center py-20 bg-white dark:bg-gray-800 rounded-lg shadow transition-colors">
             <p-progressSpinner strokeWidth="4" />
           </div>
         } @else {
@@ -78,7 +80,7 @@ import { Space } from '../../../../shared/interfaces';
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Nombre -->
                 <div class="md:col-span-2 flex flex-col gap-2">
-                  <label for="name" class="font-semibold text-gray-700">
+                  <label for="name" class="font-semibold text-gray-700 dark:text-gray-300">
                     Nombre del Espacio <span class="text-red-500">*</span>
                   </label>
                   <input 
@@ -96,7 +98,7 @@ import { Space } from '../../../../shared/interfaces';
 
                 <!-- Descripción -->
                 <div class="md:col-span-2 flex flex-col gap-2">
-                  <label for="description" class="font-semibold text-gray-700">
+                  <label for="description" class="font-semibold text-gray-700 dark:text-gray-300">
                     Descripción
                   </label>
                   <textarea 
@@ -111,7 +113,7 @@ import { Space } from '../../../../shared/interfaces';
 
                 <!-- Capacidad -->
                 <div class="flex flex-col gap-2">
-                  <label for="capacity" class="font-semibold text-gray-700">
+                  <label for="capacity" class="font-semibold text-gray-700 dark:text-gray-300">
                     Capacidad <span class="text-red-500">*</span>
                   </label>
                   <p-inputNumber 
@@ -130,7 +132,7 @@ import { Space } from '../../../../shared/interfaces';
 
                 <!-- Ubicación -->
                 <div class="flex flex-col gap-2">
-                  <label for="location" class="font-semibold text-gray-700">
+                  <label for="location" class="font-semibold text-gray-700 dark:text-gray-300">
                     Ubicación
                   </label>
                   <input 
@@ -143,34 +145,69 @@ import { Space } from '../../../../shared/interfaces';
                   />
                 </div>
 
-                <!-- URL de Imagen -->
+                <!-- URLs de Imágenes -->
                 <div class="md:col-span-2 flex flex-col gap-2">
-                  <label for="image_url" class="font-semibold text-gray-700">
-                    URL de Imagen
+                  <label for="new_image_url" class="font-semibold text-gray-700 dark:text-gray-300">
+                    Imágenes del Espacio
                   </label>
-                  <input 
-                    id="image_url"
-                    type="url" 
-                    pInputText 
-                    formControlName="image_url"
-                    placeholder="https://ejemplo.com/imagen.jpg"
-                    class="w-full"
-                  />
-                  @if (imageUrlControl?.value) {
-                    <div class="mt-2">
-                      <img 
-                        [src]="imageUrlControl?.value" 
-                        alt="Preview"
-                        class="w-48 h-32 object-cover rounded-lg border"
-                        (error)="onImageError($event)"
-                      />
+                  <div class="flex gap-2">
+                    <input 
+                      id="new_image_url"
+                      type="url" 
+                      pInputText 
+                      [(ngModel)]="newImageUrl"
+                      [ngModelOptions]="{standalone: true}"
+                      placeholder="https://ejemplo.com/imagen.jpg"
+                      class="flex-1"
+                      (keydown.enter)="addImage($event)"
+                    />
+                    <p-button 
+                      icon="pi pi-plus" 
+                      (onClick)="addImage($event)"
+                      [disabled]="!newImageUrl.trim()"
+                      pTooltip="Agregar imagen"
+                    />
+                  </div>
+                  @if (imagesArray.length > 0) {
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                      @for (imageUrl of imagesArray; track imageUrl; let i = $index) {
+                        <div class="relative group">
+                          <img 
+                            [src]="imageUrl" 
+                            alt="Imagen {{i + 1}}"
+                            class="w-full h-24 object-cover rounded-lg border"
+                            (error)="onImageError($event)"
+                          />
+                          <button 
+                            type="button"
+                            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            (click)="removeImage(i)"
+                            pTooltip="Eliminar imagen">
+                            <i class="pi pi-times text-xs"></i>
+                          </button>
+                          @if (i === 0) {
+                            <span class="absolute bottom-1 left-1 bg-teal-500 text-white text-xs px-2 py-0.5 rounded">
+                              Principal
+                            </span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="text-center py-8 bg-gray-100 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 mt-2">
+                      <i class="pi pi-images text-4xl text-gray-400 dark:text-gray-500 mb-2"></i>
+                      <p class="text-gray-500 dark:text-gray-400">No hay imágenes agregadas</p>
+                      <p class="text-gray-400 dark:text-gray-500 text-sm">Agrega URLs de imágenes para mostrar en el espacio</p>
                     </div>
                   }
+                  <small class="text-gray-500 dark:text-gray-400">
+                    La primera imagen será la imagen principal del espacio
+                  </small>
                 </div>
 
                 <!-- Amenidades -->
                 <div class="md:col-span-2 flex flex-col gap-2">
-                  <label for="amenities" class="font-semibold text-gray-700">
+                  <label for="amenities" class="font-semibold text-gray-700 dark:text-gray-300">
                     Amenidades
                   </label>
                   <div class="flex gap-2">
@@ -193,11 +230,11 @@ import { Space } from '../../../../shared/interfaces';
                   @if (amenitiesArray.length > 0) {
                     <div class="flex flex-wrap gap-2 mt-2">
                       @for (amenity of amenitiesArray; track amenity; let i = $index) {
-                        <span class="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                        <span class="inline-flex items-center gap-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm">
                           {{ amenity }}
                           <button 
                             type="button"
-                            class="ml-1 hover:text-red-600 transition-colors"
+                            class="ml-1 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                             (click)="removeAmenity(i)">
                             <i class="pi pi-times text-xs"></i>
                           </button>
@@ -205,7 +242,7 @@ import { Space } from '../../../../shared/interfaces';
                       }
                     </div>
                   }
-                  <small class="text-gray-500">
+                  <small class="text-gray-500 dark:text-gray-400">
                     Ejemplos: WiFi, Proyector, Pizarra, Aire Acondicionado
                   </small>
                 </div>
@@ -218,10 +255,10 @@ import { Space } from '../../../../shared/interfaces';
                     formControlName="is_active"
                     inputId="is_active"
                   />
-                  <label for="is_active" class="font-semibold text-gray-700 cursor-pointer">
+                  <label for="is_active" class="font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
                     Espacio Activo
                   </label>
-                  <span class="text-gray-500 text-sm">
+                  <span class="text-gray-500 dark:text-gray-400 text-sm">
                     (Los espacios inactivos no aparecen en las búsquedas)
                   </span>
                 </div>
@@ -268,19 +305,37 @@ export class SpaceFormComponent implements OnInit {
   newAmenity = '';
   amenitiesArray: string[] = [];
 
+  // Para manejo de imágenes múltiples
+  newImageUrl = '';
+  imagesArray: string[] = [];
+
   spaceForm: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
     description: [''],
     capacity: [1, [Validators.required, Validators.min(1)]],
     location: [''],
-    image_url: [''],
+    images: [[]],
     amenities: [[]],
     is_active: [true]
   });
 
   get nameControl() { return this.spaceForm.get('name'); }
   get capacityControl() { return this.spaceForm.get('capacity'); }
-  get imageUrlControl() { return this.spaceForm.get('image_url'); }
+
+  addImage(event: Event): void {
+    event.preventDefault();
+    const value = this.newImageUrl.trim();
+    if (value && !this.imagesArray.includes(value)) {
+      this.imagesArray.push(value);
+      this.spaceForm.patchValue({ images: this.imagesArray });
+    }
+    this.newImageUrl = '';
+  }
+
+  removeImage(index: number): void {
+    this.imagesArray.splice(index, 1);
+    this.spaceForm.patchValue({ images: this.imagesArray });
+  }
 
   addAmenity(event: Event): void {
     event.preventDefault();
@@ -311,12 +366,13 @@ export class SpaceFormComponent implements OnInit {
     this.spacesService.getSpace(id).subscribe({
       next: (space) => {
         this.amenitiesArray = space.amenities || [];
+        this.imagesArray = space.images || (space.image_url ? [space.image_url] : []);
         this.spaceForm.patchValue({
           name: space.name,
           description: space.description || '',
           capacity: space.capacity,
           location: space.location || '',
-          image_url: space.image_url || '',
+          images: this.imagesArray,
           amenities: this.amenitiesArray,
           is_active: space.is_active
         });

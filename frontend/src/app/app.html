@@ -24,11 +24,26 @@
         }
 
         @if (isAdmin()) {
-          <a routerLink="/admin" 
-             routerLinkActive="text-white"
-             class="text-gray-400 hover:text-white transition-colors text-sm font-medium tracking-wide">
-            Admin
-          </a>
+          <div class="relative group">
+            <button class="text-gray-400 hover:text-white transition-colors text-sm font-medium tracking-wide flex items-center gap-1">
+              Admin
+              <i class="pi pi-chevron-down text-xs"></i>
+            </button>
+            <div class="absolute top-full left-0 mt-2 bg-gray-800 rounded-lg shadow-lg py-2 min-w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <a routerLink="/admin/spaces" 
+                 class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors">
+                <i class="pi pi-building mr-2"></i>Espacios
+              </a>
+              <a routerLink="/admin/reservations" 
+                 class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors">
+                <i class="pi pi-calendar mr-2"></i>Reservaciones
+              </a>
+              <a routerLink="/admin/stats" 
+                 class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors">
+                <i class="pi pi-chart-bar mr-2"></i>Estadísticas
+              </a>
+            </div>
+          </div>
         }
       </div>
 

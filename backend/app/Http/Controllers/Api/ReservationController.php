@@ -189,10 +189,15 @@ class ReservationController extends Controller
             ], 409);
         }
 
+        // Si es admin y proporciona user_id, usarlo; de lo contrario, usar el usuario autenticado
+        $userId = $request->user()->isAdmin() && isset($validated['user_id'])
+            ? $validated['user_id']
+            : $request->user()->id;
+
         $reservation = Reservation::create([
             ...$validated,
-            'user_id' => $request->user()->id,
-            'status' => 'confirmed',
+            'user_id' => $userId,
+            'status' => $validated['status'] ?? 'confirmed',
         ]);
 
         return response()->json([

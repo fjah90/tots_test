@@ -19,17 +19,12 @@
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6 transition-colors">
       <div class="flex flex-wrap gap-4">
         <div class="flex-1 min-w-[250px]">
-          <div class="p-inputgroup">
-            <span class="p-inputgroup-addon">
-              <i class="pi pi-search"></i>
-            </span>
-            <input type="text" 
-                   pInputText 
-                   placeholder="Buscar por nombre..."
-                   class="w-full"
-                   [(ngModel)]="searchTerm"
-                   (keyup.enter)="onSearch()" />
-          </div>
+          <input type="text" 
+                 pInputText 
+                 placeholder="Buscar por nombre..."
+                 class="w-full"
+                 [(ngModel)]="searchTerm"
+                 (keyup.enter)="onSearch()" />
         </div>
         <p-button label="Buscar" 
                   icon="pi pi-search" 
