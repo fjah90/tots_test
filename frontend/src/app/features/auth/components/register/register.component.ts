@@ -51,18 +51,14 @@ import { AuthService } from '../../../../core/services/auth.service';
           <!-- Nombre -->
           <div class="flex flex-col gap-2">
             <label for="name" class="font-medium text-gray-700">Nombre Completo</label>
-            <div class="p-inputgroup">
-              <span class="p-inputgroup-addon">
-                <i class="pi pi-user"></i>
-              </span>
-              <input 
-                id="name"
-                type="text" 
-                pInputText 
-                formControlName="name"
-                placeholder="Juan Pérez"
-              />
-            </div>
+            <input 
+              id="name"
+              type="text" 
+              pInputText 
+              formControlName="name"
+              placeholder="Juan Pérez"
+              class="w-full"
+            />
             @if (nameControl?.invalid && nameControl?.touched) {
               <small class="text-red-500">El nombre es requerido (mínimo 2 caracteres)</small>
             }
@@ -71,18 +67,14 @@ import { AuthService } from '../../../../core/services/auth.service';
           <!-- Email -->
           <div class="flex flex-col gap-2">
             <label for="email" class="font-medium text-gray-700">Correo Electrónico</label>
-            <div class="p-inputgroup">
-              <span class="p-inputgroup-addon">
-                <i class="pi pi-envelope"></i>
-              </span>
-              <input 
-                id="email"
-                type="email" 
-                pInputText 
-                formControlName="email"
-                placeholder="correo@ejemplo.com"
-              />
-            </div>
+            <input 
+              id="email"
+              type="email" 
+              pInputText 
+              formControlName="email"
+              placeholder="correo@ejemplo.com"
+              class="w-full"
+            />
             @if (emailControl?.invalid && emailControl?.touched) {
               <small class="text-red-500">
                 @if (emailControl?.errors?.['required']) {
