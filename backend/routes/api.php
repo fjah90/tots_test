@@ -31,6 +31,9 @@ Route::get('spaces/{space}', [SpaceController::class, 'show']);
 Route::get('spaces/{space}/availability', [SpaceController::class, 'availability']);
 Route::get('spaces/{space}/reservations', [SpaceController::class, 'reservations']);
 
+// Calendario público - Ver todas las reservaciones para disponibilidad
+Route::get('calendar/reservations', [ReservationController::class, 'calendarPublic']);
+
 // ============================================================================
 // RUTAS PROTEGIDAS (Requieren autenticación)
 // ============================================================================

@@ -367,4 +367,68 @@ class ReservationController extends Controller
             'data' => $reservation->fresh()->load(['user', 'space']),
         ]);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/calendar/reservations",
+     *     summary="Obtener reservaciones públicas para el calendario (sin datos sensibles)",
+     *     tags={"Calendar"},
+     *     @OA\Parameter(
+     *         name="space_id",
+     *         in="query",
+     *         description="Filtrar por espacio",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de reservaciones para calendario",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array",
+     *                 @OA\Items(type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="space_id", type="integer"),
+     *                     @OA\Property(property="start_time", type="string"),
+     *                     @OA\Property(property="end_time", type="string"),
+     *                     @OA\Property(property="status", type="string")
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function calendarPublic(Request $request): JsonResponse
+    {
+        $query = Reservation::with('space:id,name')
+            ->whereIn('status', ['confirmed', 'pending']);
+
+        // Filtro por espacio
+        if ($request->has('space_id')) {
+            $query->where('space_id', $request->space_id);
+        }
+
+        // Solo reservaciones del mes actual y siguiente
+        $fromDate = now()->startOfMonth();
+        $toDate = now()->addMonths(2)->endOfMonth();
+        
+        $query->whereBetween('start_time', [$fromDate, $toDate]);
+
+        $reservations = $query->orderBy('start_time', 'asc')
+            ->get(['id', 'space_id', 'start_time', 'end_time', 'status']);
+
+        // Agregar nombre del espacio
+        $reservations = $reservations->map(function ($reservation) {
+            return [
+                'id' => $reservation->id,
+                'space_id' => $reservation->space_id,
+                'space_name' => $reservation->space->name ?? 'Espacio',
+                'start_time' => $reservation->start_time,
+                'end_time' => $reservation->end_time,
+                'status' => $reservation->status,
+            ];
+        });
+
+        return response()->json([
+            'data' => $reservations,
+        ]);
+    }
 }
