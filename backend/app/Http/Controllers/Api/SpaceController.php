@@ -42,12 +42,30 @@ class SpaceController extends Controller
      *         description="Buscar por nombre o ubicación",
      *         @OA\Schema(type="string")
      *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Número de página para paginación",
+     *         @OA\Schema(type="integer", default=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Elementos por página (0 = todos)",
+     *         @OA\Schema(type="integer", default=0)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Lista de espacios",
      *         @OA\JsonContent(
      *             @OA\Property(property="data", type="array",
      *                 @OA\Items(ref="#/components/schemas/Space")
+     *             ),
+     *             @OA\Property(property="meta", type="object",
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="per_page", type="integer"),
+     *                 @OA\Property(property="total", type="integer"),
+     *                 @OA\Property(property="last_page", type="integer")
      *             )
      *         )
      *     )
@@ -81,7 +99,27 @@ class SpaceController extends Controller
             });
         }
 
-        $spaces = $query->orderBy('name')->get();
+        $query->orderBy('name');
+
+        // Paginación opcional (per_page=0 retorna todos)
+        $perPage = (int) $request->get('per_page', 0);
+        
+        if ($perPage > 0) {
+            $paginated = $query->paginate($perPage);
+            
+            return response()->json([
+                'data' => $paginated->items(),
+                'meta' => [
+                    'current_page' => $paginated->currentPage(),
+                    'per_page' => $paginated->perPage(),
+                    'total' => $paginated->total(),
+                    'last_page' => $paginated->lastPage(),
+                ]
+            ]);
+        }
+
+        // Sin paginación (comportamiento original)
+        $spaces = $query->get();
 
         return response()->json([
             'data' => $spaces,
