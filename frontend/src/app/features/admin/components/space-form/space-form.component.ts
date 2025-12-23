@@ -45,7 +45,7 @@ import { Space } from '../../../../shared/interfaces';
 
     <div class="min-h-screen bg-gray-50">
       <!-- Header -->
-      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-8 px-6">
+      <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white py-8 px-6">
         <div class="max-w-4xl mx-auto">
           <div class="flex items-center gap-4 mb-4">
             <p-button 
@@ -59,7 +59,7 @@ import { Space } from '../../../../shared/interfaces';
               <h1 class="text-3xl font-bold">
                 {{ isEditMode() ? 'Editar Espacio' : 'Nuevo Espacio' }}
               </h1>
-              <p class="text-blue-100">
+              <p class="text-teal-100">
                 {{ isEditMode() ? 'Modifica los datos del espacio' : 'Completa los datos para crear un nuevo espacio' }}
               </p>
             </div>

@@ -2,10 +2,10 @@
 
 <div class="min-h-screen bg-gray-50">
   <!-- Header Section -->
-  <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12 px-6">
+  <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white py-12 px-6">
     <div class="max-w-7xl mx-auto">
       <h1 class="text-4xl font-bold mb-2">Encuentra tu Espacio Ideal</h1>
-      <p class="text-blue-100 text-lg">Reserva salas de reuniones, auditorios y espacios de trabajo</p>
+      <p class="text-teal-100 text-lg">Reserva salas de reuniones, auditorios y espacios de trabajo</p>
     </div>
   </div>
 
@@ -17,18 +17,14 @@
         <!-- Búsqueda por texto -->
         <div class="flex flex-col gap-2">
           <label class="text-sm font-medium text-gray-700">Buscar</label>
-          <div class="p-inputgroup">
-            <span class="p-inputgroup-addon">
-              <i class="pi pi-search"></i>
-            </span>
-            <input 
-              type="text" 
-              pInputText 
-              placeholder="Nombre, ubicación..." 
-              [ngModel]="searchTerm()"
-              (ngModelChange)="searchTerm.set($event)"
-            />
-          </div>
+          <input 
+            type="text" 
+            pInputText 
+            placeholder="Nombre, ubicación..." 
+            [ngModel]="searchTerm()"
+            (ngModelChange)="searchTerm.set($event)"
+            class="w-full"
+          />
         </div>
 
         <!-- Filtro por fecha -->

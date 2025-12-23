@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 40" class="logo">
+  <defs>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2dd4bf"/>
+      <stop offset="100%" style="stop-color:#14b8a6"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Icono -->
+  <g transform="translate(2, 2)">
+    <!-- Fondo del icono -->
+    <rect width="36" height="36" rx="8" fill="url(#logoGrad)"/>
+    
+    <!-- Edificio -->
+    <rect x="6" y="12" width="14" height="18" rx="2" fill="white" opacity="0.95"/>
+    <rect x="9" y="15" width="3" height="3" rx="0.5" fill="#0d9488"/>
+    <rect x="14" y="15" width="3" height="3" rx="0.5" fill="#0d9488"/>
+    <rect x="9" y="21" width="3" height="3" rx="0.5" fill="#0d9488"/>
+    <rect x="14" y="21" width="3" height="3" rx="0.5" fill="#0d9488"/>
+    <rect x="11" y="26" width="4" height="4" rx="0.5" fill="#4b5563"/>
+    
+    <!-- Mini calendario -->
+    <g transform="translate(18, 6)">
+      <rect width="14" height="12" rx="2" fill="white" opacity="0.95"/>
+      <rect width="14" height="4" rx="2" fill="#4b5563"/>
+      <rect y="3" width="14" height="1" fill="#4b5563"/>
+      <rect x="2" y="6" width="2" height="2" rx="0.3" fill="#ccfbf1"/>
+      <rect x="6" y="6" width="2" height="2" rx="0.3" fill="#2dd4bf"/>
+      <rect x="10" y="6" width="2" height="2" rx="0.3" fill="#ccfbf1"/>
+    </g>
+    
+    <!-- Check badge -->
+    <circle cx="30" cy="28" r="6" fill="#4b5563"/>
+    <path d="M27 28 L29 30 L33 26" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  
+  <!-- Texto -->
+  <text x="46" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#1e1b4b">
+    <tspan fill="#2dd4bf">Space</tspan><tspan fill="#4b5563">Book</tspan>
+  </text>
+</svg>

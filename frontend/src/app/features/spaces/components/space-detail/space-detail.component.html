@@ -15,19 +15,18 @@
           class="w-full h-64 object-cover"
         />
       } @else {
-        <div class="w-full h-64 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+        <div class="w-full h-64 bg-gradient-to-r from-teal-500 to-teal-600"></div>
       }
       <div class="absolute inset-0 bg-black/40"></div>
       
       <!-- Back button -->
       <div class="absolute top-4 left-4">
-        <p-button 
-          icon="pi pi-arrow-left" 
-          label="Volver"
-          [rounded]="true"
-          severity="secondary"
+        <button 
           routerLink="/spaces"
-        />
+          class="flex items-center gap-2 bg-white/90 hover:bg-white text-gray-800 font-medium px-4 py-2 rounded-full shadow-lg transition-colors">
+          <i class="pi pi-arrow-left"></i>
+          <span>Volver</span>
+        </button>
       </div>
     </div>
 
@@ -177,15 +176,15 @@
         <div class="lg:col-span-1">
           <p-card styleClass="sticky top-6">
             <ng-template #header>
-              <div class="p-4 pb-0 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-t-lg">
+              <div class="p-4 pb-0 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-t-lg">
                 <h2 class="text-xl font-semibold">Reservar este espacio</h2>
-                <p class="text-blue-100 text-sm mt-1">Asegura tu lugar ahora</p>
+                <p class="text-teal-100 text-sm mt-1">Asegura tu lugar ahora</p>
               </div>
             </ng-template>
 
             <div class="space-y-4 pt-4">
               <div class="text-center">
-                <i class="pi pi-calendar-plus text-4xl text-blue-500 mb-3"></i>
+                <i class="pi pi-calendar-plus text-4xl text-teal-500 mb-3"></i>
                 <p class="text-gray-600 mb-4">
                   Selecciona fecha y horario para hacer tu reservación
                 </p>

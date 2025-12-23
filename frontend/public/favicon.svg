@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2dd4bf"/>
+      <stop offset="100%" style="stop-color:#14b8a6"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0.3)"/>
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0)"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Fondo con gradiente turquesa -->
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  
+  <!-- Brillo sutil -->
+  <rect width="64" height="32" rx="14" fill="url(#shine)"/>
+  
+  <!-- Edificio/Espacio principal -->
+  <g fill="white">
+    <!-- Estructura del edificio -->
+    <rect x="12" y="24" width="24" height="28" rx="3" opacity="0.95"/>
+    
+    <!-- Ventanas del edificio -->
+    <rect x="16" y="28" width="6" height="6" rx="1" fill="#0d9488"/>
+    <rect x="26" y="28" width="6" height="6" rx="1" fill="#0d9488"/>
+    <rect x="16" y="38" width="6" height="6" rx="1" fill="#0d9488"/>
+    <rect x="26" y="38" width="6" height="6" rx="1" fill="#0d9488"/>
+    
+    <!-- Puerta -->
+    <rect x="21" y="46" width="6" height="6" rx="1" fill="#4b5563"/>
+  </g>
+  
+  <!-- Calendario flotante -->
+  <g transform="translate(32, 12)">
+    <rect width="22" height="20" rx="4" fill="white" opacity="0.95"/>
+    <rect width="22" height="6" rx="4" fill="#4b5563"/>
+    <rect y="4" width="22" height="2" fill="#4b5563"/>
+    
+    <!-- Días del calendario -->
+    <rect x="3" y="9" width="4" height="3" rx="0.5" fill="#ccfbf1"/>
+    <rect x="9" y="9" width="4" height="3" rx="0.5" fill="#2dd4bf"/>
+    <rect x="15" y="9" width="4" height="3" rx="0.5" fill="#ccfbf1"/>
+    <rect x="3" y="14" width="4" height="3" rx="0.5" fill="#ccfbf1"/>
+    <rect x="9" y="14" width="4" height="3" rx="0.5" fill="#ccfbf1"/>
+    <rect x="15" y="14" width="4" height="3" rx="0.5" fill="#2dd4bf"/>
+  </g>
+  
+  <!-- Checkmark de confirmación -->
+  <circle cx="48" cy="44" r="10" fill="#4b5563"/>
+  <path d="M43 44 L46 47 L53 40" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

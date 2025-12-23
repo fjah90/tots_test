@@ -45,10 +45,10 @@ import { environment } from '../../../../../environments/environment';
 
     <div class="min-h-screen bg-gray-50">
       <!-- Header -->
-      <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-8 px-6">
+      <div class="bg-gradient-to-r from-gray-700 to-gray-800 text-white py-8 px-6">
         <div class="max-w-7xl mx-auto">
           <h1 class="text-3xl font-bold">Administrar Reservaciones</h1>
-          <p class="text-purple-100 mt-1">Gestiona todas las reservaciones del sistema</p>
+          <p class="text-gray-300 mt-1">Gestiona todas las reservaciones del sistema</p>
         </div>
       </div>
 

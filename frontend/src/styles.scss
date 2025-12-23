@@ -6,9 +6,12 @@
 /* PrimeNG Icons */
 @import "primeicons/primeicons.css";
 
-/* Variables globales */
+/* Variables globales - Paleta Fernando Aponte */
 :root {
-  --primary-color: #3B82F6;
+  --primary-color: #2dd4bf;
+  --primary-color-dark: #14b8a6;
+  --primary-color-light: #5eead4;
+  --brand-dark: #4b5563;
   --surface-ground: #f8fafc;
 }
 
@@ -27,4 +30,54 @@ html, body {
 /* Utilidades adicionales */
 .text-primary {
   color: var(--primary-color);
+}
+
+/* PrimeNG overrides para paleta turquesa */
+.p-button {
+  background: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  
+  &:hover {
+    background: var(--primary-color-dark) !important;
+    border-color: var(--primary-color-dark) !important;
+  }
+  
+  &.p-button-outlined {
+    background: transparent !important;
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    
+    &:hover {
+      background: rgba(45, 212, 191, 0.1) !important;
+    }
+  }
+  
+  &.p-button-secondary {
+    background: var(--brand-dark) !important;
+    border-color: var(--brand-dark) !important;
+  }
+  
+  &.p-button-text {
+    background: transparent !important;
+    color: var(--brand-dark) !important;
+  }
+}
+
+.p-avatar {
+  background: var(--primary-color) !important;
+}
+
+.p-progressbar-value {
+  background: var(--primary-color) !important;
+}
+
+/* Mobile drawer oscuro */
+.dark-drawer {
+  .p-drawer-content {
+    background: #1f2937 !important;
+  }
+  .p-drawer-header {
+    background: #1f2937 !important;
+    border-bottom: 1px solid #374151;
+  }
 }

@@ -43,10 +43,10 @@ import { Reservation } from '../../../../shared/interfaces';
 
     <div class="min-h-screen bg-gray-50">
       <!-- Header -->
-      <div class="bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-10 px-6">
+      <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white py-10 px-6">
         <div class="max-w-7xl mx-auto">
           <h1 class="text-3xl font-bold mb-2">Mis Reservaciones</h1>
-          <p class="text-indigo-100">Gestiona todas tus reservaciones de espacios</p>
+          <p class="text-teal-100">Gestiona todas tus reservaciones de espacios</p>
         </div>
       </div>
 
@@ -135,7 +135,7 @@ import { Reservation } from '../../../../shared/interfaces';
                           class="w-12 h-12 rounded-lg object-cover"
                         />
                       } @else {
-                        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
+                        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center">
                           <i class="pi pi-building text-white"></i>
                         </div>
                       }

@@ -29,11 +29,11 @@ import { AuthService } from '../../../../core/services/auth.service';
     DividerModule
   ],
   template: `
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 p-4">
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-400 to-teal-600 p-4">
       <p-card styleClass="w-full max-w-md shadow-2xl">
         <ng-template #header>
           <div class="text-center pt-6">
-            <i class="pi pi-building text-5xl text-blue-500 mb-4"></i>
+            <img src="logo.svg" alt="SpaceBook" class="h-12 mx-auto mb-4" />
             <h1 class="text-2xl font-bold text-gray-800">Bienvenido</h1>
             <p class="text-gray-600">Inicia sesión en tu cuenta</p>
           </div>
