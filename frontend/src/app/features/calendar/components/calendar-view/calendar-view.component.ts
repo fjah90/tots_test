@@ -118,6 +118,7 @@ export class CalendarViewComponent implements OnInit {
     height: 'auto',
     events: [],
     eventClick: this.handleEventClick.bind(this),
+    eventDidMount: this.handleEventDidMount.bind(this),
   });
 
   ngOnInit(): void {
@@ -207,6 +208,46 @@ export class CalendarViewComponent implements OnInit {
         }
       };
     });
+  }
+
+  /**
+   * Configura tooltip para eventos del calendario
+   */
+  private handleEventDidMount(info: any): void {
+    const event = info.event;
+    const startDate = event.start;
+    const endDate = event.end;
+    const status = event.extendedProps?.status || 'pending';
+    const spaceName = event.extendedProps?.spaceName || event.title;
+    
+    // Formatear fecha y hora
+    const dateOptions: Intl.DateTimeFormatOptions = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    const timeOptions: Intl.DateTimeFormatOptions = { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: false
+    };
+    
+    const dateStr = startDate.toLocaleDateString('es-ES', dateOptions);
+    const startTime = startDate.toLocaleTimeString('es-ES', timeOptions);
+    const endTime = endDate ? endDate.toLocaleTimeString('es-ES', timeOptions) : '';
+    
+    const statusLabels: Record<string, string> = {
+      confirmed: 'Confirmada',
+      pending: 'Pendiente',
+      cancelled: 'Cancelada'
+    };
+    
+    const tooltipText = `${spaceName}\n${dateStr}\n${startTime} - ${endTime}\nEstado: ${statusLabels[status] || status}`;
+    
+    // Agregar atributo title para tooltip nativo
+    info.el.setAttribute('title', tooltipText);
+    info.el.style.cursor = 'pointer';
   }
 
   handleEventClick(clickInfo: any): void {
