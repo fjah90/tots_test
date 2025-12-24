@@ -99,6 +99,24 @@ class SpaceController extends Controller
             });
         }
 
+        // Filtro por disponibilidad en una fecha específica
+        // Excluye espacios que tengan reservaciones activas todo el día (8:00-20:00)
+        if ($request->has('available_date')) {
+            $date = $request->available_date;
+            $query->where(function ($q) use ($date) {
+                // Incluir espacios que NO tengan reservaciones confirmadas/pendientes que cubran todo el horario
+                $q->whereDoesntHave('reservations', function ($rq) use ($date) {
+                    $rq->whereDate('start_time', $date)
+                       ->whereIn('status', ['confirmed', 'pending']);
+                })
+                // O que tengan al menos algún hueco de disponibilidad
+                ->orWhereHas('reservations', function ($rq) use ($date) {
+                    $rq->whereDate('start_time', $date)
+                       ->whereIn('status', ['confirmed', 'pending']);
+                }, '<', 12); // Menos de 12 reservaciones de 1 hora = hay disponibilidad
+            });
+        }
+
         $query->orderBy('name');
 
         // Paginación opcional (per_page=0 retorna todos)

@@ -57,6 +57,34 @@ class ReservationSeeder extends Seeder
         $reservationsCount = 0;
         $statusCounts = ['confirmed' => 0, 'pending' => 0, 'cancelled' => 0];
 
+        // =====================================================================
+        // CASO DE PRUEBA: Espacio completamente ocupado para probar filtro
+        // =====================================================================
+        $testSpace = Space::where('is_active', true)->first();
+        $testDate = Carbon::now()->addDays(5)->startOfDay(); // 5 días en el futuro
+        $testUser = $users->first();
+        
+        $this->command->info('');
+        $this->command->info('📅 CASO DE PRUEBA - Espacio completamente ocupado:');
+        $this->command->info("   Espacio: \"{$testSpace->name}\" (ID: {$testSpace->id})");
+        $this->command->info("   Fecha: {$testDate->format('Y-m-d')} ({$testDate->format('l, d M Y')})");
+        $this->command->info('   Horario: 08:00 - 20:00 (todo el día)');
+        $this->command->info('');
+        
+        // Crear reservaciones que cubran todo el día (8:00-20:00) en bloques de 2 horas
+        for ($hour = 8; $hour < 20; $hour += 2) {
+            Reservation::create([
+                'user_id' => $testUser->id,
+                'space_id' => $testSpace->id,
+                'start_time' => $testDate->copy()->setTime($hour, 0),
+                'end_time' => $testDate->copy()->setTime($hour + 2, 0),
+                'status' => 'confirmed',
+                'notes' => "Bloque reservado {$hour}:00 - " . ($hour + 2) . ":00",
+            ]);
+            $reservationsCount++;
+            $statusCounts['confirmed']++;
+        }
+
         // Generar reservaciones para los próximos 30 días y los últimos 15 días
         for ($dayOffset = -15; $dayOffset <= 30; $dayOffset++) {
             $date = Carbon::now()->addDays($dayOffset)->startOfDay();
