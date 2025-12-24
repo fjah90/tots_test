@@ -15,13 +15,13 @@ RUN apk add --no-cache \
     libxml2-dev \
     zip \
     unzip \
-    sqlite-dev \
+    postgresql-dev \
     supervisor \
     nginx
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql pdo_sqlite mbstring exif pcntl bcmath gd opcache
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd opcache
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -80,14 +80,10 @@ COPY . .
 # Generate optimized autoloader
 RUN composer dump-autoload --optimize --no-dev
 
-# Create sqlite database file if not exists
-RUN mkdir -p database && touch database/database.sqlite
-
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache \
-    && chmod -R 755 /var/www/html/database
+    && chmod -R 755 /var/www/html/bootstrap/cache
 
 # Copy nginx configuration
 COPY docker/nginx/api.conf /etc/nginx/http.d/default.conf

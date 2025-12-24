@@ -136,7 +136,7 @@ Sistema completo de reserva de espacios y salas con gestión administrativa, aut
 |------------|---------|
 | Laravel | 12.44.0 |
 | PHP | 8.2+ |
-| SQLite | 3.x |
+| PostgreSQL | 16 |
 | Sanctum | 4.x |
 | Swagger/OpenAPI | 4.x |
 
