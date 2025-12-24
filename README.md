@@ -15,6 +15,7 @@ Sistema completo de reserva de espacios y salas con gestión administrativa, aut
 - [Características](#-características)
 - [Estructura](#-estructura)
 - [Tests](#-tests)
+- [Code Quality](#-code-quality)
 
 ---
 
@@ -274,6 +275,76 @@ php artisan test
 cd frontend
 pnpm test
 ```
+
+---
+
+## 🧹 Code Quality
+
+El proyecto implementa herramientas de linting y formateo automático para mantener un código limpio y consistente.
+
+### Herramientas Configuradas
+
+| Proyecto | Herramienta | Propósito |
+|----------|-------------|----------|
+| Frontend | **ESLint** | Análisis estático de TypeScript/Angular |
+| Frontend | **Prettier** | Formateo automático de código |
+| Frontend | **lint-staged** | Ejecuta linters solo en archivos staged |
+| Backend | **Laravel Pint** | Formateo PHP (PSR-12 + Laravel) |
+| Monorepo | **Husky** | Git hooks para pre-commit |
+
+### Flujo Pre-commit
+
+```mermaid
+flowchart LR
+    A[git commit] --> B[Husky pre-commit]
+    B --> C[lint-staged]
+    C --> D[ESLint + Prettier]
+    B --> E[Laravel Pint --dirty]
+    D --> F{¿Errores?}
+    E --> F
+    F -->|Sí| G[❌ Commit rechazado]
+    F -->|No| H[✅ Commit exitoso]
+```
+
+### Comandos Disponibles
+
+**Frontend:**
+```bash
+cd frontend
+pnpm lint          # Lint y fix automático
+pnpm lint:check    # Solo verificar (sin cambios)
+pnpm format        # Formatear con Prettier
+pnpm format:check  # Verificar formato
+```
+
+**Backend:**
+```bash
+cd backend
+composer lint       # Formatear con Pint
+composer lint:check # Verificar sin cambiar
+```
+
+**Monorepo (raíz):**
+```bash
+pnpm lint           # Lint frontend + backend
+pnpm format         # Formatear frontend
+```
+
+### Archivos de Configuración
+
+| Archivo | Ubicación | Descripción |
+|---------|-----------|-------------|
+| `eslint.config.mjs` | `/frontend/` | Reglas ESLint para Angular |
+| `.prettierrc` | `/frontend/` | Configuración Prettier |
+| `pint.json` | `/backend/` | Reglas Laravel Pint |
+| `pre-commit` | `/.husky/` | Hook de pre-commit |
+
+### Beneficios
+
+- ✅ **Consistencia**: Todo el equipo usa las mismas reglas
+- ✅ **Automatización**: Formateo automático en cada commit
+- ✅ **Prevención**: Errores detectados antes de llegar al repo
+- ✅ **Code Reviews**: Enfocados en lógica, no en formato
 
 ---
 
