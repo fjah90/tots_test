@@ -16,6 +16,7 @@ import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { CarouselModule } from 'primeng/carousel';
 import { TooltipModule } from 'primeng/tooltip';
+import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService } from 'primeng/api';
 
 // Services & Interfaces
@@ -43,6 +44,7 @@ import { ReservationFormComponent } from '../reservation-form/reservation-form.c
     ToastModule,
     CarouselModule,
     TooltipModule,
+    SkeletonModule,
     // Custom
     ReservationFormComponent,
   ],
@@ -53,6 +55,9 @@ import { ReservationFormComponent } from '../reservation-form/reservation-form.c
 export class SpacesListComponent implements OnInit {
   private spacesService = inject(SpacesService);
   private messageService = inject(MessageService);
+
+  // Skeleton items para loading inicial
+  skeletonItems = Array(6).fill(0);
 
   // Estado
   spaces = signal<Space[]>([]);
