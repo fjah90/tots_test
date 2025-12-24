@@ -276,6 +276,226 @@ pnpm test
 
 ---
 
+## 🔄 Diagramas de Flujo
+
+### Flujo de Autenticación
+
+```mermaid
+flowchart TD
+    A[Usuario] --> B{¿Tiene cuenta?}
+    B -->|No| C[Registro]
+    B -->|Sí| D[Login]
+    
+    C --> E[POST /auth/register]
+    E --> F{¿Datos válidos?}
+    F -->|No| G[Mostrar errores]
+    G --> C
+    F -->|Sí| H[Crear usuario]
+    H --> I[Generar token Sanctum]
+    
+    D --> J[POST /auth/login]
+    J --> K{¿Credenciales válidas?}
+    K -->|No| L[Error 401]
+    L --> D
+    K -->|Sí| I
+    
+    I --> M[Guardar token en localStorage]
+    M --> N[Redirigir a /spaces]
+    
+    N --> O{¿Es admin?}
+    O -->|Sí| P[Mostrar menú Admin]
+    O -->|No| Q[Mostrar menú Usuario]
+```
+
+### Flujo de Búsqueda de Espacios
+
+```mermaid
+flowchart TD
+    A[Usuario en /spaces] --> B[Ver listado inicial]
+    B --> C{¿Aplicar filtros?}
+    
+    C -->|Nombre| D[Filtro por texto]
+    C -->|Fecha| E[Seleccionar fecha]
+    C -->|Capacidad| F[Ajustar slider]
+    
+    E --> G{¿Filtrar por hora?}
+    G -->|Sí| H[Seleccionar hora inicio/fin]
+    G -->|No| I[Usar horario completo 08:00-20:00]
+    
+    H --> J[GET /spaces con filtros]
+    I --> J
+    D --> J
+    F --> J
+    
+    J --> K[Backend filtra espacios]
+    K --> L{¿Hay reservas en rango?}
+    L -->|Sí| M[Excluir espacio]
+    L -->|No| N[Incluir espacio]
+    
+    M --> O[Retornar espacios disponibles]
+    N --> O
+    O --> P[Mostrar resultados paginados]
+    
+    P --> Q{¿Scroll down?}
+    Q -->|Sí| R[Infinite scroll - cargar más]
+    R --> P
+```
+
+### Flujo de Reservación Simple
+
+```mermaid
+flowchart TD
+    A[Usuario selecciona espacio] --> B[Abrir modal de reserva]
+    B --> C[Completar formulario]
+    C --> D[Seleccionar fecha]
+    D --> E[Seleccionar hora inicio/fin]
+    E --> F[Nombre del evento]
+    
+    F --> G[Click 'Reservar']
+    G --> H{¿Usuario autenticado?}
+    H -->|No| I[Redirigir a Login]
+    H -->|Sí| J[POST /reservations]
+    
+    J --> K{¿Validación OK?}
+    K -->|No| L[Mostrar errores 422]
+    L --> C
+    
+    K -->|Sí| M{¿Espacio disponible?}
+    M -->|No| N[Error 409 - Ocupado]
+    N --> O[Mostrar toast error]
+    O --> C
+    
+    M -->|Sí| P[Crear reservación]
+    P --> Q[Estado: pending]
+    Q --> R[Mostrar toast éxito]
+    R --> S[Cerrar modal]
+```
+
+### Flujo de Reservación Múltiples Fechas (Bulk)
+
+```mermaid
+flowchart TD
+    A[Usuario activa modo multi-fecha] --> B[Seleccionar múltiples fechas]
+    B --> C[Configurar hora inicio/fin]
+    C --> D[Click 'Reservar X fechas']
+    
+    D --> E[POST /reservations/bulk]
+    E --> F[Backend procesa cada fecha]
+    
+    F --> G{Para cada fecha}
+    G --> H{¿Disponible?}
+    H -->|Sí| I[Crear reservación]
+    H -->|No| J[Agregar a fallidos]
+    
+    I --> K[Agregar a creados]
+    J --> L{¿Más fechas?}
+    K --> L
+    
+    L -->|Sí| G
+    L -->|No| M[Retornar resultado]
+    
+    M --> N{¿Todas exitosas?}
+    N -->|Sí| O[Toast: Todas creadas]
+    N -->|No| P{¿Algunas exitosas?}
+    P -->|Sí| Q[Toast: Éxito parcial]
+    P -->|No| R[Toast: Todas fallaron]
+    
+    Q --> S[Mostrar fechas fallidas]
+```
+
+### Flujo de Gestión de Reservaciones (Usuario)
+
+```mermaid
+flowchart TD
+    A[Usuario en /my-reservations] --> B[GET /reservations]
+    B --> C[Mostrar mis reservaciones]
+    
+    C --> D{Acción}
+    D -->|Ver| E[Expandir detalles]
+    D -->|Cancelar| F[Confirmar cancelación]
+    
+    F --> G{¿Confirmar?}
+    G -->|No| C
+    G -->|Sí| H[PATCH /reservations/:id/cancel]
+    
+    H --> I{¿Puede cancelar?}
+    I -->|No pasado| J[Actualizar estado: cancelled]
+    I -->|Ya pasó| K[Error: No se puede cancelar]
+    
+    J --> L[Toast éxito]
+    K --> M[Toast error]
+    L --> C
+    M --> C
+```
+
+### Flujo Admin - CRUD Espacios
+
+```mermaid
+flowchart TD
+    A[Admin en /admin/spaces] --> B[GET /spaces - MC-Table]
+    B --> C[Mostrar listado paginado]
+    
+    C --> D{Acción}
+    D -->|Crear| E[Abrir formulario nuevo]
+    D -->|Editar| F[Cargar datos espacio]
+    D -->|Eliminar| G[Confirmar eliminación]
+    
+    E --> H[Completar campos]
+    F --> H
+    H --> I[Subir imágenes]
+    I --> J[Guardar]
+    
+    J --> K{¿Nuevo?}
+    K -->|Sí| L[POST /spaces]
+    K -->|No| M[PUT /spaces/:id]
+    
+    L --> N{¿Válido?}
+    M --> N
+    N -->|No| O[Mostrar errores]
+    O --> H
+    N -->|Sí| P[Toast éxito]
+    
+    G --> Q{¿Confirmar?}
+    Q -->|No| C
+    Q -->|Sí| R[DELETE /spaces/:id]
+    R --> S{¿Tiene reservas?}
+    S -->|No| T[Eliminar]
+    S -->|Sí| U[Error: Tiene reservas activas]
+    
+    T --> P
+    U --> V[Toast error]
+    P --> C
+    V --> C
+```
+
+### Flujo de Validación de Disponibilidad
+
+```mermaid
+flowchart TD
+    A[Request de reservación] --> B[Extraer space_id, start_time, end_time]
+    
+    B --> C[AvailabilityService]
+    C --> D[Buscar reservaciones existentes]
+    
+    D --> E{Consulta SQL}
+    E --> F["WHERE space_id = :id
+    AND status IN ('confirmed', 'pending')
+    AND start_time < :end_time
+    AND end_time > :start_time"]
+    
+    F --> G{¿Hay overlap?}
+    G -->|Sí| H[Retornar reservaciones conflictivas]
+    G -->|No| I[Retornar array vacío]
+    
+    H --> J[Controller rechaza - 409]
+    I --> K[Controller permite crear]
+    
+    J --> L[Response: Espacio ocupado]
+    K --> M[Response: Reservación creada]
+```
+
+---
+
 ## 📖 Documentación
 
 - **Swagger API**: http://localhost:8000/api/documentation
