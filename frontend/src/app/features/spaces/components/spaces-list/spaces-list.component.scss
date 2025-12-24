@@ -100,16 +100,54 @@
   }
   
   .p-slider {
+    height: 6px !important;
+    background: #e5e7eb !important;
+    border-radius: 3px !important;
+    
     .p-slider-range {
-      background: linear-gradient(90deg, #2dd4bf, #14b8a6);
+      background: linear-gradient(90deg, #2dd4bf, #14b8a6) !important;
+      border-radius: 3px !important;
     }
     
     .p-slider-handle {
-      border-color: #2dd4bf;
+      width: 18px !important;
+      height: 18px !important;
+      margin-top: -7px !important;
+      margin-left: -9px !important;
+      border: 2px solid #2dd4bf !important;
+      background: #ffffff !important;
+      border-radius: 50% !important;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+      transition: transform 0.15s ease, box-shadow 0.15s ease !important;
       
       &:hover {
-        background: #2dd4bf;
+        transform: scale(1.15) !important;
+        box-shadow: 0 4px 8px rgba(45, 212, 191, 0.3) !important;
       }
+      
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2) !important;
+      }
+    }
+  }
+  
+  // Datepicker time inputs más anchos
+  .p-datepicker {
+    min-width: 100% !important;
+    
+    .p-datepicker-input {
+      width: 100% !important;
+    }
+  }
+
+  // Dark mode slider
+  :host-context(.dark) .p-slider,
+  .dark .p-slider {
+    background: #374151 !important;
+    
+    .p-slider-handle {
+      background: #1f2937 !important;
+      border-color: #2dd4bf !important;
     }
   }
 

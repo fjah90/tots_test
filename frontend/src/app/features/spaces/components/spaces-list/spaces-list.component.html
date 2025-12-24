@@ -12,10 +12,10 @@
   <!-- Filters Section -->
   <div class="max-w-7xl mx-auto px-6 -mt-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
         
         <!-- Búsqueda por texto -->
-        <div class="flex flex-col gap-2 lg:col-span-2">
+        <div class="flex flex-col gap-2 lg:col-span-3">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Buscar</label>
           <input 
             type="text" 
@@ -28,7 +28,7 @@
         </div>
 
         <!-- Filtro por fecha -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 lg:col-span-2">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
             Fecha
             <i class="pi pi-info-circle ml-1 text-gray-400" 
@@ -46,7 +46,7 @@
         </div>
 
         <!-- Hora de inicio -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 lg:col-span-2">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
             Desde
             <i class="pi pi-info-circle ml-1 text-gray-400" 
@@ -70,7 +70,7 @@
         </div>
 
         <!-- Hora de fin -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 lg:col-span-2">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
             Hasta
             <i class="pi pi-info-circle ml-1 text-gray-400" 
@@ -94,7 +94,7 @@
         </div>
 
         <!-- Botón limpiar filtros -->
-        <div class="flex flex-col justify-end">
+        <div class="flex flex-col justify-end lg:col-span-3">
           <p-button 
             label="Limpiar" 
             icon="pi pi-filter-slash" 
@@ -107,19 +107,23 @@
       </div>
 
       <!-- Filtro por capacidad (fila separada) -->
-      <div class="mt-4">
-        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Capacidad: {{ capacityRange()[0] }} - {{ capacityRange()[1] === 100 ? '100+' : capacityRange()[1] }} personas
-        </label>
-        <p-slider 
-          [ngModel]="capacityRange()"
-          (ngModelChange)="capacityRange.set($event)"
-          [range]="true"
-          [min]="0"
-          [max]="100"
-          [step]="5"
-          styleClass="mt-2 max-w-md"
-        />
+      <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
+            Capacidad: {{ capacityRange()[0] }} - {{ capacityRange()[1] === 100 ? '100+' : capacityRange()[1] }} personas
+          </label>
+          <div class="flex-1 max-w-lg">
+            <p-slider 
+              [ngModel]="capacityRange()"
+              (ngModelChange)="capacityRange.set($event)"
+              [range]="true"
+              [min]="0"
+              [max]="100"
+              [step]="5"
+              styleClass="w-full"
+            />
+          </div>
+        </div>
       </div>
 
       <!-- Resultados count -->
