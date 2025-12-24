@@ -36,10 +36,12 @@ La API estará disponible en `http://localhost:8000/api`
 
 ```
 app/
+├── Contracts/               # Interfaces (ISP)
 ├── Http/Controllers/Api/    # Controladores
 ├── Models/                  # User, Space, Reservation
-├── Services/                # Lógica de negocio
+├── Services/                # Implementaciones
 ├── Http/Requests/           # Validación
+├── Providers/               # Service Providers
 database/
 ├── migrations/              # Esquema BD
 ├── seeders/                 # Datos iniciales
@@ -92,7 +94,7 @@ php artisan test --testsuite=Feature
 php artisan test --filter=ReservationControllerTest
 ```
 
-Total: 48 tests
+Total: 71 tests (168 assertions)
 
 ## Documentación Swagger
 

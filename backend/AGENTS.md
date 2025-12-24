@@ -16,7 +16,7 @@ php artisan serve                     # Servidor (localhost:8000)
 
 ## Testing Instructions
 - Framework: PHPUnit
-- Total tests: 48
+- Total tests: 71 (168 assertions)
 - Ejecutar antes de cada commit: `php artisan test`
 - Suites: Unit, Feature
 
@@ -50,8 +50,12 @@ app/
 │   ├── User.php
 │   ├── Space.php
 │   └── Reservation.php
+├── Contracts/
+│   └── AvailabilityServiceInterface.php  # ISP
 ├── Services/
-│   └── AvailabilityService.php
+│   └── AvailabilityService.php           # Implementación
+├── Providers/
+│   └── AppServiceProvider.php            # Bindings DI
 database/
 ├── migrations/
 ├── seeders/
@@ -100,6 +104,8 @@ routes/
 ## Code Conventions
 - Form Requests para validación
 - Services para lógica compleja
+- Interfaces para servicios (ISP/SOLID)
+- Inyección de dependencias via constructor
 - Type hints en todo
 - Responses JSON estandarizadas
 
