@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 /**
  * Test Unitario para AvailabilityService.
- * 
+ *
  * Prueba exhaustiva de la lógica de detección de solapamiento:
  * (StartA < EndB) AND (EndA > StartB)
  */
@@ -21,14 +21,16 @@ class AvailabilityServiceTest extends TestCase
     use RefreshDatabase;
 
     private AvailabilityService $service;
+
     private Space $space;
+
     private User $user;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
-        $this->service = new AvailabilityService();
+
+        $this->service = new AvailabilityService;
         $this->user = User::factory()->create();
         $this->space = Space::factory()->create(['is_active' => true]);
     }
@@ -93,7 +95,7 @@ class AvailabilityServiceTest extends TestCase
 
     /**
      * Test: Reserva exactamente en el mismo horario - NO disponible.
-     * 
+     *
      * Existente:  |-------|
      * Nueva:      |-------|
      */
@@ -118,7 +120,7 @@ class AvailabilityServiceTest extends TestCase
 
     /**
      * Test: Nueva reserva comienza durante existente - NO disponible.
-     * 
+     *
      * Existente:  |-------|
      * Nueva:          |-------|
      */
@@ -143,7 +145,7 @@ class AvailabilityServiceTest extends TestCase
 
     /**
      * Test: Nueva reserva termina durante existente - NO disponible.
-     * 
+     *
      * Existente:      |-------|
      * Nueva:      |-------|
      */
@@ -168,7 +170,7 @@ class AvailabilityServiceTest extends TestCase
 
     /**
      * Test: Nueva reserva contiene completamente a la existente - NO disponible.
-     * 
+     *
      * Existente:    |---|
      * Nueva:      |-------|
      */
@@ -193,7 +195,7 @@ class AvailabilityServiceTest extends TestCase
 
     /**
      * Test: Nueva reserva está contenida en la existente - NO disponible.
-     * 
+     *
      * Existente:  |-------|
      * Nueva:        |---|
      */
@@ -218,7 +220,7 @@ class AvailabilityServiceTest extends TestCase
 
     /**
      * Test: Reserva inmediatamente antes - SÍ disponible (sin gap, no solapa).
-     * 
+     *
      * Existente:           |-------|
      * Nueva:       |-------|
      */
@@ -243,7 +245,7 @@ class AvailabilityServiceTest extends TestCase
 
     /**
      * Test: Reserva inmediatamente después - SÍ disponible.
-     * 
+     *
      * Existente:  |-------|
      * Nueva:               |-------|
      */
@@ -343,7 +345,7 @@ class AvailabilityServiceTest extends TestCase
 
     /**
      * Test: Múltiples reservas - verificar gap entre ellas.
-     * 
+     *
      * Reserva1:  |-------|
      * Reserva2:                    |-------|
      * Nueva:             |-------|

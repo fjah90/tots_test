@@ -120,7 +120,7 @@ class StatsControllerTest extends TestCase
         $space = Space::first();
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
-        
+
         Reservation::factory()->count(2)->create([
             'user_id' => $user1->id,
             'space_id' => $space->id,
@@ -136,7 +136,7 @@ class StatsControllerTest extends TestCase
             ->getJson('/api/stats/dashboard');
 
         $response->assertStatus(200);
-        
+
         // Verificar estructura y valores correctos
         $data = $response->json();
         $this->assertEquals(4, $data['summary']['total_spaces']);

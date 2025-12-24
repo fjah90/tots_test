@@ -18,67 +18,90 @@ class SpaceController extends Controller
      *     path="/spaces",
      *     summary="Listar todos los espacios",
      *     tags={"Spaces"},
+     *
      *     @OA\Parameter(
      *         name="capacity_min",
      *         in="query",
      *         description="Capacidad mínima",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="capacity_max",
      *         in="query",
      *         description="Capacidad máxima",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="is_active",
      *         in="query",
      *         description="Filtrar por estado activo",
+     *
      *         @OA\Schema(type="boolean")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="search",
      *         in="query",
      *         description="Buscar por nombre o ubicación",
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="available_date",
      *         in="query",
      *         description="Filtrar por disponibilidad en fecha (YYYY-MM-DD)",
+     *
      *         @OA\Schema(type="string", format="date", example="2025-01-15")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="available_start_time",
      *         in="query",
      *         description="Hora inicio para filtro de disponibilidad (HH:mm)",
+     *
      *         @OA\Schema(type="string", example="09:00")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="available_end_time",
      *         in="query",
      *         description="Hora fin para filtro de disponibilidad (HH:mm)",
+     *
      *         @OA\Schema(type="string", example="12:00")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="page",
      *         in="query",
      *         description="Número de página para paginación",
+     *
      *         @OA\Schema(type="integer", default=1)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         description="Elementos por página (0 = todos)",
+     *
      *         @OA\Schema(type="integer", default=0)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Lista de espacios",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="data", type="array",
+     *
      *                 @OA\Items(ref="#/components/schemas/Space")
      *             ),
+     *
      *             @OA\Property(property="meta", type="object",
      *                 @OA\Property(property="current_page", type="integer"),
      *                 @OA\Property(property="per_page", type="integer"),
@@ -128,25 +151,25 @@ class SpaceController extends Controller
             $search = str_replace(['%', '_', '\\'], ['\\%', '\\_', '\\\\'], $validated['search']);
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('location', 'like', "%{$search}%");
+                    ->orWhere('location', 'like', "%{$search}%");
             });
         }
 
         // Filtro por disponibilidad en fecha y hora específica
         // Solo aplica si se especifican AMBAS horas (inicio y fin)
-        if (isset($validated['available_date']) && 
-            isset($validated['available_start_time']) && 
+        if (isset($validated['available_date']) &&
+            isset($validated['available_start_time']) &&
             isset($validated['available_end_time'])) {
-            
+
             $date = $validated['available_date'];
             $startTime = $validated['available_start_time'];
             $endTime = $validated['available_end_time'];
             $clientTimezone = $validated['timezone'] ?? 'UTC';
-            
+
             // Crear datetime en la zona horaria del cliente
             $localStart = "{$date} {$startTime}:00";
             $localEnd = "{$date} {$endTime}:00";
-            
+
             // Convertir a UTC para comparar con la base de datos
             try {
                 $startDateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $localStart, $clientTimezone)
@@ -160,13 +183,13 @@ class SpaceController extends Controller
                 $startDateTime = $localStart;
                 $endDateTime = $localEnd;
             }
-            
+
             // Excluir espacios que tengan reservaciones que se solapen con el horario solicitado
             // Algoritmo de solapamiento: (StartA < EndB) AND (EndA > StartB)
             $query->whereDoesntHave('reservations', function ($rq) use ($startDateTime, $endDateTime) {
                 $rq->whereIn('status', ['confirmed', 'pending'])
-                   ->where('start_time', '<', $endDateTime)
-                   ->where('end_time', '>', $startDateTime);
+                    ->where('start_time', '<', $endDateTime)
+                    ->where('end_time', '>', $startDateTime);
             });
         }
 
@@ -174,10 +197,10 @@ class SpaceController extends Controller
 
         // Paginación con límite máximo de seguridad (max 100 por página)
         $perPage = isset($validated['per_page']) ? min((int) $validated['per_page'], 100) : 0;
-        
+
         if ($perPage > 0) {
             $paginated = $query->paginate($perPage);
-            
+
             return response()->json([
                 'data' => $paginated->items(),
                 'meta' => [
@@ -185,7 +208,7 @@ class SpaceController extends Controller
                     'per_page' => $paginated->perPage(),
                     'total' => $paginated->total(),
                     'last_page' => $paginated->lastPage(),
-                ]
+                ],
             ]);
         }
 
@@ -202,18 +225,23 @@ class SpaceController extends Controller
      *     path="/spaces/{id}",
      *     summary="Obtener detalle de un espacio",
      *     tags={"Spaces"},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID del espacio",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Detalle del espacio",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/Space")
      *     ),
+     *
      *     @OA\Response(response=404, description="Espacio no encontrado")
      * )
      */
@@ -228,10 +256,13 @@ class SpaceController extends Controller
      *     summary="Crear nuevo espacio (Solo Admin)",
      *     tags={"Spaces"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"name","capacity","location"},
+     *
      *             @OA\Property(property="name", type="string", example="Nueva Sala de Juntas"),
      *             @OA\Property(property="description", type="string", example="Sala moderna con equipamiento"),
      *             @OA\Property(property="capacity", type="integer", example=15),
@@ -241,14 +272,18 @@ class SpaceController extends Controller
      *             @OA\Property(property="is_active", type="boolean", example=true)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Espacio creado exitosamente",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Espacio creado exitosamente"),
      *             @OA\Property(property="data", ref="#/components/schemas/Space")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="No autenticado"),
      *     @OA\Response(response=403, description="No autorizado (solo admin)"),
      *     @OA\Response(response=422, description="Error de validación")
@@ -270,16 +305,21 @@ class SpaceController extends Controller
      *     summary="Actualizar espacio (Solo Admin)",
      *     tags={"Spaces"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID del espacio",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="name", type="string", example="Sala Actualizada"),
      *             @OA\Property(property="description", type="string"),
      *             @OA\Property(property="capacity", type="integer", example=20),
@@ -289,14 +329,18 @@ class SpaceController extends Controller
      *             @OA\Property(property="is_active", type="boolean")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Espacio actualizado",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Espacio actualizado exitosamente"),
      *             @OA\Property(property="data", ref="#/components/schemas/Space")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="No autenticado"),
      *     @OA\Response(response=403, description="No autorizado"),
      *     @OA\Response(response=404, description="Espacio no encontrado")
@@ -318,20 +362,26 @@ class SpaceController extends Controller
      *     summary="Eliminar espacio (Solo Admin)",
      *     tags={"Spaces"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID del espacio",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Espacio eliminado",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Espacio eliminado exitosamente")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="No autenticado"),
      *     @OA\Response(response=403, description="No autorizado"),
      *     @OA\Response(response=404, description="Espacio no encontrado")
@@ -351,37 +401,47 @@ class SpaceController extends Controller
      *     path="/spaces/{id}/availability",
      *     summary="Verificar disponibilidad de un espacio",
      *     tags={"Spaces"},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID del espacio",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="start_time",
      *         in="query",
      *         required=true,
      *         description="Fecha y hora de inicio (Y-m-d H:i:s)",
+     *
      *         @OA\Schema(type="string", format="datetime")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="end_time",
      *         in="query",
      *         required=true,
      *         description="Fecha y hora de fin (Y-m-d H:i:s)",
+     *
      *         @OA\Schema(type="string", format="datetime")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Estado de disponibilidad",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="available", type="boolean", example=true),
      *             @OA\Property(property="space_id", type="integer", example=1),
      *             @OA\Property(property="start_time", type="string", example="2025-01-15 09:00:00"),
      *             @OA\Property(property="end_time", type="string", example="2025-01-15 12:00:00")
      *         )
      *     ),
+     *
      *     @OA\Response(response=404, description="Espacio no encontrado"),
      *     @OA\Response(response=422, description="Error de validación")
      * )
@@ -408,34 +468,45 @@ class SpaceController extends Controller
      *     path="/spaces/{id}/reservations",
      *     summary="Obtener reservaciones de un espacio",
      *     tags={"Spaces"},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID del espacio",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="from_date",
      *         in="query",
      *         description="Fecha desde (Y-m-d)",
+     *
      *         @OA\Schema(type="string", format="date")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="to_date",
      *         in="query",
      *         description="Fecha hasta (Y-m-d)",
+     *
      *         @OA\Schema(type="string", format="date")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Lista de reservaciones del espacio",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="data", type="array",
+     *
      *                 @OA\Items(ref="#/components/schemas/Reservation")
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(response=404, description="Espacio no encontrado")
      * )
      */

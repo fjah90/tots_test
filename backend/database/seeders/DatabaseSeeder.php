@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Space;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -81,7 +81,7 @@ class DatabaseSeeder extends Seeder
             'Catering disponible', 'Café Premium', 'Minibar', 'Sonido Profesional', 'Micrófonos inalámbricos',
             'Grabación de eventos', 'Accesibilidad', 'Estacionamiento', 'Casilleros', 'Impresora',
             'Escáner', 'Teléfono de conferencia', 'Iluminación regulable', 'Cortinas blackout',
-            'Vista panorámica', 'Terraza', 'Cocina equipada', 'Zona de descanso'
+            'Vista panorámica', 'Terraza', 'Cocina equipada', 'Zona de descanso',
         ];
 
         // Descripciones base
@@ -103,23 +103,23 @@ class DatabaseSeeder extends Seeder
             $type = $spaceTypes[array_rand($spaceTypes)];
             $building = $buildings[array_rand($buildings)];
             $floor = $floors[array_rand($floors)];
-            
+
             // Generar nombre único
             $suffix = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Omega', 'Prime', 'Plus', 'Pro', 'Elite'];
             $name = $type['prefix'] . ' ' . $suffix[array_rand($suffix)] . ' ' . $i;
-            
+
             // Capacidad aleatoria dentro del rango
             $capacity = rand($type['capacity_min'], $type['capacity_max']);
-            
+
             // Seleccionar amenities aleatorios (3-7)
             $numAmenities = rand(3, 7);
             $shuffledAmenities = $amenitiesPool;
             shuffle($shuffledAmenities);
             $amenities = array_slice($shuffledAmenities, 0, $numAmenities);
-            
+
             // Seleccionar imagen principal
             $mainImage = $images[array_rand($images)];
-            
+
             // Decidir si tiene múltiples imágenes (70% de probabilidad)
             $hasMultipleImages = rand(1, 100) <= 70;
             $spaceImages = null;
@@ -129,10 +129,10 @@ class DatabaseSeeder extends Seeder
                 shuffle($shuffledImages);
                 $spaceImages = array_slice($shuffledImages, 0, $numImages);
             }
-            
+
             // Descripción aleatoria
             $description = $descriptions[array_rand($descriptions)];
-            
+
             // 95% activos, 5% inactivos
             $isActive = rand(1, 100) <= 95;
 

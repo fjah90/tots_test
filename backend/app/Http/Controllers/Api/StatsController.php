@@ -63,7 +63,7 @@ class StatsController extends Controller
                 'reservations_by_status' => $reservationsByStatus,
                 'top_spaces' => $topSpaces,
                 'reservations_by_month' => $reservationsByMonth,
-            ]
+            ],
         ]);
     }
 
@@ -74,10 +74,13 @@ class StatsController extends Controller
      *     description="Funcionalidad adicional: Proporciona métricas clave del sistema para el panel de administración",
      *     tags={"Stats"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Estadísticas del sistema",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="summary", type="object",
      *                 @OA\Property(property="total_users", type="integer", example=50),
      *                 @OA\Property(property="total_spaces", type="integer", example=10),
@@ -87,15 +90,19 @@ class StatsController extends Controller
      *                 @OA\Property(property="cancelled_reservations", type="integer", example=20)
      *             ),
      *             @OA\Property(property="top_spaces", type="array",
+     *
      *                 @OA\Items(type="object",
+     *
      *                     @OA\Property(property="id", type="integer"),
      *                     @OA\Property(property="name", type="string"),
      *                     @OA\Property(property="reservations_count", type="integer")
      *                 )
      *             ),
      *             @OA\Property(property="recent_reservations", type="array",
+     *
      *                 @OA\Items(ref="#/components/schemas/Reservation")
      *             ),
+     *
      *             @OA\Property(property="reservations_by_status", type="object",
      *                 @OA\Property(property="confirmed", type="integer"),
      *                 @OA\Property(property="pending", type="integer"),
@@ -103,6 +110,7 @@ class StatsController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="No autenticado"),
      *     @OA\Response(response=403, description="No autorizado (solo admin)")
      * )
@@ -111,7 +119,7 @@ class StatsController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             return response()->json([
                 'message' => 'Solo los administradores pueden acceder a las estadísticas',
             ], 403);
@@ -172,17 +180,22 @@ class StatsController extends Controller
      *     description="Funcionalidad adicional: Métricas detalladas de uso de un espacio",
      *     tags={"Stats"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID del espacio",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Estadísticas del espacio",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="space", ref="#/components/schemas/Space"),
      *             @OA\Property(property="stats", type="object",
      *                 @OA\Property(property="total_reservations", type="integer"),
@@ -192,10 +205,12 @@ class StatsController extends Controller
      *                 @OA\Property(property="unique_users", type="integer")
      *             ),
      *             @OA\Property(property="upcoming_reservations", type="array",
+     *
      *                 @OA\Items(ref="#/components/schemas/Reservation")
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="No autenticado"),
      *     @OA\Response(response=403, description="No autorizado"),
      *     @OA\Response(response=404, description="Espacio no encontrado")
@@ -205,7 +220,7 @@ class StatsController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             return response()->json([
                 'message' => 'Solo los administradores pueden acceder a las estadísticas',
             ], 403);
@@ -217,8 +232,8 @@ class StatsController extends Controller
         $uniqueUsers = $space->reservations()->distinct('user_id')->count('user_id');
 
         // Tasa de ocupación (reservaciones confirmadas / total)
-        $occupancyRate = $totalReservations > 0 
-            ? round(($confirmedReservations / $totalReservations) * 100, 2) 
+        $occupancyRate = $totalReservations > 0
+            ? round(($confirmedReservations / $totalReservations) * 100, 2)
             : 0;
 
         // Próximas reservaciones

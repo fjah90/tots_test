@@ -7,40 +7,37 @@ use App\Models\Reservation;
 use App\Models\Space;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Servicio para gestionar la disponibilidad de espacios.
- * 
+ *
  * Implementa AvailabilityServiceInterface siguiendo el principio ISP.
  * Usa el algoritmo de detección de solapamiento: (StartA < EndB) AND (EndA > StartB)
- * 
- * @package App\Services
  */
 class AvailabilityService implements AvailabilityServiceInterface
 {
     /**
      * Verificar si un espacio está disponible en un rango de tiempo.
-     * 
+     *
      * La lógica de solapamiento detecta cuando:
      * - Una reserva existente comienza antes de que termine la nueva (StartA < EndB)
      * - Y la reserva existente termina después de que comience la nueva (EndA > StartB)
-     * 
+     *
      * Ejemplo visual:
      * Reserva existente:  |----A----|
      * Nueva reserva:           |----B----|
      * Solapamiento:            |XXXX|
-     * 
-     * @param int $spaceId ID del espacio a verificar
-     * @param string|Carbon $start Fecha/hora de inicio
-     * @param string|Carbon $end Fecha/hora de fin
-     * @param int|null $excludeReservationId ID de reserva a excluir (para updates)
+     *
+     * @param  int  $spaceId  ID del espacio a verificar
+     * @param  string|Carbon  $start  Fecha/hora de inicio
+     * @param  string|Carbon  $end  Fecha/hora de fin
+     * @param  int|null  $excludeReservationId  ID de reserva a excluir (para updates)
      * @return bool True si está disponible, False si hay conflicto
      */
     public function isSpaceAvailable(
-        int $spaceId, 
-        string|Carbon $start, 
-        string|Carbon $end, 
+        int $spaceId,
+        string|Carbon $start,
+        string|Carbon $end,
         ?int $excludeReservationId = null
     ): bool {
         // Normalizar a Carbon para manejo consistente
@@ -54,7 +51,7 @@ class AvailabilityService implements AvailabilityServiceInterface
 
         // Verificar que el espacio existe y está activo
         $space = Space::find($spaceId);
-        if (!$space || !$space->is_active) {
+        if (! $space || ! $space->is_active) {
             return false;
         }
 
@@ -65,7 +62,7 @@ class AvailabilityService implements AvailabilityServiceInterface
             ->where(function ($q) use ($startTime, $endTime) {
                 // Detectar solapamiento
                 $q->where('start_time', '<', $endTime->toDateTimeString())
-                  ->where('end_time', '>', $startTime->toDateTimeString());
+                    ->where('end_time', '>', $startTime->toDateTimeString());
             });
 
         // Excluir reserva específica (útil para updates)
@@ -79,14 +76,8 @@ class AvailabilityService implements AvailabilityServiceInterface
 
     /**
      * Obtener las reservas que solapan con un rango de tiempo.
-     * 
+     *
      * Útil para mostrar al usuario qué reservas están en conflicto.
-     * 
-     * @param int $spaceId
-     * @param string|Carbon $start
-     * @param string|Carbon $end
-     * @param int|null $excludeReservationId
-     * @return Collection
      */
     public function getOverlappingReservations(
         int $spaceId,
@@ -102,7 +93,7 @@ class AvailabilityService implements AvailabilityServiceInterface
             ->where('status', '!=', 'cancelled')
             ->where(function ($q) use ($startTime, $endTime) {
                 $q->where('start_time', '<', $endTime->toDateTimeString())
-                  ->where('end_time', '>', $startTime->toDateTimeString());
+                    ->where('end_time', '>', $startTime->toDateTimeString());
             });
 
         if ($excludeReservationId !== null) {
@@ -114,12 +105,11 @@ class AvailabilityService implements AvailabilityServiceInterface
 
     /**
      * Obtener slots disponibles para un espacio en un día específico.
-     * 
-     * @param int $spaceId
-     * @param string|Carbon $date Fecha a consultar
-     * @param int $slotDurationMinutes Duración de cada slot en minutos
-     * @param string $dayStart Hora de inicio del día (formato H:i)
-     * @param string $dayEnd Hora de fin del día (formato H:i)
+     *
+     * @param  string|Carbon  $date  Fecha a consultar
+     * @param  int  $slotDurationMinutes  Duración de cada slot en minutos
+     * @param  string  $dayStart  Hora de inicio del día (formato H:i)
+     * @param  string  $dayEnd  Hora de fin del día (formato H:i)
      * @return array Lista de slots disponibles con start y end
      */
     public function getAvailableSlots(
@@ -130,7 +120,7 @@ class AvailabilityService implements AvailabilityServiceInterface
         string $dayEnd = '20:00'
     ): array {
         $dateCarbon = $date instanceof Carbon ? $date : Carbon::parse($date);
-        
+
         $startOfDay = $dateCarbon->copy()->setTimeFromTimeString($dayStart);
         $endOfDay = $dateCarbon->copy()->setTimeFromTimeString($dayEnd);
 
@@ -146,7 +136,7 @@ class AvailabilityService implements AvailabilityServiceInterface
 
         while ($currentTime->lt($endOfDay)) {
             $slotEnd = $currentTime->copy()->addMinutes($slotDurationMinutes);
-            
+
             if ($slotEnd->gt($endOfDay)) {
                 break;
             }

@@ -16,7 +16,7 @@ class ReservationController extends Controller
 {
     /**
      * Constructor con inyección de dependencias.
-     * 
+     *
      * Se inyecta la interfaz (no la implementación concreta)
      * siguiendo el principio de Inversión de Dependencias (DIP).
      */
@@ -30,41 +30,52 @@ class ReservationController extends Controller
      *     summary="Listar reservaciones del usuario autenticado",
      *     tags={"Reservations"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="status",
      *         in="query",
      *         description="Filtrar por estado",
+     *
      *         @OA\Schema(type="string", enum={"confirmed", "cancelled", "pending"})
      *     ),
+     *
      *     @OA\Parameter(
      *         name="from_date",
      *         in="query",
      *         description="Desde fecha (Y-m-d)",
+     *
      *         @OA\Schema(type="string", format="date")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="to_date",
      *         in="query",
      *         description="Hasta fecha (Y-m-d)",
+     *
      *         @OA\Schema(type="string", format="date")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Lista de reservaciones",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="data", type="array",
+     *
      *                 @OA\Items(ref="#/components/schemas/Reservation")
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="No autenticado")
      * )
      */
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        
-        $query = $user->isAdmin() 
+
+        $query = $user->isAdmin()
             ? Reservation::with(['user', 'space'])
             : $user->reservations()->with('space');
 
@@ -95,18 +106,23 @@ class ReservationController extends Controller
      *     summary="Obtener detalle de una reservación",
      *     tags={"Reservations"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID de la reservación",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Detalle de la reservación",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/Reservation")
      *     ),
+     *
      *     @OA\Response(response=401, description="No autenticado"),
      *     @OA\Response(response=403, description="No autorizado"),
      *     @OA\Response(response=404, description="Reservación no encontrada")
@@ -117,7 +133,7 @@ class ReservationController extends Controller
         $user = $request->user();
 
         // Solo el dueño o un admin puede ver la reservación
-        if (!$user->isAdmin() && $reservation->user_id !== $user->id) {
+        if (! $user->isAdmin() && $reservation->user_id !== $user->id) {
             return response()->json([
                 'message' => 'No autorizado para ver esta reservación',
             ], 403);
@@ -132,24 +148,31 @@ class ReservationController extends Controller
      *     summary="Crear nueva reservación",
      *     tags={"Reservations"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"space_id","start_time","end_time"},
+     *
      *             @OA\Property(property="space_id", type="integer", example=1),
      *             @OA\Property(property="start_time", type="string", format="datetime", example="2025-01-20 09:00:00"),
      *             @OA\Property(property="end_time", type="string", format="datetime", example="2025-01-20 12:00:00"),
      *             @OA\Property(property="notes", type="string", example="Reunión de equipo de desarrollo")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Reservación creada exitosamente",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Reservación creada exitosamente"),
      *             @OA\Property(property="data", ref="#/components/schemas/Reservation")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="No autenticado"),
      *     @OA\Response(response=409, description="Conflicto - El espacio no está disponible"),
      *     @OA\Response(response=422, description="Error de validación")
@@ -161,7 +184,7 @@ class ReservationController extends Controller
         $space = Space::findOrFail($validated['space_id']);
 
         // Verificar que el espacio esté activo
-        if (!$space->is_active) {
+        if (! $space->is_active) {
             return response()->json([
                 'message' => 'El espacio no está disponible para reservaciones',
                 'error' => 'space_inactive',
@@ -169,7 +192,7 @@ class ReservationController extends Controller
         }
 
         // Verificar disponibilidad usando el servicio dedicado
-        if (!$this->availabilityService->isSpaceAvailable(
+        if (! $this->availabilityService->isSpaceAvailable(
             $validated['space_id'],
             $validated['start_time'],
             $validated['end_time']
@@ -184,7 +207,7 @@ class ReservationController extends Controller
             return response()->json([
                 'message' => 'El espacio no está disponible en el horario solicitado',
                 'error' => 'space_not_available',
-                'conflicting_reservations' => $conflicting->map(fn($r) => [
+                'conflicting_reservations' => $conflicting->map(fn ($r) => [
                     'id' => $r->id,
                     'start_time' => $r->start_time,
                     'end_time' => $r->end_time,
@@ -215,30 +238,39 @@ class ReservationController extends Controller
      *     summary="Actualizar reservación",
      *     tags={"Reservations"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID de la reservación",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="start_time", type="string", format="datetime"),
      *             @OA\Property(property="end_time", type="string", format="datetime"),
      *             @OA\Property(property="notes", type="string"),
      *             @OA\Property(property="status", type="string", enum={"confirmed", "cancelled", "pending"})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Reservación actualizada",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Reservación actualizada exitosamente"),
      *             @OA\Property(property="data", ref="#/components/schemas/Reservation")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="No autenticado"),
      *     @OA\Response(response=403, description="No autorizado"),
      *     @OA\Response(response=404, description="Reservación no encontrada"),
@@ -250,7 +282,7 @@ class ReservationController extends Controller
         $user = $request->user();
 
         // Solo el dueño o un admin puede actualizar
-        if (!$user->isAdmin() && $reservation->user_id !== $user->id) {
+        if (! $user->isAdmin() && $reservation->user_id !== $user->id) {
             return response()->json([
                 'message' => 'No autorizado para actualizar esta reservación',
             ], 403);
@@ -263,7 +295,7 @@ class ReservationController extends Controller
         $endTime = $validated['end_time'] ?? $reservation->end_time;
 
         if (isset($validated['start_time']) || isset($validated['end_time'])) {
-            if (!$this->availabilityService->isSpaceAvailable(
+            if (! $this->availabilityService->isSpaceAvailable(
                 $reservation->space_id,
                 $startTime,
                 $endTime,
@@ -290,20 +322,26 @@ class ReservationController extends Controller
      *     summary="Cancelar/eliminar reservación",
      *     tags={"Reservations"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID de la reservación",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Reservación eliminada",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Reservación eliminada exitosamente")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="No autenticado"),
      *     @OA\Response(response=403, description="No autorizado"),
      *     @OA\Response(response=404, description="Reservación no encontrada")
@@ -314,7 +352,7 @@ class ReservationController extends Controller
         $user = $request->user();
 
         // Solo el dueño o un admin puede eliminar
-        if (!$user->isAdmin() && $reservation->user_id !== $user->id) {
+        if (! $user->isAdmin() && $reservation->user_id !== $user->id) {
             return response()->json([
                 'message' => 'No autorizado para eliminar esta reservación',
             ], 403);
@@ -333,21 +371,27 @@ class ReservationController extends Controller
      *     summary="Cancelar una reservación (cambiar estado)",
      *     tags={"Reservations"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID de la reservación",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Reservación cancelada",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Reservación cancelada exitosamente"),
      *             @OA\Property(property="data", ref="#/components/schemas/Reservation")
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="No autenticado"),
      *     @OA\Response(response=403, description="No autorizado"),
      *     @OA\Response(response=404, description="Reservación no encontrada")
@@ -357,7 +401,7 @@ class ReservationController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isAdmin() && $reservation->user_id !== $user->id) {
+        if (! $user->isAdmin() && $reservation->user_id !== $user->id) {
             return response()->json([
                 'message' => 'No autorizado para cancelar esta reservación',
             ], 403);
@@ -376,18 +420,25 @@ class ReservationController extends Controller
      *     path="/calendar/reservations",
      *     summary="Obtener reservaciones públicas para el calendario (sin datos sensibles)",
      *     tags={"Calendar"},
+     *
      *     @OA\Parameter(
      *         name="space_id",
      *         in="query",
      *         description="Filtrar por espacio",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Lista de reservaciones para calendario",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="data", type="array",
+     *
      *                 @OA\Items(type="object",
+     *
      *                     @OA\Property(property="id", type="integer"),
      *                     @OA\Property(property="space_id", type="integer"),
      *                     @OA\Property(property="start_time", type="string"),
@@ -412,7 +463,7 @@ class ReservationController extends Controller
         // Solo reservaciones del mes actual y siguiente
         $fromDate = now()->startOfMonth();
         $toDate = now()->addMonths(2)->endOfMonth();
-        
+
         $query->whereBetween('start_time', [$fromDate, $toDate]);
 
         $reservations = $query->orderBy('start_time', 'asc')
@@ -441,10 +492,13 @@ class ReservationController extends Controller
      *     summary="Crear reservaciones en múltiples fechas",
      *     tags={"Reservations"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"space_id", "dates", "start_time", "end_time"},
+     *
      *             @OA\Property(property="space_id", type="integer", example=1),
      *             @OA\Property(property="dates", type="array", @OA\Items(type="string", format="date"), example={"2025-01-20", "2025-01-21", "2025-01-22"}),
      *             @OA\Property(property="start_time", type="string", example="09:00"),
@@ -452,10 +506,13 @@ class ReservationController extends Controller
      *             @OA\Property(property="notes", type="string", example="Reunión recurrente")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Reservaciones creadas exitosamente",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string"),
      *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="created", type="array", @OA\Items(ref="#/components/schemas/Reservation")),
@@ -463,6 +520,7 @@ class ReservationController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="No autenticado"),
      *     @OA\Response(response=422, description="Error de validación")
      * )
@@ -486,7 +544,7 @@ class ReservationController extends Controller
 
         $space = Space::findOrFail($validated['space_id']);
 
-        if (!$space->is_active) {
+        if (! $space->is_active) {
             return response()->json([
                 'message' => 'El espacio no está disponible para reservaciones',
                 'error' => 'space_inactive',
@@ -502,7 +560,7 @@ class ReservationController extends Controller
             $endDateTime = "{$date} {$validated['end_time']}:00";
 
             // Verificar disponibilidad
-            if (!$this->availabilityService->isSpaceAvailable(
+            if (! $this->availabilityService->isSpaceAvailable(
                 $validated['space_id'],
                 $startDateTime,
                 $endDateTime

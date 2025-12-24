@@ -40,7 +40,7 @@ Route::get('calendar/reservations', [ReservationController::class, 'calendarPubl
 // ============================================================================
 
 Route::middleware('auth:sanctum')->group(function () {
-    
+
     // Autenticación
     Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
@@ -52,7 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('spaces', [SpaceController::class, 'store']);
         Route::put('spaces/{space}', [SpaceController::class, 'update']);
         Route::delete('spaces/{space}', [SpaceController::class, 'destroy']);
-        
+
         // Usuarios - Lista para seleccionar en formularios admin
         Route::get('users', [AuthController::class, 'listUsers']);
 

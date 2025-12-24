@@ -10,7 +10,7 @@ class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
-     * 
+     *
      * Aquí se registran los bindings de interfaces a implementaciones
      * siguiendo el principio de Inversión de Dependencias (DIP).
      */
@@ -26,8 +26,5 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
-    {
-        //
-    }
+    public function boot(): void {}
 }

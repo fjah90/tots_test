@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Space extends Model
 {
@@ -68,7 +68,7 @@ class Space extends Model
             ->where(function ($q) use ($startTime, $endTime) {
                 $q->where(function ($inner) use ($startTime, $endTime) {
                     $inner->where('start_time', '<', $endTime)
-                          ->where('end_time', '>', $startTime);
+                        ->where('end_time', '>', $startTime);
                 });
             });
 

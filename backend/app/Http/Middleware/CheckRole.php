@@ -8,12 +8,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Middleware para verificar el rol del usuario autenticado.
- * 
+ *
  * Uso en rutas:
  *   Route::middleware(['auth:sanctum', 'role:admin'])->group(...)
  *   Route::middleware(['auth:sanctum', 'role:admin,moderator'])->group(...)
- * 
- * @package App\Http\Middleware
  */
 class CheckRole
 {
@@ -28,7 +26,7 @@ class CheckRole
         $user = $request->user();
 
         // Si no hay usuario autenticado
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'message' => 'No autenticado',
                 'error' => 'unauthenticated',
@@ -39,7 +37,7 @@ class CheckRole
         $allowedRoles = array_map('trim', explode(',', $roles));
 
         // Verificar si el usuario tiene alguno de los roles permitidos
-        if (!in_array($user->role, $allowedRoles, true)) {
+        if (! in_array($user->role, $allowedRoles, true)) {
             return response()->json([
                 'message' => 'No tiene permisos para acceder a este recurso',
                 'error' => 'forbidden',

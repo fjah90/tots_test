@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Reservation;
 use App\Models\Space;
 use App\Models\User;
-use App\Models\Reservation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

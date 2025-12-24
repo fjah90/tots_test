@@ -20,7 +20,7 @@ class SpaceFactory extends Factory
     public function definition(): array
     {
         $amenities = ['WiFi', 'Proyector', 'Pizarra', 'Aire Acondicionado', 'Café', 'TV'];
-        
+
         return [
             'name' => fake()->randomElement(['Sala', 'Auditorio', 'Espacio']) . ' ' . fake()->word(),
             'description' => fake()->paragraph(),

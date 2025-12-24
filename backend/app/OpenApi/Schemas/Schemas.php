@@ -6,6 +6,7 @@ namespace App\OpenApi\Schemas;
  * @OA\Schema(
  *     schema="User",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Juan Pérez"),
  *     @OA\Property(property="email", type="string", format="email", example="juan@ejemplo.com"),
@@ -17,6 +18,7 @@ namespace App\OpenApi\Schemas;
  * @OA\Schema(
  *     schema="Space",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Sala de Conferencias Principal"),
  *     @OA\Property(property="description", type="string", example="Sala amplia con capacidad para 30 personas"),
@@ -25,9 +27,11 @@ namespace App\OpenApi\Schemas;
  *     @OA\Property(
  *         property="amenities",
  *         type="array",
+ *
  *         @OA\Items(type="string"),
  *         example={"WiFi", "Proyector", "Pizarra", "Aire Acondicionado"}
  *     ),
+ *
  *     @OA\Property(property="image_url", type="string", nullable=true, example="https://example.com/sala.jpg"),
  *     @OA\Property(property="is_active", type="boolean", example=true),
  *     @OA\Property(property="created_at", type="string", format="datetime"),
@@ -37,6 +41,7 @@ namespace App\OpenApi\Schemas;
  * @OA\Schema(
  *     schema="Reservation",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="user_id", type="integer", example=1),
  *     @OA\Property(property="space_id", type="integer", example=1),
@@ -54,6 +59,7 @@ namespace App\OpenApi\Schemas;
  *     schema="LoginRequest",
  *     type="object",
  *     required={"email", "password"},
+ *
  *     @OA\Property(property="email", type="string", format="email", example="admin@espacios.com"),
  *     @OA\Property(property="password", type="string", format="password", example="password123")
  * )
@@ -62,6 +68,7 @@ namespace App\OpenApi\Schemas;
  *     schema="RegisterRequest",
  *     type="object",
  *     required={"name", "email", "password", "password_confirmation"},
+ *
  *     @OA\Property(property="name", type="string", example="Nuevo Usuario"),
  *     @OA\Property(property="email", type="string", format="email", example="nuevo@ejemplo.com"),
  *     @OA\Property(property="password", type="string", format="password", minLength=8, example="password123"),
@@ -71,6 +78,7 @@ namespace App\OpenApi\Schemas;
  * @OA\Schema(
  *     schema="AuthResponse",
  *     type="object",
+ *
  *     @OA\Property(property="user", ref="#/components/schemas/User"),
  *     @OA\Property(property="token", type="string", example="1|abcdefghijklmnopqrstuvwxyz123456")
  * )
@@ -78,6 +86,7 @@ namespace App\OpenApi\Schemas;
  * @OA\Schema(
  *     schema="ErrorResponse",
  *     type="object",
+ *
  *     @OA\Property(property="message", type="string", example="Error message"),
  *     @OA\Property(property="errors", type="object", nullable=true)
  * )

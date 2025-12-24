@@ -64,7 +64,7 @@ class UpdateReservationRequest extends FormRequest
             }
 
             // Si solo se proporciona end_time, comparar con el start_time existente
-            if (!$startTime && $endTime) {
+            if (! $startTime && $endTime) {
                 $reservation = $this->route('reservation');
                 if ($reservation && strtotime($endTime) <= strtotime($reservation->start_time)) {
                     $validator->errors()->add(
