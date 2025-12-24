@@ -22,7 +22,7 @@
             pInputText 
             placeholder="Nombre, ubicación..." 
             [ngModel]="searchTerm()"
-            (ngModelChange)="searchTerm.set($event)"
+            (ngModelChange)="onSearchChange($event)"
             class="w-full"
           />
         </div>
@@ -115,7 +115,7 @@
           <div class="flex-1 max-w-lg">
             <p-slider 
               [ngModel]="capacityRange()"
-              (ngModelChange)="capacityRange.set($event)"
+              (ngModelChange)="onCapacityChange($event)"
               [range]="true"
               [min]="0"
               [max]="100"

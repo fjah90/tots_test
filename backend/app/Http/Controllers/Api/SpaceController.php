@@ -100,6 +100,7 @@ class SpaceController extends Controller
             'available_date' => ['nullable', 'date', 'date_format:Y-m-d'],
             'available_start_time' => ['nullable', 'date_format:H:i'],
             'available_end_time' => ['nullable', 'date_format:H:i'],
+            'timezone' => ['nullable', 'string', 'max:50'],
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'min:0', 'max:100'],
         ]);
@@ -132,15 +133,36 @@ class SpaceController extends Controller
         }
 
         // Filtro por disponibilidad en fecha y hora específica
-        if (isset($validated['available_date'])) {
-            $date = $validated['available_date'];
-            $startTime = $validated['available_start_time'] ?? '08:00';
-            $endTime = $validated['available_end_time'] ?? '20:00';
+        // Solo aplica si se especifican AMBAS horas (inicio y fin)
+        if (isset($validated['available_date']) && 
+            isset($validated['available_start_time']) && 
+            isset($validated['available_end_time'])) {
             
-            $startDateTime = "{$date} {$startTime}:00";
-            $endDateTime = "{$date} {$endTime}:00";
+            $date = $validated['available_date'];
+            $startTime = $validated['available_start_time'];
+            $endTime = $validated['available_end_time'];
+            $clientTimezone = $validated['timezone'] ?? 'UTC';
+            
+            // Crear datetime en la zona horaria del cliente
+            $localStart = "{$date} {$startTime}:00";
+            $localEnd = "{$date} {$endTime}:00";
+            
+            // Convertir a UTC para comparar con la base de datos
+            try {
+                $startDateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $localStart, $clientTimezone)
+                    ->setTimezone('UTC')
+                    ->toDateTimeString();
+                $endDateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $localEnd, $clientTimezone)
+                    ->setTimezone('UTC')
+                    ->toDateTimeString();
+            } catch (\Exception $e) {
+                // Si hay error con el timezone, usar las horas tal cual
+                $startDateTime = $localStart;
+                $endDateTime = $localEnd;
+            }
             
             // Excluir espacios que tengan reservaciones que se solapen con el horario solicitado
+            // Algoritmo de solapamiento: (StartA < EndB) AND (EndA > StartB)
             $query->whereDoesntHave('reservations', function ($rq) use ($startDateTime, $endDateTime) {
                 $rq->whereIn('status', ['confirmed', 'pending'])
                    ->where('start_time', '<', $endDateTime)

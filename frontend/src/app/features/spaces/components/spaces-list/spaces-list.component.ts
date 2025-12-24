@@ -19,9 +19,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 
 // Services & Interfaces
-import { SpacesService, SpaceFilters } from '../../../../core/services/spaces.service';
+import { SpacesService } from '../../../../core/services/spaces.service';
 import { Space } from '../../../../shared/interfaces';
-import { FilterSpacesPipe, SpaceFilterCriteria } from '../../../../shared/pipes/filter-spaces.pipe';
 import { ReservationFormComponent } from '../reservation-form/reservation-form.component';
 
 @Component({
@@ -78,19 +77,11 @@ export class SpacesListComponent implements OnInit {
   showReservationDialogVisible = false;
   selectedSpace = signal<Space | null>(null);
 
-  // Criterios de filtrado computados (para filtrado adicional del cliente)
-  filterCriteria = computed<SpaceFilterCriteria>(() => ({
-    search: this.searchTerm(),
-    minCapacity: this.capacityRange()[0],
-    maxCapacity: this.capacityRange()[1] === 100 ? undefined : this.capacityRange()[1],
-    isActive: true
-  }));
+  // Espacios filtrados - ahora simplemente devuelve los espacios ya que el backend ya filtra
+  filteredSpaces = computed(() => this.spaces());
 
-  // Espacios filtrados (filtra los ya cargados)
-  filteredSpaces = computed(() => {
-    const pipe = new FilterSpacesPipe();
-    return pipe.transform(this.spaces(), this.filterCriteria());
-  });
+  // Timeout para debounce de búsqueda
+  private searchTimeout: any = null;
 
   /**
    * Detectar scroll para cargar más elementos (infinite scroll)
@@ -157,6 +148,40 @@ export class SpacesListComponent implements OnInit {
     }
   }
 
+  /**
+   * Cuando cambia el término de búsqueda, recargar con debounce
+   */
+  onSearchChange(value: string): void {
+    this.searchTerm.set(value);
+    
+    // Cancelar timeout anterior
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+    
+    // Debounce de 400ms para no hacer muchas peticiones
+    this.searchTimeout = setTimeout(() => {
+      this.loadSpaces();
+    }, 400);
+  }
+
+  /**
+   * Cuando cambia el rango de capacidad, recargar con debounce
+   */
+  onCapacityChange(range: number[]): void {
+    this.capacityRange.set(range);
+    
+    // Cancelar timeout anterior
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+    
+    // Debounce de 300ms para el slider
+    this.searchTimeout = setTimeout(() => {
+      this.loadSpaces();
+    }, 300);
+  }
+
   loadSpaces(): void {
     this.loading.set(true);
     this.currentPage.set(1);
@@ -169,17 +194,26 @@ export class SpacesListComponent implements OnInit {
       per_page: this.perPage
     };
 
-    // Agregar filtro de fecha si está seleccionada
-    if (this.selectedDate()) {
+    // Agregar filtro de búsqueda por texto
+    if (this.searchTerm().trim()) {
+      filters.search = this.searchTerm().trim();
+    }
+
+    // Agregar filtros de capacidad
+    if (this.capacityRange()[0] > 0) {
+      filters.capacity_min = this.capacityRange()[0];
+    }
+    if (this.capacityRange()[1] < 100) {
+      filters.capacity_max = this.capacityRange()[1];
+    }
+
+    // Filtro de disponibilidad: solo aplica si hay fecha Y ambas horas seleccionadas
+    if (this.selectedDate() && this.selectedStartTime() && this.selectedEndTime()) {
       filters.available_date = this.formatDateForApi(this.selectedDate()!);
-      
-      // Agregar filtros de hora si están seleccionados
-      if (this.selectedStartTime()) {
-        filters.available_start_time = this.formatTimeForApi(this.selectedStartTime()!);
-      }
-      if (this.selectedEndTime()) {
-        filters.available_end_time = this.formatTimeForApi(this.selectedEndTime()!);
-      }
+      filters.available_start_time = this.formatTimeForApi(this.selectedStartTime()!);
+      filters.available_end_time = this.formatTimeForApi(this.selectedEndTime()!);
+      // Enviar timezone del navegador para conversión correcta en backend
+      filters.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     }
     
     this.spacesService.getSpacesPaginated(filters).subscribe({
@@ -220,17 +254,25 @@ export class SpacesListComponent implements OnInit {
       per_page: this.perPage
     };
 
-    // Mantener el filtro de fecha si está seleccionada
-    if (this.selectedDate()) {
+    // Mantener filtro de búsqueda por texto
+    if (this.searchTerm().trim()) {
+      filters.search = this.searchTerm().trim();
+    }
+
+    // Mantener filtros de capacidad
+    if (this.capacityRange()[0] > 0) {
+      filters.capacity_min = this.capacityRange()[0];
+    }
+    if (this.capacityRange()[1] < 100) {
+      filters.capacity_max = this.capacityRange()[1];
+    }
+
+    // Mantener filtro de disponibilidad si está activo
+    if (this.selectedDate() && this.selectedStartTime() && this.selectedEndTime()) {
       filters.available_date = this.formatDateForApi(this.selectedDate()!);
-      
-      // Mantener filtros de hora si están seleccionados
-      if (this.selectedStartTime()) {
-        filters.available_start_time = this.formatTimeForApi(this.selectedStartTime()!);
-      }
-      if (this.selectedEndTime()) {
-        filters.available_end_time = this.formatTimeForApi(this.selectedEndTime()!);
-      }
+      filters.available_start_time = this.formatTimeForApi(this.selectedStartTime()!);
+      filters.available_end_time = this.formatTimeForApi(this.selectedEndTime()!);
+      filters.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     }
     
     this.spacesService.getSpacesPaginated(filters).subscribe({

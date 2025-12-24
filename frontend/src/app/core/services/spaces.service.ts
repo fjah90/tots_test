@@ -28,6 +28,9 @@ export interface SpaceFilters {
   available_date?: string; // Formato YYYY-MM-DD
   available_start_time?: string; // Formato HH:mm
   available_end_time?: string; // Formato HH:mm
+  timezone?: string; // Timezone del cliente (ej: America/Caracas)
+  capacity_min?: number;
+  capacity_max?: number;
 }
 
 export interface PaginatedSpaces {
@@ -104,6 +107,15 @@ export class SpacesService {
     }
     if (filters?.available_end_time) {
       params = params.set('available_end_time', filters.available_end_time);
+    }
+    if (filters?.timezone) {
+      params = params.set('timezone', filters.timezone);
+    }
+    if (filters?.capacity_min) {
+      params = params.set('capacity_min', filters.capacity_min.toString());
+    }
+    if (filters?.capacity_max) {
+      params = params.set('capacity_max', filters.capacity_max.toString());
     }
 
     return this.http.get<PaginatedApiResponse<Space[]>>(this.apiUrl, { params })
