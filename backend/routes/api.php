@@ -51,6 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('spaces', [SpaceController::class, 'store']);
         Route::put('spaces/{space}', [SpaceController::class, 'update']);
         Route::delete('spaces/{space}', [SpaceController::class, 'destroy']);
+        
+        // Usuarios - Lista para seleccionar en formularios admin
+        Route::get('users', [AuthController::class, 'listUsers']);
     });
 
     // Reservaciones - CRUD completo para usuarios autenticados

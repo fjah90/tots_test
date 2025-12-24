@@ -195,4 +195,36 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
+
+    /**
+     * @OA\Get(
+     *     path="/users",
+     *     summary="Listar todos los usuarios (solo admin)",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de usuarios",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array",
+     *                 @OA\Items(type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="name", type="string"),
+     *                     @OA\Property(property="email", type="string")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="No autenticado"),
+     *     @OA\Response(response=403, description="No autorizado")
+     * )
+     */
+    public function listUsers(): JsonResponse
+    {
+        $users = User::select('id', 'name', 'email')->orderBy('name')->get();
+        
+        return response()->json([
+            'data' => $users
+        ]);
+    }
 }
