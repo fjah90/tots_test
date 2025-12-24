@@ -99,7 +99,8 @@ Sistema completo de reserva de espacios y salas con gestión administrativa, aut
 | CRUD reservas | ✅ | `ReservationController` - CRUD completo |
 | **Reservas bulk** | ✅ | `POST /reservations/bulk` - múltiples fechas |
 | Validación superposición horarios | ✅ | `AvailabilityService::getOverlappingReservations()` |
-| **Filtro disponibilidad por hora** | ✅ | Params `available_start_time`, `available_end_time` |
+| **Filtro disponibilidad por hora** | ✅ | Params `available_start_time`, `available_end_time`, `timezone` |
+| **Soporte multi-timezone** | ✅ | Conversión automática de hora local a UTC con Carbon |
 | Funcionalidad extra documentada | ✅ | Dashboard estadísticas (`StatsController`) |
 | Protección de rutas | ✅ | `auth:sanctum` + `role:admin` middleware |
 | Solo acceso a reservas propias | ✅ | Validación en ReservationController |
@@ -318,28 +319,39 @@ flowchart TD
     C -->|Fecha| E[Seleccionar fecha]
     C -->|Capacidad| F[Ajustar slider]
     
-    E --> G{¿Filtrar por hora?}
-    G -->|Sí| H[Seleccionar hora inicio/fin]
-    G -->|No| I[Usar horario completo 08:00-20:00]
-    
-    H --> J[GET /spaces con filtros]
-    I --> J
     D --> J
     F --> J
     
-    J --> K[Backend filtra espacios]
-    K --> L{¿Hay reservas en rango?}
-    L -->|Sí| M[Excluir espacio]
-    L -->|No| N[Incluir espacio]
+    E --> G{¿Especificar horas?}
+    G -->|Sí| H[Seleccionar hora inicio y fin]
+    G -->|No| I[Sin filtro de disponibilidad]
     
-    M --> O[Retornar espacios disponibles]
-    N --> O
-    O --> P[Mostrar resultados paginados]
+    I --> J
     
-    P --> Q{¿Scroll down?}
-    Q -->|Sí| R[Infinite scroll - cargar más]
-    R --> P
+    H --> TZ[Obtener timezone del navegador]
+    TZ --> J[GET /spaces con filtros + timezone]
+    
+    J --> K[Backend procesa búsqueda]
+    
+    K --> L{¿Hay filtro de fecha/hora?}
+    L -->|No| O
+    L -->|Sí| M[Convertir horas locales a UTC]
+    
+    M --> N{¿Espacio tiene reservas en rango UTC?}
+    N -->|Sí| P[Excluir espacio del resultado]
+    N -->|No| O[Incluir espacio]
+    
+    P --> Q[Retornar espacios disponibles]
+    O --> Q
+    
+    Q --> R[Mostrar resultados paginados]
+    
+    R --> S{¿Scroll down?}
+    S -->|Sí| T[Infinite scroll - cargar más]
+    T --> R
 ```
+
+> **Nota sobre Timezones**: El frontend envía el timezone del navegador (ej: `America/Caracas`) junto con las horas de búsqueda. El backend convierte estas horas locales a UTC usando Carbon antes de comparar con las reservaciones almacenadas, garantizando resultados correctos independientemente de la zona horaria del usuario.
 
 ### Flujo de Reservación Simple
 
