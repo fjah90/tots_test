@@ -1,110 +1,75 @@
-# AGENTS.md
+# AGENTS.md - Frontend
 
-## Project overview
-Frontend Angular para Sistema de Reserva de Espacios.
-Stack: Angular 21 + PrimeNG + TailwindCSS + MC-Table (@matiascamiletti/mc-kit)
+## Project Overview
+Frontend Angular 21 para Sistema de Reserva de Espacios "SpaceBook".
+Stack: Angular 21 + PrimeNG 21 + TailwindCSS + FullCalendar + MC-Table (@mckit)
 
-## Setup commands
-- Install deps: `pnpm install`
-- Start dev server: `pnpm start` or `pnpm dev`
-- Run tests: `pnpm test`
-- Build production: `pnpm build`
-- Lint: `pnpm lint`
+## Setup Commands
+```bash
+pnpm install          # Instalar dependencias
+pnpm start            # Iniciar servidor dev (localhost:4200)
+pnpm build            # Build de producción
+pnpm test             # Ejecutar tests (Vitest - 24 tests)
+pnpm test:coverage    # Tests con cobertura
+pnpm lint             # Linting
+```
 
-## Testing instructions
-- Run all tests: `pnpm test`
-- Run with coverage: `pnpm test:coverage`
-- Always run tests before committing
-- Add or update tests for the code you change, even if nobody asked
+## Testing Instructions
+- Framework: Vitest
+- Total tests: 24
+- Ejecutar antes de cada commit: `pnpm test -- --run`
+- Agregar tests para código nuevo
 
-## Code style
-- Use standalone components (not NgModules)
-- Use `inject()` instead of constructor injection
-- Use signals for component state: `spaces = signal<Space[]>([])`
-- Use `takeUntilDestroyed()` for subscriptions in components
-- TypeScript strict mode enabled
-- Single quotes, no semicolons (Prettier configured)
+## Technologies
+| Tecnología | Versión | Uso |
+|------------|---------|-----|
+| Angular | 21.0.6 | Framework principal |
+| PrimeNG | 21.0.2 | Componentes UI |
+| TailwindCSS | 3.4.19 | Estilos utilitarios |
+| FullCalendar | 6.1.20 | Calendario interactivo |
+| @mckit/table | 19.0.14 | Tabla admin |
+| Vitest | Latest | Testing |
 
-## Project structure
+## Project Structure
 ```
 src/app/
-├── core/                    # Singleton services, guards, interceptors
-│   ├── interceptors/
-│   │   └── auth.interceptor.ts
-│   ├── guards/
-│   │   └── auth.guard.ts
-│   └── services/
-│       └── auth.service.ts
-├── shared/                  # Reusable components, pipes, interfaces
-│   ├── components/
-│   ├── pipes/
-│   └── interfaces/
-│       └── space.interface.ts
-├── features/                # Feature modules (lazy loaded)
-│   ├── admin/
-│   ├── auth/
-│   └── reservations/
-└── app.config.ts
+├── core/                    # Servicios singleton, guards, interceptors
+│   ├── services/            # auth, spaces, reservations, theme
+│   ├── guards/              # auth.guard, admin.guard
+│   └── interceptors/        # auth.interceptor
+├── shared/                  # Interfaces, pipes, componentes reutilizables
+│   └── interfaces/          # Space, Reservation, User
+├── features/                # Módulos por funcionalidad (lazy loaded)
+│   ├── auth/                # Login, Register
+│   ├── spaces/              # Lista, Detalle, Reservación
+│   ├── reservations/        # Mis Reservaciones
+│   ├── calendar/            # Calendario público
+│   └── admin/               # Dashboard, Espacios, Reservaciones, Stats
+└── app.routes.ts            # Rutas principales
 ```
 
-## Component conventions
+## Key Features
+- **Dark Mode**: Toggle Light/Dark/System con persistencia
+- **Infinite Scroll**: Carga progresiva de espacios
+- **FullCalendar**: Vista mes/semana/día con reservaciones
+- **MC-Table**: Tabla avanzada para admin
+- **Carousel**: Múltiples imágenes por espacio
+- **Responsive**: Grid adaptativo 3/2/1 columnas
+
+## Code Conventions
 ```typescript
+// Standalone components con inject()
 @Component({
-  selector: 'app-spaces-list',
+  selector: 'app-example',
   standalone: true,
-  imports: [CommonModule, McTableComponent],
-  templateUrl: './spaces-list.component.html',
+  imports: [CommonModule],
 })
-export class SpacesListComponent {
-  private spacesService = inject(SpacesService);
-  
-  spaces = signal<Space[]>([]);
+export class ExampleComponent {
+  private service = inject(ExampleService);
+  data = signal<Data[]>([]);
   loading = signal(false);
 }
 ```
-
-## Service conventions
-```typescript
-@Injectable({ providedIn: 'root' })
-export class SpacesService {
-  private http = inject(HttpClient);
-  private apiUrl = environment.apiUrl;
-
-  getSpaces(): Observable<Space[]> {
-    return this.http.get<{data: Space[]}>(`${this.apiUrl}/spaces`)
-      .pipe(map(res => res.data));
-  }
-}
-```
-
-## MC-Table usage (@matiascamiletti/mc-kit)
-```html
-<mc-table 
-  [data]="spaces()" 
-  [columns]="columns"
-  [loading]="loading()"
-  (onRowSelect)="onSelect($event)">
-</mc-table>
-```
-
-```typescript
-columns: McTableColumn[] = [
-  { field: 'name', header: 'Nombre', sortable: true },
-  { field: 'capacity', header: 'Capacidad', sortable: true },
-  { field: 'is_active', header: 'Estado', type: 'boolean' },
-  { field: 'actions', header: 'Acciones', type: 'template' }
-];
-```
-
-## Styling
-- Use TailwindCSS utility classes
-- Avoid inline styles
-- Import only needed PrimeNG modules
-
-## Authentication
-- JWT token stored in localStorage
-- AuthInterceptor adds token to all requests
-- AuthGuard protects private routes
 
 ## Environment
 ```typescript
@@ -115,12 +80,8 @@ export const environment = {
 };
 ```
 
-## Security considerations
-- Never store sensitive data in localStorage without encryption
-- Always type HTTP responses with interfaces
-- Validate user input before sending to API
-
-## PR instructions
-- Title format: `[frontend] <Title>`
-- Always run `pnpm build` and `pnpm test` before committing
-- Commit message format: `feat:`, `fix:`, `style:`, `refactor:`, `test:`
+## Styling
+- TailwindCSS para utilidades
+- SCSS para estilos complejos
+- Dark mode: clases `dark:*` de Tailwind
+- PrimeNG dark mode: estilos globales en `styles.scss`

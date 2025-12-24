@@ -1,59 +1,91 @@
-# Frontend
+# Frontend - SpaceBook
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.4.
+Sistema de reserva de espacios desarrollado con Angular 21.
 
-## Development server
-
-To start a local development server, run:
+## Instalación
 
 ```bash
-ng serve
+# Instalar dependencias
+pnpm install
+
+# Iniciar servidor de desarrollo
+pnpm start
+
+# La aplicación estará en http://localhost:4200
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Scripts Disponibles
 
-## Code scaffolding
+| Comando | Descripción |
+|---------|-------------|
+| `pnpm start` | Servidor de desarrollo |
+| `pnpm build` | Build de producción |
+| `pnpm test` | Ejecutar tests (Vitest) |
+| `pnpm lint` | Linting del código |
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Tecnologías
+
+- **Angular 21.0.6** - Framework principal
+- **PrimeNG 21.0.2** - Componentes UI (Carousel, Dialog, DataPicker, Toast)
+- **TailwindCSS 3.4.19** - Estilos utilitarios
+- **FullCalendar 6.1.20** - Calendario interactivo
+- **@mckit/table 19.0.14** - Tabla avanzada para admin
+- **Vitest** - Testing (24 tests)
+
+## Estructura
+
+```
+src/app/
+├── core/                    # Servicios, guards, interceptors
+├── shared/                  # Interfaces, pipes, componentes comunes
+├── features/
+│   ├── auth/                # Login, Register
+│   ├── spaces/              # Listado, Detalle, Reservación
+│   ├── reservations/        # Mis Reservaciones
+│   ├── calendar/            # Calendario público
+│   └── admin/               # Panel administrativo
+└── app.routes.ts
+```
+
+## Características
+
+### Públicas
+- Listado de espacios con filtros y búsqueda
+- Infinite scroll para carga progresiva
+- Detalle de espacio con carousel de imágenes
+- Calendario de disponibilidad (FullCalendar)
+- Dark mode (Light/Dark/System)
+
+### Autenticadas
+- Crear reservaciones
+- Ver mis reservaciones
+- Cancelar reservaciones
+
+### Admin
+- CRUD de espacios (MC-Table)
+- CRUD de reservaciones
+- Dashboard de estadísticas
+- Gestión de múltiples imágenes
+
+## Configuración
+
+El archivo `src/environments/environment.ts` contiene la URL del API:
+
+```typescript
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:8000/api'
+};
+```
+
+## Tests
 
 ```bash
-ng generate component component-name
+# Ejecutar todos los tests
+pnpm test
+
+# Con cobertura
+pnpm test:coverage
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Total: 24 tests
