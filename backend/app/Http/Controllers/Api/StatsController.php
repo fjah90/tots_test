@@ -14,6 +14,60 @@ use OpenApi\Annotations as OA;
 class StatsController extends Controller
 {
     /**
+     * Admin Stats - Estadísticas para el panel de administración
+     * GET /api/admin/stats
+     */
+    public function adminStats(Request $request): JsonResponse
+    {
+        // Totales
+        $totalSpaces = Space::count();
+        $totalReservations = Reservation::count();
+        $totalUsers = User::count();
+
+        // Reservaciones por estado
+        $reservationsByStatus = [
+            'pending' => Reservation::where('status', 'pending')->count(),
+            'confirmed' => Reservation::where('status', 'confirmed')->count(),
+            'cancelled' => Reservation::where('status', 'cancelled')->count(),
+        ];
+
+        // Top 5 espacios más reservados
+        $topSpaces = Space::withCount(['reservations' => function ($query) {
+            $query->where('status', '!=', 'cancelled');
+        }])
+            ->orderByDesc('reservations_count')
+            ->take(5)
+            ->get(['id', 'name', 'reservations_count']);
+
+        // Reservaciones por mes (últimos 6 meses)
+        $reservationsByMonth = Reservation::select(
+            DB::raw("strftime('%Y-%m', created_at) as month"),
+            DB::raw('count(*) as count')
+        )
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'month' => $item->month,
+                    'count' => $item->count,
+                ];
+            });
+
+        return response()->json([
+            'data' => [
+                'total_spaces' => $totalSpaces,
+                'total_reservations' => $totalReservations,
+                'total_users' => $totalUsers,
+                'reservations_by_status' => $reservationsByStatus,
+                'top_spaces' => $topSpaces,
+                'reservations_by_month' => $reservationsByMonth,
+            ]
+        ]);
+    }
+
+    /**
      * @OA\Get(
      *     path="/stats/dashboard",
      *     summary="Obtener estadísticas del dashboard (Solo Admin)",

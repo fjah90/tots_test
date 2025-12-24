@@ -54,6 +54,9 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // Usuarios - Lista para seleccionar en formularios admin
         Route::get('users', [AuthController::class, 'listUsers']);
+
+        // Admin Stats - Dashboard
+        Route::get('admin/stats', [StatsController::class, 'adminStats']);
     });
 
     // Reservaciones - CRUD completo para usuarios autenticados
