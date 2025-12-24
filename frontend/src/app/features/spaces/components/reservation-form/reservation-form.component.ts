@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, signal, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, signal, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -29,7 +29,7 @@ import { Space } from '../../../../shared/interfaces';
   templateUrl: './reservation-form.component.html',
   styleUrl: './reservation-form.component.scss'
 })
-export class ReservationFormComponent implements OnInit {
+export class ReservationFormComponent implements OnInit, OnChanges {
   private fb = inject(FormBuilder);
   private reservationsService = inject(ReservationsService);
   private authService = inject(AuthService);
@@ -56,6 +56,16 @@ export class ReservationFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Si cambia preselectedDate y el formulario ya existe, actualizar la fecha
+    if (changes['preselectedDate'] && this.reservationForm) {
+      const newDate = changes['preselectedDate'].currentValue;
+      if (newDate) {
+        this.reservationForm.patchValue({ date: newDate });
+      }
+    }
   }
 
   private initForm(): void {
