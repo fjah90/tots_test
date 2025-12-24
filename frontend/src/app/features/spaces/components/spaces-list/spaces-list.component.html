@@ -29,10 +29,14 @@
 
         <!-- Filtro por fecha -->
         <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Reserva</label>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Fecha de Reserva
+            <i class="pi pi-info-circle ml-1 text-gray-400" 
+               pTooltip="Filtra espacios con disponibilidad en esta fecha"></i>
+          </label>
           <p-datepicker 
             [ngModel]="selectedDate()"
-            (ngModelChange)="selectedDate.set($event)"
+            (ngModelChange)="onDateChange($event)"
             [showIcon]="true"
             [minDate]="minDate"
             dateFormat="dd/mm/yy"

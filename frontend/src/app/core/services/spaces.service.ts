@@ -25,6 +25,7 @@ export interface SpaceFilters {
   is_active?: boolean;
   page?: number;
   per_page?: number;
+  available_date?: string;
 }
 
 export interface PaginatedSpaces {
@@ -92,6 +93,9 @@ export class SpacesService {
     }
     if (filters?.per_page) {
       params = params.set('per_page', filters.per_page.toString());
+    }
+    if (filters?.available_date) {
+      params = params.set('available_date', filters.available_date);
     }
 
     return this.http.get<PaginatedApiResponse<Space[]>>(this.apiUrl, { params })

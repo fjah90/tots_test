@@ -15,6 +15,7 @@ import { DividerModule } from 'primeng/divider';
 import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { CarouselModule } from 'primeng/carousel';
+import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 
 // Services & Interfaces
@@ -42,6 +43,7 @@ import { ReservationFormComponent } from '../reservation-form/reservation-form.c
     DialogModule,
     ToastModule,
     CarouselModule,
+    TooltipModule,
     // Custom
     ReservationFormComponent
   ],
@@ -106,17 +108,42 @@ export class SpacesListComponent implements OnInit {
     this.loadSpaces();
   }
 
+  /**
+   * Formatea una fecha para enviar al backend (YYYY-MM-DD)
+   */
+  private formatDateForApi(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  /**
+   * Cuando cambia la fecha seleccionada, recargar espacios
+   */
+  onDateChange(date: Date | null): void {
+    this.selectedDate.set(date);
+    this.loadSpaces();
+  }
+
   loadSpaces(): void {
     this.loading.set(true);
     this.currentPage.set(1);
     this.spaces.set([]);
     this.hasMore.set(true);
-    
-    this.spacesService.getSpacesPaginated({ 
+
+    const filters: any = { 
       is_active: true,
       page: 1,
       per_page: this.perPage
-    }).subscribe({
+    };
+
+    // Agregar filtro de fecha si está seleccionada
+    if (this.selectedDate()) {
+      filters.available_date = this.formatDateForApi(this.selectedDate()!);
+    }
+    
+    this.spacesService.getSpacesPaginated(filters).subscribe({
       next: (response) => {
         this.spaces.set(response.data);
         if (response.meta) {
@@ -147,12 +174,19 @@ export class SpacesListComponent implements OnInit {
     
     this.loadingMore.set(true);
     const nextPage = this.currentPage() + 1;
-    
-    this.spacesService.getSpacesPaginated({
+
+    const filters: any = {
       is_active: true,
       page: nextPage,
       per_page: this.perPage
-    }).subscribe({
+    };
+
+    // Mantener el filtro de fecha si está seleccionada
+    if (this.selectedDate()) {
+      filters.available_date = this.formatDateForApi(this.selectedDate()!);
+    }
+    
+    this.spacesService.getSpacesPaginated(filters).subscribe({
       next: (response) => {
         // Agregar nuevos espacios a los existentes
         this.spaces.update(current => [...current, ...response.data]);
