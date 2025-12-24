@@ -1,0 +1,21 @@
+{
+  "name": "spacebook-monorepo",
+  "version": "1.0.0",
+  "description": "SpaceBook - Sistema de Reserva de Espacios",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "lint:frontend": "cd frontend && pnpm lint",
+    "lint:backend": "cd backend && composer lint",
+    "lint": "pnpm lint:frontend && pnpm lint:backend",
+    "format:frontend": "cd frontend && pnpm format",
+    "format": "pnpm format:frontend"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.25.0",
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}

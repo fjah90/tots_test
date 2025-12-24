@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Run frontend linting with lint-staged
+cd frontend && pnpm exec lint-staged
+
+# Run backend linting (PHP Pint for changed files only)
+cd ../backend && ./vendor/bin/pint --dirty
