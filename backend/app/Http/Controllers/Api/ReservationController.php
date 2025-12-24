@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Contracts\AvailabilityServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreReservationRequest;
 use App\Http\Requests\UpdateReservationRequest;
 use App\Models\Reservation;
 use App\Models\Space;
-use App\Services\AvailabilityService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Annotations as OA;
@@ -16,9 +16,12 @@ class ReservationController extends Controller
 {
     /**
      * Constructor con inyección de dependencias.
+     * 
+     * Se inyecta la interfaz (no la implementación concreta)
+     * siguiendo el principio de Inversión de Dependencias (DIP).
      */
     public function __construct(
-        protected AvailabilityService $availabilityService
+        protected AvailabilityServiceInterface $availabilityService
     ) {}
 
     /**

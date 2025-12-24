@@ -2,20 +2,22 @@
 
 namespace App\Services;
 
+use App\Contracts\AvailabilityServiceInterface;
 use App\Models\Reservation;
 use App\Models\Space;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Servicio para gestionar la disponibilidad de espacios.
  * 
- * Implementa la lógica de detección de solapamiento de reservas
- * usando el algoritmo: (StartA < EndB) AND (EndA > StartB)
+ * Implementa AvailabilityServiceInterface siguiendo el principio ISP.
+ * Usa el algoritmo de detección de solapamiento: (StartA < EndB) AND (EndA > StartB)
  * 
  * @package App\Services
  */
-class AvailabilityService
+class AvailabilityService implements AvailabilityServiceInterface
 {
     /**
      * Verificar si un espacio está disponible en un rango de tiempo.
@@ -84,14 +86,14 @@ class AvailabilityService
      * @param string|Carbon $start
      * @param string|Carbon $end
      * @param int|null $excludeReservationId
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function getOverlappingReservations(
         int $spaceId,
         string|Carbon $start,
         string|Carbon $end,
         ?int $excludeReservationId = null
-    ) {
+    ): Collection {
         $startTime = $start instanceof Carbon ? $start : Carbon::parse($start);
         $endTime = $end instanceof Carbon ? $end : Carbon::parse($end);
 
