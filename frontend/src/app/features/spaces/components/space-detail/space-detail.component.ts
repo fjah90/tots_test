@@ -12,12 +12,13 @@ import { ToastModule } from 'primeng/toast';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageService } from 'primeng/api';
 
-// FullCalendar - BONUS VISUAL
-// Instalar: pnpm add @fullcalendar/core @fullcalendar/daygrid @fullcalendar/timegrid @fullcalendar/interaction
-// import { FullCalendarModule } from '@fullcalendar/angular';
-// import dayGridPlugin from '@fullcalendar/daygrid';
-// import timeGridPlugin from '@fullcalendar/timegrid';
-// import interactionPlugin from '@fullcalendar/interaction';
+// FullCalendar
+import { FullCalendarModule } from '@fullcalendar/angular';
+import { CalendarOptions } from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import esLocale from '@fullcalendar/core/locales/es';
 
 // Services & Components
 import { SpacesService } from '../../../../core/services/spaces.service';
@@ -54,7 +55,7 @@ interface CalendarEvent {
     ToastModule,
     ProgressSpinnerModule,
     ReservationFormComponent,
-    // FullCalendarModule, // Descomentar cuando se instale
+    FullCalendarModule,
   ],
   providers: [MessageService],
   templateUrl: './space-detail.component.html',
@@ -76,13 +77,12 @@ export class SpaceDetailComponent implements OnInit {
 
   // Modal
   showReservationDialog = false;
+  selectedDate: Date | null = null;
 
-  // FullCalendar Options (BONUS VISUAL)
-  // Descomentar cuando se instale @fullcalendar/angular
-  /*
-  calendarOptions = signal({
+  // FullCalendar Options
+  calendarOptions = signal<CalendarOptions>({
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-    initialView: 'timeGridWeek',
+    initialView: 'dayGridMonth',
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
@@ -96,14 +96,20 @@ export class SpaceDetailComponent implements OnInit {
     selectable: true,
     selectMirror: true,
     dayMaxEvents: true,
-    locale: 'es',
-    events: [] as CalendarEvent[],
-    select: this.handleDateSelect.bind(this),
-    eventClick: this.handleEventClick.bind(this),
+    locale: esLocale,
+    height: 'auto',
+    events: [],
   });
-  */
 
   ngOnInit(): void {
+    // Configurar handlers del calendario después de la inicialización
+    this.calendarOptions.update(options => ({
+      ...options,
+      select: this.handleDateSelect.bind(this),
+      dateClick: this.handleDateClick.bind(this),
+      eventClick: this.handleEventClick.bind(this),
+    }));
+
     const spaceId = this.route.snapshot.paramMap.get('id');
     if (spaceId) {
       this.loadSpace(+spaceId);
@@ -148,7 +154,13 @@ export class SpaceDetailComponent implements OnInit {
     ).subscribe({
       next: (reservations) => {
         this.reservations.set(reservations);
-        this.calendarEvents.set(this.mapReservationsToEvents(reservations));
+        const events = this.mapReservationsToEvents(reservations);
+        this.calendarEvents.set(events);
+        // Actualizar eventos en el calendario
+        this.calendarOptions.update(options => ({
+          ...options,
+          events: events
+        }));
         this.loadingReservations.set(false);
       },
       error: (err) => {
@@ -160,20 +172,30 @@ export class SpaceDetailComponent implements OnInit {
 
   /**
    * Mapea reservaciones a eventos de FullCalendar
-   * Los bloques ocupados se muestran en ROJO
+   * Colores consistentes con la página de calendario
    */
   private mapReservationsToEvents(reservations: Reservation[]): CalendarEvent[] {
     return reservations.map(reservation => {
-      // Colores según estado
-      let backgroundColor = '#ef4444'; // Rojo por defecto (ocupado)
-      let borderColor = '#dc2626';
+      // Colores según estado (consistente con /calendar)
+      let backgroundColor: string;
+      let borderColor: string;
       
-      if (reservation.status === 'cancelled') {
-        backgroundColor = '#9ca3af'; // Gris para canceladas
-        borderColor = '#6b7280';
-      } else if (reservation.status === 'pending') {
-        backgroundColor = '#f59e0b'; // Naranja para pendientes
-        borderColor = '#d97706';
+      switch (reservation.status) {
+        case 'confirmed':
+          backgroundColor = '#14b8a6'; // Teal
+          borderColor = '#0d9488';
+          break;
+        case 'pending':
+          backgroundColor = '#fbbf24'; // Amarillo
+          borderColor = '#f59e0b';
+          break;
+        case 'cancelled':
+          backgroundColor = '#9ca3af'; // Gris
+          borderColor = '#6b7280';
+          break;
+        default:
+          backgroundColor = '#14b8a6';
+          borderColor = '#0d9488';
       }
 
       return {
@@ -229,19 +251,39 @@ export class SpaceDetailComponent implements OnInit {
     }
   }
 
-  // Handlers para FullCalendar (BONUS)
-  /*
+  // Handlers para FullCalendar
   handleDateSelect(selectInfo: any): void {
     // Abrir modal de reservación con fecha preseleccionada
     this.openReservationModal();
   }
 
-  handleEventClick(clickInfo: any): void {
-    // Mostrar detalles de la reservación
-    const reservationId = clickInfo.event.extendedProps.reservationId;
-    console.log('Reservation clicked:', reservationId);
+  handleDateClick(arg: any): void {
+    // Solo abrir modal si el clic NO fue en un evento
+    // El evento tiene su propio handler (eventClick)
+    // jsEvent.target nos permite verificar si se hizo clic en un evento
+    const target = arg.jsEvent?.target as HTMLElement;
+    if (target && target.closest('.fc-event')) {
+      // Se hizo clic en un evento, no abrir el modal
+      return;
+    }
+    // Guardar la fecha seleccionada y abrir modal de reservación
+    this.selectedDate = arg.date;
+    this.openReservationModal();
   }
-  */
+
+  handleEventClick(clickInfo: any): void {
+    // Detener propagación para evitar que también se dispare dateClick
+    clickInfo.jsEvent?.stopPropagation();
+    
+    // Mostrar detalles de la reservación
+    const status = clickInfo.event.extendedProps?.status;
+    const title = clickInfo.event.title;
+    this.messageService.add({
+      severity: status === 'cancelled' ? 'warn' : 'info',
+      summary: 'Reservación',
+      detail: `${title} - Estado: ${this.getStatusLabel(status)}`
+    });
+  }
 
   private formatDate(date: Date): string {
     return date.toISOString().split('T')[0];

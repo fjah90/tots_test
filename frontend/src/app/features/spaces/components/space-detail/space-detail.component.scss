@@ -9,11 +9,18 @@
     overflow: hidden;
   }
 
-  // FullCalendar customizations (when enabled)
+  // FullCalendar customizations
+  .calendar-container {
+    min-height: 400px;
+  }
+
   .fc {
+    font-family: inherit;
+
     .fc-event {
       cursor: pointer;
       border-radius: 4px;
+      padding: 2px 4px;
     }
 
     .fc-timegrid-slot {
@@ -26,23 +33,83 @@
     }
 
     .fc-button-primary {
-      background-color: #3b82f6;
-      border-color: #3b82f6;
+      background-color: #14b8a6;
+      border-color: #14b8a6;
 
       &:hover {
-        background-color: #2563eb;
-        border-color: #2563eb;
+        background-color: #0d9488;
+        border-color: #0d9488;
       }
 
       &:disabled {
-        background-color: #93c5fd;
-        border-color: #93c5fd;
+        background-color: #5eead4;
+        border-color: #5eead4;
       }
     }
 
     .fc-button-active {
-      background-color: #1d4ed8 !important;
-      border-color: #1d4ed8 !important;
+      background-color: #0f766e !important;
+      border-color: #0f766e !important;
+    }
+
+    .fc-col-header-cell-cushion,
+    .fc-daygrid-day-number {
+      color: inherit;
+    }
+
+    .fc-timegrid-slot-label-cushion {
+      font-size: 0.75rem;
+    }
+
+    // Selección de horario
+    .fc-highlight {
+      background-color: rgba(20, 184, 166, 0.2);
+    }
+  }
+}
+
+// Dark mode styles for FullCalendar
+:host-context(.dark) ::ng-deep {
+  .fc {
+    .fc-toolbar-title {
+      color: #f3f4f6;
+    }
+
+    .fc-col-header-cell-cushion {
+      color: #d1d5db;
+    }
+
+    .fc-daygrid-day-number {
+      color: #9ca3af;
+    }
+
+    .fc-timegrid-slot-label-cushion {
+      color: #9ca3af;
+    }
+
+    .fc-scrollgrid {
+      border-color: #374151;
+    }
+
+    .fc-scrollgrid td,
+    .fc-scrollgrid th {
+      border-color: #374151;
+    }
+
+    .fc-timegrid-slot {
+      border-color: #374151;
+    }
+
+    .fc-daygrid-day {
+      background-color: #1f2937;
+    }
+
+    .fc-day-today {
+      background-color: rgba(20, 184, 166, 0.1) !important;
+    }
+
+    .fc-highlight {
+      background-color: rgba(20, 184, 166, 0.3);
     }
   }
 }

@@ -71,6 +71,22 @@ export class ReservationsService {
   }
 
   /**
+   * Obtener reservaciones públicas para el calendario (sin autenticación)
+   */
+  getCalendarReservations(spaceId?: number): Observable<Reservation[]> {
+    let params = new HttpParams();
+    
+    if (spaceId) {
+      params = params.set('space_id', spaceId.toString());
+    }
+
+    return this.http.get<ApiResponse<Reservation[]>>(`${environment.apiUrl}/calendar/reservations`, { params })
+      .pipe(
+        map(response => response.data)
+      );
+  }
+
+  /**
    * Crear nueva reservación
    */
   createReservation(payload: ReservationPayload): Observable<Reservation> {

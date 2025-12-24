@@ -47,7 +47,7 @@ interface Stats {
 
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <!-- Header -->
-      <div class="bg-gradient-to-r from-teal-600 to-cyan-600 text-white py-8 px-6">
+      <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white py-8 px-6">
         <div class="max-w-7xl mx-auto">
           <h1 class="text-3xl font-bold">Dashboard de Estadísticas</h1>
           <p class="text-teal-100 mt-1">Resumen general del sistema de reservaciones</p>

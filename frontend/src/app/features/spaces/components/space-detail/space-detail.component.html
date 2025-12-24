@@ -105,74 +105,31 @@
                   <p-progressSpinner strokeWidth="4" />
                 </div>
               } @else {
-                <!-- FullCalendar Integration (BONUS VISUAL) -->
-                <!-- 
-                  Para habilitar FullCalendar, instalar:
-                  pnpm add @fullcalendar/core @fullcalendar/angular @fullcalendar/daygrid @fullcalendar/timegrid @fullcalendar/interaction
-                  
-                  Luego descomentar:
+                <!-- FullCalendar Integration -->
+                <div class="calendar-container">
                   <full-calendar [options]="calendarOptions()" />
-                -->
-                
-                <!-- Vista alternativa: Lista de reservaciones -->
-                <div class="space-y-3">
-                  <div class="flex items-center gap-4 mb-4">
-                    <div class="flex items-center gap-2">
-                      <span class="w-4 h-4 bg-red-500 rounded"></span>
-                      <span class="text-sm text-gray-600 dark:text-gray-400">Ocupado</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <span class="w-4 h-4 bg-orange-500 rounded"></span>
-                      <span class="text-sm text-gray-600 dark:text-gray-400">Pendiente</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <span class="w-4 h-4 bg-gray-400 rounded"></span>
-                      <span class="text-sm text-gray-600 dark:text-gray-400">Cancelada</span>
-                    </div>
-                  </div>
-
-                  @if (reservations().length === 0) {
-                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-                      <i class="pi pi-calendar-times text-4xl mb-2"></i>
-                      <p>No hay reservaciones próximas</p>
-                      <p class="text-sm">¡Este espacio está disponible!</p>
-                    </div>
-                  } @else {
-                    <div class="space-y-2 max-h-64 overflow-y-auto">
-                      @for (reservation of reservations(); track reservation.id) {
-                        <div 
-                          class="flex items-center justify-between p-3 rounded-lg border"
-                          [class.bg-red-50]="reservation.status === 'confirmed'"
-                          [class.dark:bg-red-900/30]="reservation.status === 'confirmed'"
-                          [class.border-red-200]="reservation.status === 'confirmed'"
-                          [class.dark:border-red-800]="reservation.status === 'confirmed'"
-                          [class.bg-orange-50]="reservation.status === 'pending'"
-                          [class.dark:bg-orange-900/30]="reservation.status === 'pending'"
-                          [class.border-orange-200]="reservation.status === 'pending'"
-                          [class.dark:border-orange-800]="reservation.status === 'pending'"
-                          [class.bg-gray-50]="reservation.status === 'cancelled'"
-                          [class.dark:bg-gray-700]="reservation.status === 'cancelled'"
-                          [class.border-gray-200]="reservation.status === 'cancelled'"
-                          [class.dark:border-gray-600]="reservation.status === 'cancelled'"
-                        >
-                          <div>
-                            <p class="font-medium text-gray-800 dark:text-gray-100">
-                              {{ reservation.start_time | date:'dd/MM/yyyy' }}
-                            </p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
-                              {{ reservation.start_time | date:'HH:mm' }} - 
-                              {{ reservation.end_time | date:'HH:mm' }}
-                            </p>
-                          </div>
-                          <p-tag 
-                            [value]="getStatusLabel(reservation.status)"
-                            [severity]="getStatusSeverity(reservation.status)"
-                          />
-                        </div>
-                      }
-                    </div>
-                  }
                 </div>
+                
+                <!-- Leyenda de colores -->
+                <div class="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t dark:border-gray-700">
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 bg-teal-500 rounded-full"></span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Confirmada</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 bg-yellow-400 rounded-full"></span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Pendiente</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 bg-gray-400 rounded-full"></span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Cancelada</span>
+                  </div>
+                </div>
+
+                <p class="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">
+                  <i class="pi pi-info-circle mr-1"></i>
+                  Haz clic en un bloque horario libre para reservar
+                </p>
               }
             </div>
           </p-card>
@@ -231,6 +188,7 @@
   @if (space()) {
     <app-reservation-form
       [space]="space()!"
+      [preselectedDate]="selectedDate"
       (success)="onReservationSuccess()"
       (error)="onReservationError($event)"
       (cancel)="closeReservationModal()"

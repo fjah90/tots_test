@@ -51,10 +51,10 @@ import { environment } from '../../../../../environments/environment';
 
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <!-- Header -->
-      <div class="bg-gradient-to-r from-gray-700 to-gray-800 text-white py-8 px-6">
+      <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white py-8 px-6">
         <div class="max-w-7xl mx-auto">
           <h1 class="text-3xl font-bold">Administrar Reservaciones</h1>
-          <p class="text-gray-300 mt-1">Gestiona todas las reservaciones del sistema</p>
+          <p class="text-teal-100 mt-1">Gestiona todas las reservaciones del sistema</p>
         </div>
       </div>
 
@@ -297,7 +297,7 @@ import { environment } from '../../../../../environments/environment';
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Usuario *</label>
           <p-select 
             [(ngModel)]="formData.user_id"
-            [options]="users"
+            [options]="users()"
             optionLabel="name"
             optionValue="id"
             placeholder="Seleccionar usuario"
@@ -317,7 +317,7 @@ import { environment } from '../../../../../environments/environment';
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Espacio *</label>
           <p-select 
             [(ngModel)]="formData.space_id"
-            [options]="spaces"
+            [options]="spaces()"
             optionLabel="name"
             optionValue="id"
             placeholder="Seleccionar espacio"
@@ -425,8 +425,8 @@ export class AdminReservationsComponent implements OnInit {
     notes: '' as string
   };
 
-  users: any[] = [];
-  spaces: any[] = [];
+  users = signal<any[]>([]);
+  spaces = signal<any[]>([]);
 
   statusOptions = [
     { label: 'Confirmadas', value: 'confirmed' },
@@ -475,7 +475,7 @@ export class AdminReservationsComponent implements OnInit {
   loadUsers(): void {
     this.http.get<{ data: any[] }>(`${environment.apiUrl}/users`).subscribe({
       next: (res) => {
-        this.users = res.data || [];
+        this.users.set(res.data || []);
       },
       error: () => {
         this.messageService.add({
@@ -490,7 +490,7 @@ export class AdminReservationsComponent implements OnInit {
   loadSpaces(): void {
     this.http.get<{ data: any[] }>(`${environment.apiUrl}/spaces?limit=1000`).subscribe({
       next: (res) => {
-        this.spaces = res.data || [];
+        this.spaces.set(res.data || []);
       },
       error: () => {
         this.messageService.add({

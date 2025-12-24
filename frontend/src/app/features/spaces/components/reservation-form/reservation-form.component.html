@@ -1,13 +1,13 @@
 <div class="reservation-form">
   <!-- Space Info Header -->
-  <div class="bg-blue-50 p-4 rounded-lg mb-6">
+  <div class="bg-teal-50 dark:bg-teal-900/20 p-4 rounded-lg mb-6">
     <div class="flex items-center gap-3">
-      <div class="bg-blue-500 text-white p-2 rounded-lg">
+      <div class="bg-teal-500 text-white p-2 rounded-lg">
         <i class="pi pi-building text-xl"></i>
       </div>
       <div>
-        <h4 class="font-semibold text-gray-800">{{ space.name }}</h4>
-        <p class="text-sm text-gray-600">
+        <h4 class="font-semibold text-gray-800 dark:text-gray-100">{{ space.name }}</h4>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
           <i class="pi pi-users mr-1"></i>
           Capacidad: {{ space.capacity }} personas
           @if (space.location) {

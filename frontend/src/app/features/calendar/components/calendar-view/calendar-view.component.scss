@@ -1,0 +1,146 @@
+// Calendar container styles
+.calendar-container {
+  // Light mode styles
+  .fc {
+    .fc-button {
+      &.fc-button-active {
+        background-color: #14b8a6 !important;
+        border-color: #0d9488 !important;
+      }
+    }
+
+    .fc-event {
+      border-radius: 4px;
+      font-size: 0.75rem;
+      padding: 2px 4px;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+
+      &:hover {
+        transform: scale(1.02);
+      }
+    }
+
+    .fc-daygrid-day.fc-day-today {
+      background-color: rgba(20, 184, 166, 0.1) !important;
+    }
+
+    .fc-timegrid-now-indicator-line {
+      border-color: #ef4444 !important;
+      border-width: 2px;
+    }
+  }
+}
+
+// Dark mode styles using ::ng-deep for FullCalendar
+:host-context(.dark) ::ng-deep,
+.dark ::ng-deep {
+  .calendar-container .fc,
+  .fc {
+    // Toolbar
+    .fc-toolbar-title {
+      color: #f3f4f6 !important;
+    }
+
+    .fc-button {
+      background-color: #374151 !important;
+      border-color: #4b5563 !important;
+      color: #f3f4f6 !important;
+
+      &:hover {
+        background-color: #4b5563 !important;
+      }
+
+      &.fc-button-active {
+        background-color: #14b8a6 !important;
+        border-color: #0d9488 !important;
+      }
+    }
+
+    // Calendar grid
+    .fc-scrollgrid {
+      border-color: #374151 !important;
+    }
+
+    .fc-scrollgrid-section > * {
+      border-color: #374151 !important;
+    }
+
+    th {
+      background-color: #1f2937 !important;
+      border-color: #374151 !important;
+      color: #f3f4f6 !important;
+    }
+
+    td {
+      border-color: #374151 !important;
+    }
+
+    .fc-daygrid-day {
+      background-color: #111827 !important;
+
+      &.fc-day-today {
+        background-color: rgba(20, 184, 166, 0.1) !important;
+      }
+
+      &:hover {
+        background-color: #1f2937 !important;
+      }
+    }
+
+    .fc-daygrid-day-number {
+      color: #f3f4f6 !important;
+    }
+
+    .fc-col-header-cell-cushion {
+      color: #f3f4f6 !important;
+    }
+
+    // Time grid
+    .fc-timegrid-slot {
+      background-color: #111827 !important;
+      border-color: #374151 !important;
+    }
+
+    .fc-timegrid-slot-label {
+      color: #9ca3af !important;
+    }
+
+    .fc-timegrid-col {
+      &.fc-day-today {
+        background-color: rgba(20, 184, 166, 0.05) !important;
+      }
+    }
+
+    // Events
+    .fc-event {
+      border-radius: 4px;
+      font-size: 0.75rem;
+      padding: 2px 4px;
+    }
+
+    // Now indicator
+    .fc-timegrid-now-indicator-line {
+      border-color: #ef4444 !important;
+    }
+
+    .fc-timegrid-now-indicator-arrow {
+      border-color: #ef4444 !important;
+      border-top-color: transparent !important;
+      border-bottom-color: transparent !important;
+    }
+  }
+}
+
+// Select dropdown dark mode
+:host-context(.dark) {
+  ::ng-deep .p-select {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+
+    .p-select-label {
+      color: #f3f4f6 !important;
+    }
+  }
+}

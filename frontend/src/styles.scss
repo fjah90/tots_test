@@ -117,6 +117,16 @@ html, body {
       &:hover {
         background: #374151 !important;
       }
+
+      > td {
+        border-color: #374151 !important;
+        color: var(--text-color) !important;
+      }
+    }
+
+    // Striped table in dark mode
+    &.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
+      background: #1f2937 !important;
     }
   }
 
@@ -183,6 +193,29 @@ html, body {
   .p-paginator {
     background: var(--surface-card) !important;
     border-color: #374151 !important;
+    
+    .p-paginator-element {
+      color: var(--text-color) !important;
+      
+      &:hover {
+        background: #374151 !important;
+      }
+      
+      &.p-paginator-page-selected {
+        background: var(--primary-color) !important;
+        color: white !important;
+      }
+    }
+
+    .p-paginator-current {
+      color: var(--text-color) !important;
+    }
+
+    .p-paginator-rpp-dropdown {
+      background: #374151 !important;
+      border-color: #4b5563 !important;
+      color: var(--text-color) !important;
+    }
   }
 
   .p-tag.p-tag-secondary {
@@ -313,5 +346,128 @@ mc-table {
   &:has(mc-table),
   &:has(.p-table) {
     overflow: visible !important;
+  }
+}
+
+/* ========================================
+   FullCalendar - Cursor Styles (ambos modos)
+   ======================================== */
+.fc {
+  // Celdas clickeables del mes actual
+  .fc-daygrid-day:not(.fc-day-other),
+  .fc-timegrid-slot {
+    cursor: pointer;
+  }
+
+  // Días de otros meses - cursor normal
+  .fc-day-other {
+    cursor: default;
+  }
+
+  // Eventos siempre clickeables
+  .fc-event {
+    cursor: pointer;
+  }
+}
+
+/* ========================================
+   FullCalendar Dark Mode
+   ======================================== */
+.dark {
+  .fc {
+    // Toolbar
+    .fc-toolbar-title {
+      color: #f3f4f6 !important;
+    }
+
+    .fc-button {
+      background-color: #374151 !important;
+      border-color: #4b5563 !important;
+      color: #f3f4f6 !important;
+
+      &:hover {
+        background-color: #4b5563 !important;
+      }
+
+      &.fc-button-active {
+        background-color: #14b8a6 !important;
+        border-color: #0d9488 !important;
+      }
+    }
+
+    // Calendar grid
+    .fc-scrollgrid {
+      border-color: #374151 !important;
+    }
+
+    .fc-scrollgrid-section > * {
+      border-color: #374151 !important;
+    }
+
+    th {
+      background-color: #1f2937 !important;
+      border-color: #374151 !important;
+      color: #f3f4f6 !important;
+    }
+
+    td {
+      border-color: #374151 !important;
+      background-color: #111827 !important;
+    }
+
+    .fc-daygrid-day {
+      background-color: #111827 !important;
+
+      &.fc-day-today {
+        background-color: rgba(20, 184, 166, 0.15) !important;
+      }
+    }
+
+    .fc-daygrid-day-number,
+    .fc-col-header-cell-cushion {
+      color: #f3f4f6 !important;
+    }
+
+    // Time grid
+    .fc-timegrid-slot {
+      background-color: #111827 !important;
+      border-color: #374151 !important;
+    }
+
+    .fc-timegrid-slot-label {
+      color: #9ca3af !important;
+    }
+
+    .fc-timegrid-col.fc-day-today {
+      background-color: rgba(20, 184, 166, 0.08) !important;
+    }
+
+    .fc-timegrid-axis {
+      background-color: #1f2937 !important;
+      border-color: #374151 !important;
+    }
+
+    // Events
+    .fc-event {
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    // Días de otros meses - cursor normal
+    .fc-day-other {
+      cursor: default;
+    }
+
+    // Now indicator
+    .fc-timegrid-now-indicator-line {
+      border-color: #ef4444 !important;
+      border-width: 2px;
+    }
+
+    .fc-timegrid-now-indicator-arrow {
+      border-color: #ef4444 !important;
+      border-top-color: transparent !important;
+      border-bottom-color: transparent !important;
+    }
   }
 }

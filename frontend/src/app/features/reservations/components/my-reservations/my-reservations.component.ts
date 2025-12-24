@@ -141,11 +141,11 @@ import { Reservation } from '../../../../shared/interfaces';
                       }
                       <div>
                         <a [routerLink]="['/spaces', reservation.space_id]" 
-                           class="font-semibold text-gray-800 hover:text-primary transition-colors">
+                           class="font-semibold text-gray-800 dark:text-gray-100 hover:text-primary transition-colors">
                           {{ reservation.space?.name || 'Espacio #' + reservation.space_id }}
                         </a>
                         @if (reservation.space?.location) {
-                          <p class="text-sm text-gray-500">
+                          <p class="text-sm text-gray-500 dark:text-gray-400">
                             <i class="pi pi-map-marker mr-1"></i>
                             {{ reservation.space.location }}
                           </p>
@@ -156,7 +156,7 @@ import { Reservation } from '../../../../shared/interfaces';
 
                   <!-- Fecha -->
                   <td>
-                    <span class="font-medium">
+                    <span class="font-medium dark:text-gray-100">
                       {{ reservation.start_time | date:'EEEE, d MMM yyyy':'':'es' }}
                     </span>
                   </td>
@@ -165,7 +165,7 @@ import { Reservation } from '../../../../shared/interfaces';
                   <td>
                     <div class="flex items-center gap-2">
                       <i class="pi pi-clock text-gray-400"></i>
-                      <span>
+                      <span class="dark:text-gray-100">
                         {{ reservation.start_time | date:'HH:mm' }} - 
                         {{ reservation.end_time | date:'HH:mm' }}
                       </span>
@@ -209,7 +209,7 @@ import { Reservation } from '../../../../shared/interfaces';
 
               <ng-template pTemplate="emptymessage">
                 <tr>
-                  <td colspan="5" class="text-center py-8 text-gray-500">
+                  <td colspan="5" class="text-center py-8 text-gray-500 dark:text-gray-400">
                     No se encontraron reservaciones con los filtros seleccionados
                   </td>
                 </tr>
@@ -221,33 +221,33 @@ import { Reservation } from '../../../../shared/interfaces';
         <!-- Resumen de estadísticas -->
         @if (reservations().length > 0) {
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div class="bg-white rounded-lg shadow p-6 flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                <i class="pi pi-check text-2xl text-green-600"></i>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                <i class="pi pi-check text-2xl text-green-600 dark:text-green-400"></i>
               </div>
               <div>
-                <p class="text-2xl font-bold text-gray-800">{{ confirmedCount() }}</p>
-                <p class="text-gray-500 text-sm">Confirmadas</p>
+                <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ confirmedCount() }}</p>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Confirmadas</p>
               </div>
             </div>
             
-            <div class="bg-white rounded-lg shadow p-6 flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
-                <i class="pi pi-clock text-2xl text-yellow-600"></i>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
+                <i class="pi pi-clock text-2xl text-yellow-600 dark:text-yellow-400"></i>
               </div>
               <div>
-                <p class="text-2xl font-bold text-gray-800">{{ pendingCount() }}</p>
-                <p class="text-gray-500 text-sm">Pendientes</p>
+                <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ pendingCount() }}</p>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Pendientes</p>
               </div>
             </div>
             
-            <div class="bg-white rounded-lg shadow p-6 flex items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                <i class="pi pi-times text-2xl text-red-600"></i>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                <i class="pi pi-times text-2xl text-red-600 dark:text-red-400"></i>
               </div>
               <div>
-                <p class="text-2xl font-bold text-gray-800">{{ cancelledCount() }}</p>
-                <p class="text-gray-500 text-sm">Canceladas</p>
+                <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ cancelledCount() }}</p>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Canceladas</p>
               </div>
             </div>
           </div>

@@ -38,6 +38,13 @@ export const routes: Routes = [
       import('./features/spaces/spaces.routes').then(m => m.SPACES_ROUTES)
   },
 
+  // Calendario - Público (ver disponibilidad)
+  {
+    path: 'calendar',
+    loadChildren: () => 
+      import('./features/calendar/calendar.routes').then(m => m.CALENDAR_ROUTES)
+  },
+
   // Mis Reservaciones - Requiere autenticación (User & Admin)
   {
     path: 'my-reservations',

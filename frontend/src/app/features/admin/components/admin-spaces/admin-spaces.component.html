@@ -140,33 +140,33 @@
 
     <!-- Estadísticas rápidas -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-      <div class="bg-white rounded-lg shadow p-6 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-          <i class="pi pi-building text-2xl text-blue-600"></i>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center gap-4 transition-colors">
+        <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+          <i class="pi pi-building text-2xl text-blue-600 dark:text-blue-400"></i>
         </div>
         <div>
-          <p class="text-2xl font-bold text-gray-800">{{ spaces().length }}</p>
-          <p class="text-gray-500 text-sm">Total Espacios</p>
+          <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ spaces().length }}</p>
+          <p class="text-gray-500 dark:text-gray-400 text-sm">Total Espacios</p>
         </div>
       </div>
       
-      <div class="bg-white rounded-lg shadow p-6 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-          <i class="pi pi-check text-2xl text-green-600"></i>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center gap-4 transition-colors">
+        <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+          <i class="pi pi-check text-2xl text-green-600 dark:text-green-400"></i>
         </div>
         <div>
-          <p class="text-2xl font-bold text-gray-800">{{ getActiveCount() }}</p>
-          <p class="text-gray-500 text-sm">Activos</p>
+          <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ getActiveCount() }}</p>
+          <p class="text-gray-500 dark:text-gray-400 text-sm">Activos</p>
         </div>
       </div>
       
-      <div class="bg-white rounded-lg shadow p-6 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-          <i class="pi pi-times text-2xl text-red-600"></i>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center gap-4 transition-colors">
+        <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+          <i class="pi pi-times text-2xl text-red-600 dark:text-red-400"></i>
         </div>
         <div>
-          <p class="text-2xl font-bold text-gray-800">{{ getInactiveCount() }}</p>
-          <p class="text-gray-500 text-sm">Inactivos</p>
+          <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ getInactiveCount() }}</p>
+          <p class="text-gray-500 dark:text-gray-400 text-sm">Inactivos</p>
         </div>
       </div>
     </div>
