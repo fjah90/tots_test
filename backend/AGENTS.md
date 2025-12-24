@@ -59,7 +59,8 @@ app/
 database/
 ├── migrations/
 ├── seeders/
-│   └── DatabaseSeeder.php     # 100 espacios, 2 usuarios
+│   ├── DatabaseSeeder.php     # 100 espacios, 2 usuarios
+│   └── ReservationSeeder.php  # ~150 reservaciones con estados variados
 routes/
 └── api.php                    # Rutas API
 ```

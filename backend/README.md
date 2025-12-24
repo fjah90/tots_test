@@ -54,7 +54,7 @@ routes/
 ### Públicos (sin autenticación)
 - `POST /auth/register` - Registro
 - `POST /auth/login` - Login
-- `GET /spaces` - Listar espacios
+- `GET /spaces` - Listar espacios (soporta `?available_date=YYYY-MM-DD` para filtrar por disponibilidad)
 - `GET /spaces/{id}` - Detalle de espacio
 - `GET /calendar/reservations` - Reservaciones para calendario
 
@@ -112,3 +112,13 @@ El seeder crea:
 - 100 espacios con datos aleatorios
 - 10 tipos de espacios diferentes
 - Múltiples imágenes por espacio
+- **~150 reservaciones** con estados variados:
+  - Confirmadas (~45%)
+  - Pendientes (~35%)
+  - Canceladas (~20%)
+  - Distribuidas en pasado (-15 días) y futuro (+30 días)
+
+### Ejecutar solo ReservationSeeder
+```bash
+php artisan db:seed --class=ReservationSeeder
+```

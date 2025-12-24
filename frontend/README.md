@@ -51,6 +51,7 @@ src/app/
 
 ### Públicas
 - Listado de espacios con filtros y búsqueda
+- **Filtro por fecha de disponibilidad** (muestra espacios con horarios libres)
 - Infinite scroll para carga progresiva
 - Detalle de espacio con carousel de imágenes
 - Calendario de disponibilidad (FullCalendar)
@@ -59,7 +60,8 @@ src/app/
 ### Autenticadas
 - Crear reservaciones
 - Ver mis reservaciones
-- Cancelar reservaciones
+- **Cancelar reservaciones** (con diálogo de confirmación)
+- Fecha preseleccionada desde filtro de búsqueda
 
 ### Admin
 - CRUD de espacios (MC-Table)

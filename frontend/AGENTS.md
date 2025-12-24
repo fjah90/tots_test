@@ -51,6 +51,8 @@ src/app/
 ## Key Features
 - **Dark Mode**: Toggle Light/Dark/System con persistencia
 - **Infinite Scroll**: Carga progresiva de espacios
+- **Filtro Disponibilidad**: Filtrar espacios por fecha disponible
+- **Cancelar Reservaciones**: Desde "Mis Reservaciones" con confirmación
 - **FullCalendar**: Vista mes/semana/día con reservaciones
 - **MC-Table**: Tabla avanzada para admin
 - **Carousel**: Múltiples imágenes por espacio
