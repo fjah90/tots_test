@@ -43,6 +43,24 @@ class SpaceController extends Controller
      *         @OA\Schema(type="string")
      *     ),
      *     @OA\Parameter(
+     *         name="available_date",
+     *         in="query",
+     *         description="Filtrar por disponibilidad en fecha (YYYY-MM-DD)",
+     *         @OA\Schema(type="string", format="date", example="2025-01-15")
+     *     ),
+     *     @OA\Parameter(
+     *         name="available_start_time",
+     *         in="query",
+     *         description="Hora inicio para filtro de disponibilidad (HH:mm)",
+     *         @OA\Schema(type="string", example="09:00")
+     *     ),
+     *     @OA\Parameter(
+     *         name="available_end_time",
+     *         in="query",
+     *         description="Hora fin para filtro de disponibilidad (HH:mm)",
+     *         @OA\Schema(type="string", example="12:00")
+     *     ),
+     *     @OA\Parameter(
      *         name="page",
      *         in="query",
      *         description="Número de página para paginación",
@@ -99,21 +117,20 @@ class SpaceController extends Controller
             });
         }
 
-        // Filtro por disponibilidad en una fecha específica
-        // Excluye espacios que tengan reservaciones activas todo el día (8:00-20:00)
+        // Filtro por disponibilidad en fecha y hora específica
         if ($request->has('available_date')) {
             $date = $request->available_date;
-            $query->where(function ($q) use ($date) {
-                // Incluir espacios que NO tengan reservaciones confirmadas/pendientes que cubran todo el horario
-                $q->whereDoesntHave('reservations', function ($rq) use ($date) {
-                    $rq->whereDate('start_time', $date)
-                       ->whereIn('status', ['confirmed', 'pending']);
-                })
-                // O que tengan al menos algún hueco de disponibilidad
-                ->orWhereHas('reservations', function ($rq) use ($date) {
-                    $rq->whereDate('start_time', $date)
-                       ->whereIn('status', ['confirmed', 'pending']);
-                }, '<', 12); // Menos de 12 reservaciones de 1 hora = hay disponibilidad
+            $startTime = $request->get('available_start_time', '08:00');
+            $endTime = $request->get('available_end_time', '20:00');
+            
+            $startDateTime = "{$date} {$startTime}:00";
+            $endDateTime = "{$date} {$endTime}:00";
+            
+            // Excluir espacios que tengan reservaciones que se solapen con el horario solicitado
+            $query->whereDoesntHave('reservations', function ($rq) use ($startDateTime, $endDateTime) {
+                $rq->whereIn('status', ['confirmed', 'pending'])
+                   ->where('start_time', '<', $endDateTime)
+                   ->where('end_time', '>', $startDateTime);
             });
         }
 

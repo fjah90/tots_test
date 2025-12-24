@@ -25,7 +25,9 @@ export interface SpaceFilters {
   is_active?: boolean;
   page?: number;
   per_page?: number;
-  available_date?: string;
+  available_date?: string; // Formato YYYY-MM-DD
+  available_start_time?: string; // Formato HH:mm
+  available_end_time?: string; // Formato HH:mm
 }
 
 export interface PaginatedSpaces {
@@ -96,6 +98,12 @@ export class SpacesService {
     }
     if (filters?.available_date) {
       params = params.set('available_date', filters.available_date);
+    }
+    if (filters?.available_start_time) {
+      params = params.set('available_start_time', filters.available_start_time);
+    }
+    if (filters?.available_end_time) {
+      params = params.set('available_end_time', filters.available_end_time);
     }
 
     return this.http.get<PaginatedApiResponse<Space[]>>(this.apiUrl, { params })

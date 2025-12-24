@@ -60,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Reservaciones - CRUD completo para usuarios autenticados
+    Route::post('reservations/bulk', [ReservationController::class, 'storeBulk']); // Debe ir antes del apiResource
     Route::apiResource('reservations', ReservationController::class);
     Route::patch('reservations/{reservation}/cancel', [ReservationController::class, 'cancel']);
 

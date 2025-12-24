@@ -72,7 +72,7 @@ routes/
 |--------|------|-------------|
 | POST | /auth/register | Registro |
 | POST | /auth/login | Login |
-| GET | /spaces | Listar espacios |
+| GET | /spaces | Listar espacios (filtros: `available_date`, `available_start_time`, `available_end_time`) |
 | GET | /spaces/{id} | Detalle espacio |
 | GET | /calendar/reservations | Reservaciones públicas |
 
@@ -83,6 +83,7 @@ routes/
 | GET | /auth/user | Usuario actual |
 | GET | /reservations | Mis reservaciones |
 | POST | /reservations | Crear reservación |
+| POST | /reservations/bulk | **Crear reservaciones múltiples fechas** |
 | PATCH | /reservations/{id}/cancel | Cancelar |
 
 ### Admin

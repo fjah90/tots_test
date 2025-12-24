@@ -104,6 +104,32 @@ export class ReservationsService {
   }
 
   /**
+   * Crear reservaciones en múltiples fechas (bulk)
+   */
+  createBulkReservations(payload: {
+    space_id: number;
+    dates: string[];
+    start_time: string;
+    end_time: string;
+    notes?: string;
+  }): Observable<{ message: string; data: { created: Reservation[]; failed: { date: string; reason: string }[] } }> {
+    this.loading.set(true);
+    this.error.set(null);
+
+    return this.http.post<{ message: string; data: { created: Reservation[]; failed: { date: string; reason: string }[] } }>(
+      `${this.apiUrl}/bulk`,
+      payload
+    ).pipe(
+      tap(response => {
+        if (response.data.created.length > 0) {
+          this.reservations.update(list => [...list, ...response.data.created]);
+        }
+      }),
+      finalize(() => this.loading.set(false))
+    );
+  }
+
+  /**
    * Actualizar reservación
    */
   updateReservation(id: number, payload: Partial<ReservationPayload>): Observable<Reservation> {

@@ -12,10 +12,10 @@
   <!-- Filters Section -->
   <div class="max-w-7xl mx-auto px-6 -mt-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
         
         <!-- Búsqueda por texto -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 lg:col-span-2">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Buscar</label>
           <input 
             type="text" 
@@ -30,7 +30,7 @@
         <!-- Filtro por fecha -->
         <div class="flex flex-col gap-2">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Fecha de Reserva
+            Fecha
             <i class="pi pi-info-circle ml-1 text-gray-400" 
                pTooltip="Filtra espacios con disponibilidad en esta fecha"></i>
           </label>
@@ -40,37 +40,86 @@
             [showIcon]="true"
             [minDate]="minDate"
             dateFormat="dd/mm/yy"
-            placeholder="Seleccionar fecha"
+            placeholder="Seleccionar"
             styleClass="w-full"
           />
         </div>
 
-        <!-- Filtro por capacidad -->
+        <!-- Hora de inicio -->
         <div class="flex flex-col gap-2">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Capacidad: {{ capacityRange()[0] }} - {{ capacityRange()[1] === 100 ? '100+' : capacityRange()[1] }} personas
+            Desde
+            <i class="pi pi-info-circle ml-1 text-gray-400" 
+               pTooltip="Hora de inicio del rango disponible"></i>
           </label>
-          <p-slider 
-            [ngModel]="capacityRange()"
-            (ngModelChange)="capacityRange.set($event)"
-            [range]="true"
-            [min]="0"
-            [max]="100"
-            [step]="5"
-            styleClass="mt-4"
-          />
+          <p-datepicker 
+            [ngModel]="selectedStartTime()"
+            (ngModelChange)="onStartTimeChange($event)"
+            [timeOnly]="true"
+            [showIcon]="true"
+            [iconDisplay]="'input'"
+            [stepMinute]="30"
+            placeholder="08:00"
+            styleClass="w-full"
+            [disabled]="!selectedDate()"
+          >
+            <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+              <i class="pi pi-clock cursor-pointer" (click)="clickCallBack($event)"></i>
+            </ng-template>
+          </p-datepicker>
+        </div>
+
+        <!-- Hora de fin -->
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Hasta
+            <i class="pi pi-info-circle ml-1 text-gray-400" 
+               pTooltip="Hora de fin del rango disponible"></i>
+          </label>
+          <p-datepicker 
+            [ngModel]="selectedEndTime()"
+            (ngModelChange)="onEndTimeChange($event)"
+            [timeOnly]="true"
+            [showIcon]="true"
+            [iconDisplay]="'input'"
+            [stepMinute]="30"
+            placeholder="20:00"
+            styleClass="w-full"
+            [disabled]="!selectedDate()"
+          >
+            <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+              <i class="pi pi-clock cursor-pointer" (click)="clickCallBack($event)"></i>
+            </ng-template>
+          </p-datepicker>
         </div>
 
         <!-- Botón limpiar filtros -->
         <div class="flex flex-col justify-end">
           <p-button 
-            label="Limpiar Filtros" 
+            label="Limpiar" 
             icon="pi pi-filter-slash" 
             severity="secondary"
             [outlined]="true"
             (click)="clearFilters()"
+            styleClass="w-full"
           />
         </div>
+      </div>
+
+      <!-- Filtro por capacidad (fila separada) -->
+      <div class="mt-4">
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+          Capacidad: {{ capacityRange()[0] }} - {{ capacityRange()[1] === 100 ? '100+' : capacityRange()[1] }} personas
+        </label>
+        <p-slider 
+          [ngModel]="capacityRange()"
+          (ngModelChange)="capacityRange.set($event)"
+          [range]="true"
+          [min]="0"
+          [max]="100"
+          [step]="5"
+          styleClass="mt-2 max-w-md"
+        />
       </div>
 
       <!-- Resultados count -->

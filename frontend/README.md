@@ -51,14 +51,19 @@ src/app/
 
 ### Públicas
 - Listado de espacios con filtros y búsqueda
-- **Filtro por fecha de disponibilidad** (muestra espacios con horarios libres)
+- **Filtro avanzado de disponibilidad**:
+  - Por fecha (muestra espacios con horarios libres)
+  - Por rango horario (hora inicio/fin)
+  - Búsqueda por nombre/ubicación
+  - Filtro por capacidad
 - Infinite scroll para carga progresiva
 - Detalle de espacio con carousel de imágenes
 - Calendario de disponibilidad (FullCalendar)
 - Dark mode (Light/Dark/System)
 
 ### Autenticadas
-- Crear reservaciones
+- Crear reservaciones (fecha simple)
+- **Crear reservaciones en múltiples fechas** (modo bulk)
 - Ver mis reservaciones
 - **Cancelar reservaciones** (con diálogo de confirmación)
 - Fecha preseleccionada desde filtro de búsqueda
@@ -68,6 +73,23 @@ src/app/
 - CRUD de reservaciones
 - Dashboard de estadísticas
 - Gestión de múltiples imágenes
+
+## Funcionalidades Destacadas
+
+### Filtro Avanzado de Espacios
+El listado de espacios permite filtrar por:
+1. **Nombre/Ubicación**: Búsqueda de texto libre
+2. **Fecha de disponibilidad**: Muestra solo espacios disponibles en esa fecha
+3. **Rango horario**: Filtra por hora de inicio y fin (ej: 09:00 - 12:00)
+4. **Capacidad**: Slider de rango (0-100+ personas)
+
+Los filtros de hora solo se activan cuando hay una fecha seleccionada.
+
+### Reservaciones en Múltiples Fechas
+El formulario de reservación incluye un modo "múltiples fechas" que permite:
+- Seleccionar varias fechas para el mismo horario
+- Ver cuáles reservaciones se crearon exitosamente
+- Ver cuáles fallaron (espacio ocupado) con detalle del error
 
 ## Configuración
 

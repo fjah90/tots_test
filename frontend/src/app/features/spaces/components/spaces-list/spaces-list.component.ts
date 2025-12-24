@@ -70,6 +70,8 @@ export class SpacesListComponent implements OnInit {
   searchTerm = signal('');
   capacityRange = signal<number[]>([0, 100]);
   selectedDate = signal<Date | null>(null);
+  selectedStartTime = signal<Date | null>(null);
+  selectedEndTime = signal<Date | null>(null);
   minDate = new Date(); // No permitir fechas pasadas
   
   // Modal de reserva
@@ -119,11 +121,40 @@ export class SpacesListComponent implements OnInit {
   }
 
   /**
+   * Formatear hora para la API (HH:mm)
+   */
+  private formatTimeForApi(date: Date): string {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  /**
    * Cuando cambia la fecha seleccionada, recargar espacios
    */
   onDateChange(date: Date | null): void {
     this.selectedDate.set(date);
     this.loadSpaces();
+  }
+
+  /**
+   * Cuando cambia la hora de inicio, recargar espacios
+   */
+  onStartTimeChange(time: Date | null): void {
+    this.selectedStartTime.set(time);
+    if (this.selectedDate()) {
+      this.loadSpaces();
+    }
+  }
+
+  /**
+   * Cuando cambia la hora de fin, recargar espacios
+   */
+  onEndTimeChange(time: Date | null): void {
+    this.selectedEndTime.set(time);
+    if (this.selectedDate()) {
+      this.loadSpaces();
+    }
   }
 
   loadSpaces(): void {
@@ -141,6 +172,14 @@ export class SpacesListComponent implements OnInit {
     // Agregar filtro de fecha si está seleccionada
     if (this.selectedDate()) {
       filters.available_date = this.formatDateForApi(this.selectedDate()!);
+      
+      // Agregar filtros de hora si están seleccionados
+      if (this.selectedStartTime()) {
+        filters.available_start_time = this.formatTimeForApi(this.selectedStartTime()!);
+      }
+      if (this.selectedEndTime()) {
+        filters.available_end_time = this.formatTimeForApi(this.selectedEndTime()!);
+      }
     }
     
     this.spacesService.getSpacesPaginated(filters).subscribe({
@@ -184,6 +223,14 @@ export class SpacesListComponent implements OnInit {
     // Mantener el filtro de fecha si está seleccionada
     if (this.selectedDate()) {
       filters.available_date = this.formatDateForApi(this.selectedDate()!);
+      
+      // Mantener filtros de hora si están seleccionados
+      if (this.selectedStartTime()) {
+        filters.available_start_time = this.formatTimeForApi(this.selectedStartTime()!);
+      }
+      if (this.selectedEndTime()) {
+        filters.available_end_time = this.formatTimeForApi(this.selectedEndTime()!);
+      }
     }
     
     this.spacesService.getSpacesPaginated(filters).subscribe({
@@ -255,6 +302,9 @@ export class SpacesListComponent implements OnInit {
     this.searchTerm.set('');
     this.capacityRange.set([0, 100]);
     this.selectedDate.set(null);
+    this.selectedStartTime.set(null);
+    this.selectedEndTime.set(null);
+    this.loadSpaces();
   }
 
   getCapacityIcon(capacity: number): string {

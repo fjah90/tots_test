@@ -21,6 +21,29 @@
     </div>
   </div>
 
+  <!-- Toggle Múltiples Fechas -->
+  <div class="flex items-center gap-3 mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+    <p-checkbox 
+      [binary]="true"
+      [ngModel]="multiDateMode()"
+      (ngModelChange)="toggleMultiDateMode()"
+      inputId="multiDateToggle"
+    />
+    <label for="multiDateToggle" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+      <i class="pi pi-calendar-plus mr-1"></i>
+      Reservar en múltiples fechas
+    </label>
+  </div>
+
+  <!-- Success Message -->
+  @if (successMessage()) {
+    <p-message 
+      severity="success" 
+      [text]="successMessage()!" 
+      styleClass="mb-4 w-full"
+    />
+  }
+
   <!-- Error Message -->
   @if (errorMessage()) {
     <p-message 
@@ -30,34 +53,84 @@
     />
   }
 
+  <!-- Failed Dates -->
+  @if (failedDates().length > 0) {
+    <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+      <p class="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-2">
+        <i class="pi pi-exclamation-triangle mr-1"></i>
+        Fechas no disponibles:
+      </p>
+      <div class="flex flex-wrap gap-2">
+        @for (failed of failedDates(); track failed.date) {
+          <p-tag 
+            [value]="failed.date" 
+            severity="warn"
+            [pTooltip]="failed.reason"
+          />
+        }
+      </div>
+    </div>
+  }
+
   <!-- Reservation Form -->
   <form [formGroup]="reservationForm" (ngSubmit)="onSubmit()" class="space-y-5">
     
-    <!-- Fecha -->
-    <div class="flex flex-col gap-2">
-      <label for="date" class="font-medium text-gray-700">
-        Fecha de Reserva <span class="text-red-500">*</span>
-      </label>
-      <p-datepicker 
-        id="date"
-        formControlName="date"
-        [showIcon]="true"
-        [minDate]="minDate"
-        dateFormat="dd/mm/yy"
-        placeholder="Seleccionar fecha"
-        styleClass="w-full"
-        [invalid]="dateControl?.invalid && dateControl?.touched"
-      />
-      @if (dateControl?.invalid && dateControl?.touched) {
-        <small class="text-red-500">La fecha es requerida</small>
-      }
-    </div>
+    <!-- Fecha única -->
+    @if (!multiDateMode()) {
+      <div class="flex flex-col gap-2">
+        <label for="date" class="font-medium text-gray-700 dark:text-gray-300">
+          Fecha de Reserva <span class="text-red-500">*</span>
+        </label>
+        <p-datepicker 
+          id="date"
+          formControlName="date"
+          [showIcon]="true"
+          [minDate]="minDate"
+          dateFormat="dd/mm/yy"
+          placeholder="Seleccionar fecha"
+          styleClass="w-full"
+          [invalid]="dateControl?.invalid && dateControl?.touched"
+        />
+        @if (dateControl?.invalid && dateControl?.touched) {
+          <small class="text-red-500">La fecha es requerida</small>
+        }
+      </div>
+    }
+
+    <!-- Múltiples fechas -->
+    @if (multiDateMode()) {
+      <div class="flex flex-col gap-2">
+        <label for="dates" class="font-medium text-gray-700 dark:text-gray-300">
+          Fechas de Reserva <span class="text-red-500">*</span>
+          <span class="text-sm font-normal text-gray-500 ml-2">(máx. 30 fechas)</span>
+        </label>
+        <p-datepicker 
+          id="dates"
+          formControlName="dates"
+          [showIcon]="true"
+          [minDate]="minDate"
+          dateFormat="dd/mm/yy"
+          placeholder="Seleccionar fechas"
+          styleClass="w-full"
+          selectionMode="multiple"
+          [showButtonBar]="true"
+        />
+        @if (datesControl?.value?.length > 0) {
+          <small class="text-teal-600 dark:text-teal-400">
+            <i class="pi pi-check-circle mr-1"></i>
+            {{ datesControl?.value?.length }} fecha(s) seleccionada(s)
+          </small>
+        } @else {
+          <small class="text-gray-500">Selecciona una o más fechas en el calendario</small>
+        }
+      </div>
+    }
 
     <!-- Hora Inicio y Hora Fin en grid -->
     <div class="grid grid-cols-2 gap-4">
       <!-- Hora Inicio -->
       <div class="flex flex-col gap-2">
-        <label for="startTime" class="font-medium text-gray-700">
+        <label for="startTime" class="font-medium text-gray-700 dark:text-gray-300">
           Hora Inicio <span class="text-red-500">*</span>
         </label>
         <p-datepicker 
@@ -77,7 +150,7 @@
 
       <!-- Hora Fin -->
       <div class="flex flex-col gap-2">
-        <label for="endTime" class="font-medium text-gray-700">
+        <label for="endTime" class="font-medium text-gray-700 dark:text-gray-300">
           Hora Fin <span class="text-red-500">*</span>
         </label>
         <p-datepicker 
@@ -98,7 +171,7 @@
 
     <!-- Nombre del Evento -->
     <div class="flex flex-col gap-2">
-      <label for="eventName" class="font-medium text-gray-700">
+      <label for="eventName" class="font-medium text-gray-700 dark:text-gray-300">
         Nombre del Evento <span class="text-red-500">*</span>
       </label>
       <input 
@@ -121,7 +194,7 @@
 
     <!-- Notas adicionales (opcional) -->
     <div class="flex flex-col gap-2">
-      <label for="notes" class="font-medium text-gray-700">
+      <label for="notes" class="font-medium text-gray-700 dark:text-gray-300">
         Notas adicionales <span class="text-gray-400">(opcional)</span>
       </label>
       <textarea 
@@ -135,7 +208,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="flex gap-3 justify-end pt-4 border-t">
+    <div class="flex gap-3 justify-end pt-4 border-t dark:border-gray-700">
       <p-button 
         label="Cancelar" 
         severity="secondary"
@@ -144,11 +217,11 @@
         [disabled]="loading()"
       />
       <p-button 
-        label="Confirmar Reserva" 
+        [label]="multiDateMode() ? 'Reservar ' + (datesControl?.value?.length || 0) + ' Fecha(s)' : 'Confirmar Reserva'" 
         icon="pi pi-check"
         type="submit"
         [loading]="loading()"
-        [disabled]="reservationForm.invalid || loading()"
+        [disabled]="reservationForm.invalid || loading() || (multiDateMode() && (!datesControl?.value || datesControl?.value?.length === 0))"
       />
     </div>
   </form>

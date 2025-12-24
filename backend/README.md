@@ -54,7 +54,10 @@ routes/
 ### Públicos (sin autenticación)
 - `POST /auth/register` - Registro
 - `POST /auth/login` - Login
-- `GET /spaces` - Listar espacios (soporta `?available_date=YYYY-MM-DD` para filtrar por disponibilidad)
+- `GET /spaces` - Listar espacios (soporta filtros de disponibilidad)
+  - `?available_date=YYYY-MM-DD` - Filtrar por fecha
+  - `?available_start_time=HH:mm` - Hora de inicio del rango (por defecto 08:00)
+  - `?available_end_time=HH:mm` - Hora de fin del rango (por defecto 20:00)
 - `GET /spaces/{id}` - Detalle de espacio
 - `GET /calendar/reservations` - Reservaciones para calendario
 
@@ -63,6 +66,7 @@ routes/
 - `GET /auth/user` - Usuario actual
 - `GET /reservations` - Mis reservaciones
 - `POST /reservations` - Crear reservación
+- `POST /reservations/bulk` - **Crear reservaciones en múltiples fechas**
 - `PATCH /reservations/{id}/cancel` - Cancelar
 
 ### Admin
@@ -117,8 +121,50 @@ El seeder crea:
   - Pendientes (~35%)
   - Canceladas (~20%)
   - Distribuidas en pasado (-15 días) y futuro (+30 días)
+- **Espacio de prueba**: "Sala de Juntas Elite 1" completamente ocupado el 2025-12-29 (6 bloques de 2 horas)
 
 ### Ejecutar solo ReservationSeeder
 ```bash
 php artisan db:seed --class=ReservationSeeder
 ```
+
+## Funcionalidades Extra
+
+### Reservaciones en Múltiples Fechas (Bulk)
+Permite crear reservaciones para el mismo espacio en varias fechas con un solo request:
+
+```bash
+POST /api/reservations/bulk
+{
+  "space_id": 1,
+  "dates": ["2025-01-15", "2025-01-16", "2025-01-17"],
+  "start_time": "09:00",
+  "end_time": "11:00",
+  "notes": "Reunión semanal"
+}
+```
+
+Respuesta (soporta éxito parcial):
+```json
+{
+  "message": "Proceso de reservaciones completado",
+  "data": {
+    "created": [...],
+    "failed": [
+      {
+        "date": "2025-01-16",
+        "reason": "El espacio ya está reservado en ese horario"
+      }
+    ]
+  }
+}
+```
+
+### Filtro de Disponibilidad por Rango de Hora
+Filtra espacios que tengan disponibilidad en un rango horario específico:
+
+```bash
+GET /api/spaces?available_date=2025-01-15&available_start_time=09:00&available_end_time=12:00
+```
+
+Esto excluye espacios que tengan reservaciones que se superpongan con el rango solicitado.

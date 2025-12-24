@@ -283,6 +283,57 @@
                 ]
             }
         },
+        "/users": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Listar todos los usuarios (solo admin)",
+                "operationId": "91d27c9525be07f2c137aa4ff98c67e5",
+                "responses": {
+                    "200": {
+                        "description": "Lista de usuarios",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "403": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/reservations": {
             "get": {
                 "tags": [
@@ -668,6 +719,162 @@
                 ]
             }
         },
+        "/calendar/reservations": {
+            "get": {
+                "tags": [
+                    "Calendar"
+                ],
+                "summary": "Obtener reservaciones públicas para el calendario (sin datos sensibles)",
+                "operationId": "a041803b46dff28c650363f472f0a585",
+                "parameters": [
+                    {
+                        "name": "space_id",
+                        "in": "query",
+                        "description": "Filtrar por espacio",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de reservaciones para calendario",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "space_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "start_time": {
+                                                        "type": "string"
+                                                    },
+                                                    "end_time": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reservations/bulk": {
+            "post": {
+                "tags": [
+                    "Reservations"
+                ],
+                "summary": "Crear reservaciones en múltiples fechas",
+                "operationId": "e10731265a4ae5df4dc487700bb91bd8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "space_id",
+                                    "dates",
+                                    "start_time",
+                                    "end_time"
+                                ],
+                                "properties": {
+                                    "space_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "dates": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "date"
+                                        },
+                                        "example": [
+                                            "2025-01-20",
+                                            "2025-01-21",
+                                            "2025-01-22"
+                                        ]
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "example": "09:00"
+                                    },
+                                    "end_time": {
+                                        "type": "string",
+                                        "example": "12:00"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "Reunión recurrente"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Reservaciones creadas exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "created": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Reservation"
+                                                    }
+                                                },
+                                                "failed": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/spaces": {
             "get": {
                 "tags": [
@@ -707,6 +914,52 @@
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "available_date",
+                        "in": "query",
+                        "description": "Filtrar por disponibilidad en fecha (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-01-15"
+                        }
+                    },
+                    {
+                        "name": "available_start_time",
+                        "in": "query",
+                        "description": "Hora inicio para filtro de disponibilidad (HH:mm)",
+                        "schema": {
+                            "type": "string",
+                            "example": "09:00"
+                        }
+                    },
+                    {
+                        "name": "available_end_time",
+                        "in": "query",
+                        "description": "Hora fin para filtro de disponibilidad (HH:mm)",
+                        "schema": {
+                            "type": "string",
+                            "example": "12:00"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página para paginación",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Elementos por página (0 = todos)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
                     }
                 ],
                 "responses": {
@@ -721,6 +974,23 @@
                                             "items": {
                                                 "$ref": "#/components/schemas/Space"
                                             }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -1072,6 +1342,67 @@
                     },
                     "422": {
                         "description": "Error de validación"
+                    }
+                }
+            }
+        },
+        "/spaces/{id}/reservations": {
+            "get": {
+                "tags": [
+                    "Spaces"
+                ],
+                "summary": "Obtener reservaciones de un espacio",
+                "operationId": "f56c57cccb7c743bd7061898126c7f15",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del espacio",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "description": "Fecha desde (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "description": "Fecha hasta (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de reservaciones del espacio",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Reservation"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Espacio no encontrado"
                     }
                 }
             }
@@ -1500,6 +1831,10 @@
         {
             "name": "Reservations",
             "description": "CRUD de reservas"
+        },
+        {
+            "name": "Calendar",
+            "description": "Calendar"
         },
         {
             "name": "Stats",

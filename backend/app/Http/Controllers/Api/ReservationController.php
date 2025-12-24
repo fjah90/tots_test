@@ -434,4 +434,123 @@ class ReservationController extends Controller
             'data' => $reservations,
         ]);
     }
+
+    /**
+     * @OA\Post(
+     *     path="/reservations/bulk",
+     *     summary="Crear reservaciones en múltiples fechas",
+     *     tags={"Reservations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"space_id", "dates", "start_time", "end_time"},
+     *             @OA\Property(property="space_id", type="integer", example=1),
+     *             @OA\Property(property="dates", type="array", @OA\Items(type="string", format="date"), example={"2025-01-20", "2025-01-21", "2025-01-22"}),
+     *             @OA\Property(property="start_time", type="string", example="09:00"),
+     *             @OA\Property(property="end_time", type="string", example="12:00"),
+     *             @OA\Property(property="notes", type="string", example="Reunión recurrente")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Reservaciones creadas exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="created", type="array", @OA\Items(ref="#/components/schemas/Reservation")),
+     *                 @OA\Property(property="failed", type="array", @OA\Items(type="object"))
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="No autenticado"),
+     *     @OA\Response(response=422, description="Error de validación")
+     * )
+     */
+    public function storeBulk(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'space_id' => ['required', 'integer', 'exists:spaces,id'],
+            'dates' => ['required', 'array', 'min:1', 'max:30'],
+            'dates.*' => ['required', 'date', 'after_or_equal:today'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+            'notes' => ['nullable', 'string', 'max:500'],
+        ], [
+            'dates.required' => 'Debe seleccionar al menos una fecha',
+            'dates.max' => 'Máximo 30 fechas por reservación',
+            'dates.*.after_or_equal' => 'Las fechas deben ser hoy o futuras',
+            'start_time.date_format' => 'Formato de hora inválido (use HH:mm)',
+            'end_time.after' => 'La hora de fin debe ser posterior a la de inicio',
+        ]);
+
+        $space = Space::findOrFail($validated['space_id']);
+
+        if (!$space->is_active) {
+            return response()->json([
+                'message' => 'El espacio no está disponible para reservaciones',
+                'error' => 'space_inactive',
+            ], 422);
+        }
+
+        $userId = $request->user()->id;
+        $created = [];
+        $failed = [];
+
+        foreach ($validated['dates'] as $date) {
+            $startDateTime = "{$date} {$validated['start_time']}:00";
+            $endDateTime = "{$date} {$validated['end_time']}:00";
+
+            // Verificar disponibilidad
+            if (!$this->availabilityService->isSpaceAvailable(
+                $validated['space_id'],
+                $startDateTime,
+                $endDateTime
+            )) {
+                $failed[] = [
+                    'date' => $date,
+                    'reason' => 'Espacio ocupado en este horario',
+                ];
+                continue;
+            }
+
+            // Crear reservación
+            $reservation = Reservation::create([
+                'user_id' => $userId,
+                'space_id' => $validated['space_id'],
+                'start_time' => $startDateTime,
+                'end_time' => $endDateTime,
+                'status' => 'confirmed',
+                'notes' => $validated['notes'] ?? null,
+            ]);
+
+            $created[] = $reservation->load(['user', 'space']);
+        }
+
+        $totalRequested = count($validated['dates']);
+        $totalCreated = count($created);
+        $totalFailed = count($failed);
+
+        if ($totalCreated === 0) {
+            return response()->json([
+                'message' => 'No se pudo crear ninguna reservación. Todas las fechas están ocupadas.',
+                'data' => [
+                    'created' => [],
+                    'failed' => $failed,
+                ],
+            ], 409);
+        }
+
+        $message = $totalFailed > 0
+            ? "Se crearon {$totalCreated} de {$totalRequested} reservaciones. {$totalFailed} fechas no disponibles."
+            : "Se crearon {$totalCreated} reservaciones exitosamente.";
+
+        return response()->json([
+            'message' => $message,
+            'data' => [
+                'created' => $created,
+                'failed' => $failed,
+            ],
+        ], 201);
+    }
 }

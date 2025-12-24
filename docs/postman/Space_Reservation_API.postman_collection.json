@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
 		"name": "SpaceBook API - spacebook-jfah",
-		"description": "API REST para sistema de reserva de espacios para eventos.\n\n## Proyecto: spacebook-jfah\n**Autor:** Fernando Aponte\n\n## Características\n- ✅ Autenticación con Laravel Sanctum\n- ✅ CRUD de Espacios (Admin)\n- ✅ CRUD de Reservas (Usuario)\n- ✅ CRUD Admin de Reservas\n- ✅ Paginación con `page` y `per_page`\n- ✅ Filtros de capacidad y estado\n- ✅ Validación de disponibilidad\n- ✅ Soporte para múltiples imágenes\n\n## Datos de Prueba\n\n### Usuarios\n- **Admin:** admin@espacios.com / password123\n- **User:** juan@ejemplo.com / password123\n\n### Espacios (IDs 1-5)\n- Sala de Conferencias Principal\n- Sala de Reuniones Ejecutiva\n- Auditorio Central\n- Espacio de Coworking Creativo\n- Sala de Capacitación Tech",
+		"description": "API REST para sistema de reserva de espacios para eventos.\n\n## Proyecto: spacebook-jfah\n**Autor:** Fernando Aponte\n\n## Características\n- ✅ Autenticación con Laravel Sanctum\n- ✅ CRUD de Espacios (Admin)\n- ✅ CRUD de Reservas (Usuario)\n- ✅ CRUD Admin de Reservas\n- ✅ Paginación con `page` y `per_page`\n- ✅ Filtros de capacidad y estado\n- ✅ **Filtros de disponibilidad** (fecha, hora inicio, hora fin)\n- ✅ Validación de disponibilidad\n- ✅ **Reservaciones en múltiples fechas** (bulk)\n- ✅ Soporte para múltiples imágenes\n\n## Datos de Prueba\n\n### Usuarios\n- **Admin:** admin@espacios.com / password123\n- **User:** juan@ejemplo.com / password123\n\n### Espacios (IDs 1-5)\n- Sala de Conferencias Principal\n- Sala de Reuniones Ejecutiva\n- Auditorio Central\n- Espacio de Coworking Creativo\n- Sala de Capacitación Tech",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"variable": [
@@ -244,7 +244,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/spaces?capacity_min=20&capacity_max=50&is_active=true&page=1&per_page=10",
+							"raw": "{{base_url}}/spaces?capacity_min=20&capacity_max=50&is_active=true&page=1&per_page=10&available_date=2025-01-15&available_start_time=09:00&available_end_time=12:00",
 							"host": ["{{base_url}}"],
 							"path": ["spaces"],
 							"query": [
@@ -272,10 +272,25 @@
 									"key": "per_page",
 									"value": "10",
 									"description": "Elementos por página"
+								},
+								{
+									"key": "available_date",
+									"value": "2025-01-15",
+									"description": "Filtrar por disponibilidad en esta fecha (YYYY-MM-DD)"
+								},
+								{
+									"key": "available_start_time",
+									"value": "09:00",
+									"description": "Hora de inicio del rango (HH:mm). Default: 08:00"
+								},
+								{
+									"key": "available_end_time",
+									"value": "12:00",
+									"description": "Hora de fin del rango (HH:mm). Default: 20:00"
 								}
 							]
 						},
-						"description": "Listar espacios con filtros de capacidad, estado y paginación.\n\n**Filtros disponibles:**\n- `capacity_min`: Capacidad mínima\n- `capacity_max`: Capacidad máxima\n- `is_active`: Estado activo (true/false)\n- `page`: Número de página\n- `per_page`: Elementos por página"
+						"description": "Listar espacios con filtros de capacidad, estado, disponibilidad y paginación.\n\n**Filtros disponibles:**\n- `capacity_min`: Capacidad mínima\n- `capacity_max`: Capacidad máxima\n- `is_active`: Estado activo (true/false)\n- `page`: Número de página\n- `per_page`: Elementos por página\n- `available_date`: Fecha de disponibilidad (YYYY-MM-DD)\n- `available_start_time`: Hora inicio del rango (HH:mm)\n- `available_end_time`: Hora fin del rango (HH:mm)"
 					},
 					"response": []
 				},
@@ -492,6 +507,37 @@
 							"path": ["reservations"]
 						},
 						"description": "Crear una nueva reserva.\n\n⚠️ Requiere autenticación\n\n**Validaciones:**\n- El espacio debe existir y estar activo\n- start_time debe ser anterior a end_time\n- No puede haber superposición con otras reservas\n- No se pueden crear reservas en el pasado"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Bulk Reservations",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"space_id\": 1,\n    \"dates\": [\"2025-01-20\", \"2025-01-21\", \"2025-01-22\"],\n    \"start_time\": \"09:00\",\n    \"end_time\": \"11:00\",\n    \"notes\": \"Reunión semanal de equipo\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/reservations/bulk",
+							"host": ["{{base_url}}"],
+							"path": ["reservations", "bulk"]
+						},
+						"description": "Crear reservaciones en múltiples fechas con un solo request.\n\n⚠️ Requiere autenticación\n\n**Características:**\n- Máximo 30 fechas por request\n- Soporte para éxito parcial (algunas fechas pueden fallar)\n- Retorna `created` y `failed` arrays\n\n**Respuesta:**\n```json\n{\n  \"message\": \"Proceso de reservaciones completado\",\n  \"data\": {\n    \"created\": [...],\n    \"failed\": [\n      {\n        \"date\": \"2025-01-21\",\n        \"reason\": \"El espacio ya está reservado en ese horario\"\n      }\n    ]\n  }\n}\n```"
 					},
 					"response": []
 				},

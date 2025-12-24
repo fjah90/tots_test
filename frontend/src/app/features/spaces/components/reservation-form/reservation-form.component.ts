@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, inject, signal, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -8,6 +8,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { DatePickerModule } from 'primeng/datepicker';
 import { MessageModule } from 'primeng/message';
+import { CheckboxModule } from 'primeng/checkbox';
+import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
 
 // Services & Interfaces
 import { ReservationsService } from '../../../../core/services/reservations.service';
@@ -20,11 +23,15 @@ import { Space } from '../../../../shared/interfaces';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     ButtonModule,
     InputTextModule,
     TextareaModule,
     DatePickerModule,
-    MessageModule
+    MessageModule,
+    CheckboxModule,
+    TagModule,
+    TooltipModule
   ],
   templateUrl: './reservation-form.component.html',
   styleUrl: './reservation-form.component.scss'
@@ -46,6 +53,11 @@ export class ReservationFormComponent implements OnInit, OnChanges {
   // Estado
   loading = signal(false);
   errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
+  failedDates = signal<{ date: string; reason: string }[]>([]);
+
+  // Modo múltiples fechas
+  multiDateMode = signal(false);
 
   // Configuración de fechas
   minDate = new Date();
@@ -80,11 +92,27 @@ export class ReservationFormComponent implements OnInit, OnChanges {
 
     this.reservationForm = this.fb.group({
       date: [defaultDate, Validators.required],
+      dates: [[] as Date[]], // Para múltiples fechas
       startTime: [defaultStartTime, Validators.required],
       endTime: [defaultEndTime, Validators.required],
       eventName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       notes: ['']
     });
+  }
+
+  toggleMultiDateMode(): void {
+    this.multiDateMode.update(v => !v);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+    this.failedDates.set([]);
+    
+    if (this.multiDateMode()) {
+      // Inicializar con la fecha actual seleccionada
+      const currentDate = this.reservationForm.get('date')?.value;
+      if (currentDate) {
+        this.reservationForm.patchValue({ dates: [currentDate] });
+      }
+    }
   }
 
   onSubmit(): void {
@@ -100,16 +128,31 @@ export class ReservationFormComponent implements OnInit, OnChanges {
     }
 
     const formValue = this.reservationForm.value;
-    
-    // Combinar fecha con horas
-    const startDateTime = this.combineDateAndTime(formValue.date, formValue.startTime);
-    const endDateTime = this.combineDateAndTime(formValue.date, formValue.endTime);
 
     // Validar que hora fin sea mayor a hora inicio
-    if (endDateTime <= startDateTime) {
+    const startTime = formValue.startTime as Date;
+    const endTime = formValue.endTime as Date;
+    if (endTime.getHours() * 60 + endTime.getMinutes() <= startTime.getHours() * 60 + startTime.getMinutes()) {
       this.errorMessage.set('La hora de fin debe ser mayor a la hora de inicio');
       return;
     }
+
+    this.loading.set(true);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+    this.failedDates.set([]);
+
+    if (this.multiDateMode()) {
+      this.submitBulkReservation(formValue);
+    } else {
+      this.submitSingleReservation(formValue);
+    }
+  }
+
+  private submitSingleReservation(formValue: any): void {
+    // Combinar fecha con horas
+    const startDateTime = this.combineDateAndTime(formValue.date, formValue.startTime);
+    const endDateTime = this.combineDateAndTime(formValue.date, formValue.endTime);
 
     // Preparar payload
     const payload = {
@@ -119,9 +162,6 @@ export class ReservationFormComponent implements OnInit, OnChanges {
       notes: formValue.eventName + (formValue.notes ? ` - ${formValue.notes}` : '')
     };
 
-    this.loading.set(true);
-    this.errorMessage.set(null);
-
     this.reservationsService.createReservation(payload).subscribe({
       next: () => {
         this.loading.set(false);
@@ -130,6 +170,53 @@ export class ReservationFormComponent implements OnInit, OnChanges {
       error: (err) => {
         this.loading.set(false);
         this.handleError(err);
+      }
+    });
+  }
+
+  private submitBulkReservation(formValue: any): void {
+    const dates: Date[] = formValue.dates || [];
+    
+    if (dates.length === 0) {
+      this.errorMessage.set('Selecciona al menos una fecha');
+      this.loading.set(false);
+      return;
+    }
+
+    const payload = {
+      space_id: this.space.id,
+      dates: dates.map(d => this.formatDate(d)),
+      start_time: this.formatTime(formValue.startTime),
+      end_time: this.formatTime(formValue.endTime),
+      notes: formValue.eventName + (formValue.notes ? ` - ${formValue.notes}` : '')
+    };
+
+    this.reservationsService.createBulkReservations(payload).subscribe({
+      next: (response) => {
+        this.loading.set(false);
+        
+        if (response.data.failed.length > 0) {
+          this.failedDates.set(response.data.failed);
+        }
+        
+        if (response.data.created.length > 0) {
+          this.successMessage.set(response.message);
+          // Si todas fueron exitosas, cerrar el modal
+          if (response.data.failed.length === 0) {
+            setTimeout(() => this.success.emit(), 1500);
+          }
+        }
+      },
+      error: (err) => {
+        this.loading.set(false);
+        if (err.status === 409) {
+          this.errorMessage.set(err.error?.message || 'Todas las fechas seleccionadas están ocupadas');
+          if (err.error?.data?.failed) {
+            this.failedDates.set(err.error.data.failed);
+          }
+        } else {
+          this.handleError(err);
+        }
       }
     });
   }
@@ -172,8 +259,24 @@ export class ReservationFormComponent implements OnInit, OnChanges {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
+  private formatDate(date: Date): string {
+    // Formato: YYYY-MM-DD
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private formatTime(time: Date): string {
+    // Formato: HH:mm
+    const hours = String(time.getHours()).padStart(2, '0');
+    const minutes = String(time.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
   // Getters para validación en template
   get dateControl() { return this.reservationForm.get('date'); }
+  get datesControl() { return this.reservationForm.get('dates'); }
   get startTimeControl() { return this.reservationForm.get('startTime'); }
   get endTimeControl() { return this.reservationForm.get('endTime'); }
   get eventNameControl() { return this.reservationForm.get('eventName'); }
