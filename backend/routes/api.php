@@ -20,7 +20,8 @@ use Illuminate\Support\Facades\Route;
 // RUTAS PÚBLICAS (Sin autenticación)
 // ============================================================================
 
-Route::prefix('auth')->group(function () {
+// Rate limiting: 5 intentos por minuto para prevenir ataques de fuerza bruta
+Route::prefix('auth')->middleware('throttle:5,1')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
 });

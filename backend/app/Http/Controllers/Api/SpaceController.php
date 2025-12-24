@@ -91,26 +91,40 @@ class SpaceController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        // Validar parámetros de query para seguridad
+        $validated = $request->validate([
+            'capacity_min' => ['nullable', 'integer', 'min:1', 'max:10000'],
+            'capacity_max' => ['nullable', 'integer', 'min:1', 'max:10000'],
+            'is_active' => ['nullable', 'string', 'in:true,false,1,0'],
+            'search' => ['nullable', 'string', 'max:100'],
+            'available_date' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'available_start_time' => ['nullable', 'date_format:H:i'],
+            'available_end_time' => ['nullable', 'date_format:H:i'],
+            'page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'min:0', 'max:100'],
+        ]);
+
         $query = Space::query();
 
         // Filtro por capacidad mínima
-        if ($request->has('capacity_min')) {
-            $query->where('capacity', '>=', $request->capacity_min);
+        if (isset($validated['capacity_min'])) {
+            $query->where('capacity', '>=', $validated['capacity_min']);
         }
 
         // Filtro por capacidad máxima
-        if ($request->has('capacity_max')) {
-            $query->where('capacity', '<=', $request->capacity_max);
+        if (isset($validated['capacity_max'])) {
+            $query->where('capacity', '<=', $validated['capacity_max']);
         }
 
         // Filtro por estado activo
-        if ($request->has('is_active')) {
-            $query->where('is_active', filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN));
+        if (isset($validated['is_active'])) {
+            $query->where('is_active', filter_var($validated['is_active'], FILTER_VALIDATE_BOOLEAN));
         }
 
-        // Búsqueda por nombre o ubicación
-        if ($request->has('search')) {
-            $search = $request->search;
+        // Búsqueda por nombre o ubicación (sanitizado contra LIKE injection)
+        if (isset($validated['search'])) {
+            // Escapar caracteres especiales de LIKE para evitar búsquedas maliciosas
+            $search = str_replace(['%', '_', '\\'], ['\\%', '\\_', '\\\\'], $validated['search']);
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('location', 'like', "%{$search}%");
@@ -118,10 +132,10 @@ class SpaceController extends Controller
         }
 
         // Filtro por disponibilidad en fecha y hora específica
-        if ($request->has('available_date')) {
-            $date = $request->available_date;
-            $startTime = $request->get('available_start_time', '08:00');
-            $endTime = $request->get('available_end_time', '20:00');
+        if (isset($validated['available_date'])) {
+            $date = $validated['available_date'];
+            $startTime = $validated['available_start_time'] ?? '08:00';
+            $endTime = $validated['available_end_time'] ?? '20:00';
             
             $startDateTime = "{$date} {$startTime}:00";
             $endDateTime = "{$date} {$endTime}:00";
@@ -136,8 +150,8 @@ class SpaceController extends Controller
 
         $query->orderBy('name');
 
-        // Paginación opcional (per_page=0 retorna todos)
-        $perPage = (int) $request->get('per_page', 0);
+        // Paginación con límite máximo de seguridad (max 100 por página)
+        $perPage = isset($validated['per_page']) ? min((int) $validated['per_page'], 100) : 0;
         
         if ($perPage > 0) {
             $paginated = $query->paginate($perPage);
@@ -153,8 +167,8 @@ class SpaceController extends Controller
             ]);
         }
 
-        // Sin paginación (comportamiento original)
-        $spaces = $query->get();
+        // Sin paginación: limitar a máximo 500 registros para evitar sobrecarga
+        $spaces = $query->limit(500)->get();
 
         return response()->json([
             'data' => $spaces,

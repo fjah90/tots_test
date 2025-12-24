@@ -19,11 +19,15 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    /**
+     * The attributes that are mass assignable.
+     * NOTA: 'role' fue removido intencionalmente para prevenir Mass Assignment.
+     * El rol debe asignarse explícitamente en el código.
+     */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'role',
     ];
 
     /**

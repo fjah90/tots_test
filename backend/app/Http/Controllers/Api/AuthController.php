@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use OpenApi\Annotations as OA;
@@ -54,14 +55,23 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)],
         ]);
 
-        $user = User::create([
+        // Crear usuario - role se asigna explícitamente fuera de Mass Assignment
+        $user = new User([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role' => 'user',
         ]);
+        $user->role = 'user'; // Asignación explícita para seguridad
+        $user->save();
 
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Log de seguridad: nuevo usuario registrado
+        Log::info('New user registered', [
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'ip' => $request->ip(),
+        ]);
 
         return response()->json([
             'message' => 'Usuario registrado exitosamente',
@@ -113,6 +123,13 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($validated)) {
+            // Log de seguridad: intento fallido de login
+            Log::warning('Failed login attempt', [
+                'email' => $validated['email'],
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+
             return response()->json([
                 'message' => 'Credenciales incorrectas',
             ], 401);
@@ -124,6 +141,13 @@ class AuthController extends Controller
         $user->tokens()->delete();
         
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Log de seguridad: login exitoso
+        Log::info('Successful login', [
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'ip' => $request->ip(),
+        ]);
 
         return response()->json([
             'message' => 'Login exitoso',
@@ -193,7 +217,19 @@ class AuthController extends Controller
      */
     public function user(Request $request): JsonResponse
     {
-        return response()->json($request->user());
+        // Retornar solo los campos necesarios explícitamente
+        // Esto es más seguro que confiar solo en $hidden del modelo
+        $user = $request->user();
+        
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'email_verified_at' => $user->email_verified_at,
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at,
+        ]);
     }
 
     /**
