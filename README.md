@@ -510,7 +510,7 @@ flowchart TD
 
 ## 📖 Documentación
 
-- **Swagger API**: http://localhost:8000/api/documentation
+- **Swagger API**: /api/documentation
 - **Backend README**: [backend/README.md](backend/README.md)
 - **Frontend README**: [frontend/README.md](frontend/README.md)
 
