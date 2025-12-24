@@ -59,3 +59,5 @@ docker/nginx/vps/
 DOCKER.md
 backend/.env.production
 frontend/src/environments/environment.production.ts
+backend/docker/nginx/spacebook.conf
+frontend/docker/nginx/frontend-prod.conf

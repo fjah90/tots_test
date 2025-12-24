@@ -89,6 +89,7 @@ RUN chown -R www-data:www-data /var/www/html \
 COPY docker/nginx/api.conf /etc/nginx/http.d/default.conf
 
 # Copy supervisor configuration
+RUN mkdir -p /var/log/supervisor /var/run/supervisor
 COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Expose port
