@@ -507,5 +507,5 @@ flowchart TD
 ## 👨‍💻 Autor
 
 **Fernando Aponte**
-- GitHub: [@tu-usuario](https://github.com)
+- GitHub: [@fjah90](https://github.com/fjah90)
 - LinkedIn: [Fernando Aponte](https://linkedin.com)
