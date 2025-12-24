@@ -5,17 +5,40 @@
   "private": true,
   "scripts": {
     "prepare": "husky",
+    "install:frontend": "cd frontend && pnpm install",
+    "install:backend": "cd backend && composer install",
+    "install:all": "pnpm install:frontend && pnpm install:backend",
+    "setup": "pnpm install && pnpm install:all",
+    "dev:frontend": "cd frontend && pnpm start",
+    "dev:backend": "cd backend && php artisan serve",
+    "dev": "concurrently -n \"API,WEB\" -c \"blue,green\" \"pnpm dev:backend\" \"pnpm dev:frontend\"",
+    "docker:dev": "docker compose -f docker-compose.dev.yml up --build",
+    "docker:dev:d": "docker compose -f docker-compose.dev.yml up -d --build",
+    "docker:prod": "docker compose up --build",
+    "docker:prod:d": "docker compose up -d --build",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "docker:ps": "docker compose ps",
+    "migrate": "cd backend && php artisan migrate",
+    "migrate:fresh": "cd backend && php artisan migrate:fresh --seed",
+    "seed": "cd backend && php artisan db:seed",
+    "test:frontend": "cd frontend && pnpm test",
+    "test:backend": "cd backend && php artisan test",
+    "test": "pnpm test:backend && pnpm test:frontend",
     "lint:frontend": "cd frontend && pnpm lint",
     "lint:backend": "cd backend && composer lint",
     "lint": "pnpm lint:frontend && pnpm lint:backend",
     "format:frontend": "cd frontend && pnpm format",
-    "format": "pnpm format:frontend"
+    "format": "pnpm format:frontend",
+    "build:frontend": "cd frontend && pnpm build",
+    "build": "pnpm build:frontend"
   },
   "keywords": [],
-  "author": "",
+  "author": "Fernando Aponte",
   "license": "ISC",
   "packageManager": "pnpm@10.25.0",
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "husky": "^9.1.7"
   }
 }
