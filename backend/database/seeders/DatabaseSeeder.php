@@ -153,5 +153,8 @@ class DatabaseSeeder extends Seeder
         $this->command->info('   - 1 Usuario creado (juan@ejemplo.com)');
         $this->command->info('   - 100 Espacios creados');
         $this->command->info('   - Password para ambos: password123');
+
+        // Ejecutar seeder de reservaciones
+        $this->call(ReservationSeeder::class);
     }
 }
