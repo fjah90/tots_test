@@ -5,10 +5,10 @@ export type Theme = 'light' | 'dark' | 'system';
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private readonly STORAGE_KEY = 'spacebook-theme';
-  
+
   // Signal para el tema seleccionado por el usuario
   readonly selectedTheme = signal<Theme>(this.getStoredTheme());
-  
+
   // Signal para el tema efectivo (resuelve 'system' al tema real)
   readonly effectiveTheme = signal<'light' | 'dark'>(this.resolveTheme(this.getStoredTheme()));
 
@@ -53,12 +53,12 @@ export class ThemeService {
    */
   private getStoredTheme(): Theme {
     if (typeof window === 'undefined') return 'light';
-    
+
     const stored = localStorage.getItem(this.STORAGE_KEY) as Theme | null;
     if (stored && ['light', 'dark', 'system'].includes(stored)) {
       return stored;
     }
-    
+
     // Por defecto, usar preferencia del sistema
     return 'system';
   }
@@ -100,7 +100,7 @@ export class ThemeService {
     this.effectiveTheme.set(effectiveTheme);
 
     const root = document.documentElement;
-    
+
     if (effectiveTheme === 'dark') {
       root.classList.add('dark');
     } else {
@@ -115,7 +115,7 @@ export class ThemeService {
     if (typeof window === 'undefined') return;
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
+
     mediaQuery.addEventListener('change', () => {
       // Solo actualizar si el usuario eligió 'system'
       if (this.selectedTheme() === 'system') {

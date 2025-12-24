@@ -34,13 +34,7 @@ interface Stats {
 @Component({
   selector: 'app-admin-stats',
   standalone: true,
-  imports: [
-    CommonModule,
-    CardModule,
-    ChartModule,
-    ProgressSpinnerModule,
-    ToastModule
-  ],
+  imports: [CommonModule, CardModule, ChartModule, ProgressSpinnerModule, ToastModule],
   providers: [MessageService],
   template: `
     <p-toast></p-toast>
@@ -56,7 +50,9 @@ interface Stats {
 
       <div class="max-w-7xl mx-auto px-6 py-8 -mt-6">
         @if (loading()) {
-          <div class="flex justify-center items-center py-20 bg-white dark:bg-gray-800 rounded-lg shadow transition-colors">
+          <div
+            class="flex justify-center items-center py-20 bg-white dark:bg-gray-800 rounded-lg shadow transition-colors"
+          >
             <p-progressSpinner strokeWidth="4" />
           </div>
         } @else {
@@ -65,10 +61,16 @@ interface Stats {
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-gray-500 dark:text-gray-400 text-sm uppercase font-medium">Espacios</p>
-                  <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-1">{{ stats()?.total_spaces || 0 }}</p>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm uppercase font-medium">
+                    Espacios
+                  </p>
+                  <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-1">
+                    {{ stats()?.total_spaces || 0 }}
+                  </p>
                 </div>
-                <div class="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                <div
+                  class="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center"
+                >
                   <i class="pi pi-building text-2xl text-blue-600 dark:text-blue-400"></i>
                 </div>
               </div>
@@ -77,10 +79,16 @@ interface Stats {
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-gray-500 dark:text-gray-400 text-sm uppercase font-medium">Reservaciones</p>
-                  <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-1">{{ stats()?.total_reservations || 0 }}</p>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm uppercase font-medium">
+                    Reservaciones
+                  </p>
+                  <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-1">
+                    {{ stats()?.total_reservations || 0 }}
+                  </p>
                 </div>
-                <div class="w-14 h-14 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                <div
+                  class="w-14 h-14 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center"
+                >
                   <i class="pi pi-calendar text-2xl text-green-600 dark:text-green-400"></i>
                 </div>
               </div>
@@ -89,10 +97,16 @@ interface Stats {
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-gray-500 dark:text-gray-400 text-sm uppercase font-medium">Usuarios</p>
-                  <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-1">{{ stats()?.total_users || 0 }}</p>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm uppercase font-medium">
+                    Usuarios
+                  </p>
+                  <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-1">
+                    {{ stats()?.total_users || 0 }}
+                  </p>
                 </div>
-                <div class="w-14 h-14 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                <div
+                  class="w-14 h-14 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center"
+                >
                   <i class="pi pi-users text-2xl text-purple-600 dark:text-purple-400"></i>
                 </div>
               </div>
@@ -101,10 +115,16 @@ interface Stats {
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-gray-500 dark:text-gray-400 text-sm uppercase font-medium">Tasa de Confirmación</p>
-                  <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-1">{{ confirmationRate() }}%</p>
+                  <p class="text-gray-500 dark:text-gray-400 text-sm uppercase font-medium">
+                    Tasa de Confirmación
+                  </p>
+                  <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-1">
+                    {{ confirmationRate() }}%
+                  </p>
                 </div>
-                <div class="w-14 h-14 rounded-full bg-teal-100 dark:bg-teal-900 flex items-center justify-center">
+                <div
+                  class="w-14 h-14 rounded-full bg-teal-100 dark:bg-teal-900 flex items-center justify-center"
+                >
                   <i class="pi pi-check-circle text-2xl text-teal-600 dark:text-teal-400"></i>
                 </div>
               </div>
@@ -117,7 +137,9 @@ interface Stats {
             <p-card>
               <ng-template #header>
                 <div class="p-4 pb-0">
-                  <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Reservaciones por Estado</h3>
+                  <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                    Reservaciones por Estado
+                  </h3>
                 </div>
               </ng-template>
               <div class="h-64 flex items-center justify-center">
@@ -133,14 +155,18 @@ interface Stats {
             <p-card>
               <ng-template #header>
                 <div class="p-4 pb-0">
-                  <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Reservaciones por Mes</h3>
+                  <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                    Reservaciones por Mes
+                  </h3>
                 </div>
               </ng-template>
               <div class="h-64">
                 @if (monthlyChartData) {
                   <p-chart type="bar" [data]="monthlyChartData" [options]="barChartOptions" />
                 } @else {
-                  <p class="text-gray-500 dark:text-gray-400 text-center py-20">Sin datos disponibles</p>
+                  <p class="text-gray-500 dark:text-gray-400 text-center py-20">
+                    Sin datos disponibles
+                  </p>
                 }
               </div>
             </p-card>
@@ -150,19 +176,23 @@ interface Stats {
           <p-card>
             <ng-template #header>
               <div class="p-4 pb-0">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Espacios Más Reservados</h3>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                  Espacios Más Reservados
+                </h3>
               </div>
             </ng-template>
-            
+
             @if (stats()?.top_spaces && stats()!.top_spaces.length > 0) {
               <div class="space-y-4">
                 @for (space of stats()!.top_spaces; track space.id; let i = $index) {
                   <div class="flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold"
-                         [class.bg-yellow-500]="i === 0"
-                         [class.bg-gray-400]="i === 1"
-                         [class.bg-amber-700]="i === 2"
-                         [class.bg-gray-300]="i > 2">
+                    <div
+                      class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold"
+                      [class.bg-yellow-500]="i === 0"
+                      [class.bg-gray-400]="i === 1"
+                      [class.bg-amber-700]="i === 2"
+                      [class.bg-gray-300]="i > 2"
+                    >
                       {{ i + 1 }}
                     </div>
                     <div class="flex-1">
@@ -176,13 +206,15 @@ interface Stats {
                 }
               </div>
             } @else {
-              <p class="text-gray-500 dark:text-gray-400 text-center py-8">No hay datos de espacios</p>
+              <p class="text-gray-500 dark:text-gray-400 text-center py-8">
+                No hay datos de espacios
+              </p>
             }
           </p-card>
         }
       </div>
     </div>
-  `
+  `,
 })
 export class AdminStatsComponent implements OnInit {
   private http = inject(HttpClient);
@@ -193,28 +225,28 @@ export class AdminStatsComponent implements OnInit {
 
   statusChartData: any;
   monthlyChartData: any;
-  
+
   chartOptions = {
     plugins: {
       legend: {
-        position: 'bottom'
-      }
+        position: 'bottom',
+      },
     },
-    maintainAspectRatio: false
+    maintainAspectRatio: false,
   };
 
   barChartOptions = {
     plugins: {
       legend: {
-        display: false
-      }
+        display: false,
+      },
     },
     scales: {
       y: {
-        beginAtZero: true
-      }
+        beginAtZero: true,
+      },
     },
-    maintainAspectRatio: false
+    maintainAspectRatio: false,
   };
 
   ngOnInit(): void {
@@ -225,7 +257,7 @@ export class AdminStatsComponent implements OnInit {
     this.loading.set(true);
 
     this.http.get<{ data: Stats }>(`${environment.apiUrl}/admin/stats`).subscribe({
-      next: (res) => {
+      next: res => {
         this.stats.set(res.data);
         this.buildCharts(res.data);
         this.loading.set(false);
@@ -235,9 +267,9 @@ export class AdminStatsComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudieron cargar las estadísticas'
+          detail: 'No se pudieron cargar las estadísticas',
         });
-      }
+      },
     });
   }
 
@@ -246,15 +278,17 @@ export class AdminStatsComponent implements OnInit {
     if (data.reservations_by_status) {
       this.statusChartData = {
         labels: ['Confirmadas', 'Pendientes', 'Canceladas'],
-        datasets: [{
-          data: [
-            data.reservations_by_status.confirmed,
-            data.reservations_by_status.pending,
-            data.reservations_by_status.cancelled
-          ],
-          backgroundColor: ['#22c55e', '#eab308', '#ef4444'],
-          hoverBackgroundColor: ['#16a34a', '#ca8a04', '#dc2626']
-        }]
+        datasets: [
+          {
+            data: [
+              data.reservations_by_status.confirmed,
+              data.reservations_by_status.pending,
+              data.reservations_by_status.cancelled,
+            ],
+            backgroundColor: ['#22c55e', '#eab308', '#ef4444'],
+            hoverBackgroundColor: ['#16a34a', '#ca8a04', '#dc2626'],
+          },
+        ],
       };
     }
 
@@ -262,12 +296,14 @@ export class AdminStatsComponent implements OnInit {
     if (data.reservations_by_month && data.reservations_by_month.length > 0) {
       this.monthlyChartData = {
         labels: data.reservations_by_month.map(m => m.month),
-        datasets: [{
-          label: 'Reservaciones',
-          data: data.reservations_by_month.map(m => m.count),
-          backgroundColor: '#3b82f6',
-          borderRadius: 8
-        }]
+        datasets: [
+          {
+            label: 'Reservaciones',
+            data: data.reservations_by_month.map(m => m.count),
+            backgroundColor: '#3b82f6',
+            borderRadius: 8,
+          },
+        ],
       };
     }
   }

@@ -1,6 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 // PrimeNG
@@ -26,10 +33,12 @@ import { AuthService } from '../../../../core/services/auth.service';
     PasswordModule,
     CardModule,
     MessageModule,
-    DividerModule
+    DividerModule,
   ],
   template: `
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-600 to-gray-800 dark:from-gray-800 dark:to-gray-900 p-4 transition-colors">
+    <div
+      class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-600 to-gray-800 dark:from-gray-800 dark:to-gray-900 p-4 transition-colors"
+    >
       <p-card styleClass="w-full max-w-md shadow-2xl">
         <ng-template #header>
           <div class="text-center pt-6">
@@ -50,11 +59,13 @@ import { AuthService } from '../../../../core/services/auth.service';
         <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
           <!-- Nombre -->
           <div class="flex flex-col gap-2">
-            <label for="name" class="font-medium text-gray-700 dark:text-gray-300">Nombre Completo</label>
-            <input 
+            <label for="name" class="font-medium text-gray-700 dark:text-gray-300"
+              >Nombre Completo</label
+            >
+            <input
               id="name"
-              type="text" 
-              pInputText 
+              type="text"
+              pInputText
               formControlName="name"
               placeholder="Juan Pérez"
               class="w-full"
@@ -66,11 +77,13 @@ import { AuthService } from '../../../../core/services/auth.service';
 
           <!-- Email -->
           <div class="flex flex-col gap-2">
-            <label for="email" class="font-medium text-gray-700 dark:text-gray-300">Correo Electrónico</label>
-            <input 
+            <label for="email" class="font-medium text-gray-700 dark:text-gray-300"
+              >Correo Electrónico</label
+            >
+            <input
               id="email"
-              type="email" 
-              pInputText 
+              type="email"
+              pInputText
               formControlName="email"
               placeholder="correo@ejemplo.com"
               class="w-full"
@@ -88,8 +101,10 @@ import { AuthService } from '../../../../core/services/auth.service';
 
           <!-- Password -->
           <div class="flex flex-col gap-2">
-            <label for="password" class="font-medium text-gray-700 dark:text-gray-300">Contraseña</label>
-            <p-password 
+            <label for="password" class="font-medium text-gray-700 dark:text-gray-300"
+              >Contraseña</label
+            >
+            <p-password
               id="password"
               formControlName="password"
               [feedback]="true"
@@ -109,8 +124,10 @@ import { AuthService } from '../../../../core/services/auth.service';
 
           <!-- Confirm Password -->
           <div class="flex flex-col gap-2">
-            <label for="password_confirmation" class="font-medium text-gray-700 dark:text-gray-300">Confirmar Contraseña</label>
-            <p-password 
+            <label for="password_confirmation" class="font-medium text-gray-700 dark:text-gray-300"
+              >Confirmar Contraseña</label
+            >
+            <p-password
               id="password_confirmation"
               formControlName="password_confirmation"
               [feedback]="false"
@@ -131,9 +148,9 @@ import { AuthService } from '../../../../core/services/auth.service';
           </div>
 
           <!-- Submit Button -->
-          <p-button 
+          <p-button
             type="submit"
-            label="Crear Cuenta" 
+            label="Crear Cuenta"
             icon="pi pi-user-plus"
             styleClass="w-full"
             [loading]="loading()"
@@ -145,8 +162,8 @@ import { AuthService } from '../../../../core/services/auth.service';
           <span class="text-gray-500 dark:text-gray-400 text-sm">¿Ya tienes cuenta?</span>
         </p-divider>
 
-        <p-button 
-          label="Iniciar Sesión" 
+        <p-button
+          label="Iniciar Sesión"
           icon="pi pi-sign-in"
           severity="secondary"
           [outlined]="true"
@@ -155,7 +172,7 @@ import { AuthService } from '../../../../core/services/auth.service';
         />
       </p-card>
     </div>
-  `
+  `,
 })
 export class RegisterComponent {
   private fb = inject(FormBuilder);
@@ -166,22 +183,33 @@ export class RegisterComponent {
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
-  registerForm: FormGroup = this.fb.group({
-    name: ['', [Validators.required, Validators.minLength(2)]],
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
-    password_confirmation: ['', [Validators.required]]
-  }, { validators: this.passwordMatchValidator });
+  registerForm: FormGroup = this.fb.group(
+    {
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      password_confirmation: ['', [Validators.required]],
+    },
+    { validators: this.passwordMatchValidator }
+  );
 
-  get nameControl() { return this.registerForm.get('name'); }
-  get emailControl() { return this.registerForm.get('email'); }
-  get passwordControl() { return this.registerForm.get('password'); }
-  get confirmPasswordControl() { return this.registerForm.get('password_confirmation'); }
+  get nameControl() {
+    return this.registerForm.get('name');
+  }
+  get emailControl() {
+    return this.registerForm.get('email');
+  }
+  get passwordControl() {
+    return this.registerForm.get('password');
+  }
+  get confirmPasswordControl() {
+    return this.registerForm.get('password_confirmation');
+  }
 
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password');
     const confirmPassword = control.get('password_confirmation');
-    
+
     if (password && confirmPassword && password.value !== confirmPassword.value) {
       confirmPassword.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
@@ -203,7 +231,7 @@ export class RegisterComponent {
       name: this.registerForm.value.name,
       email: this.registerForm.value.email,
       password: this.registerForm.value.password,
-      password_confirmation: this.registerForm.value.password_confirmation
+      password_confirmation: this.registerForm.value.password_confirmation,
     };
 
     this.authService.register(payload).subscribe({
@@ -214,7 +242,7 @@ export class RegisterComponent {
           this.router.navigate(['/spaces']);
         }, 1500);
       },
-      error: (err) => {
+      error: err => {
         this.loading.set(false);
         if (err.status === 422) {
           const errors = err.error?.errors;
@@ -226,7 +254,7 @@ export class RegisterComponent {
         } else {
           this.errorMessage.set('Error al crear la cuenta. Intenta nuevamente.');
         }
-      }
+      },
     });
   }
 }

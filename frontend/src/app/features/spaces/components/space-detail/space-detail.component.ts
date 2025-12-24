@@ -59,7 +59,7 @@ interface CalendarEvent {
   ],
   providers: [MessageService],
   templateUrl: './space-detail.component.html',
-  styleUrl: './space-detail.component.scss'
+  styleUrl: './space-detail.component.scss',
 })
 export class SpaceDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -86,7 +86,7 @@ export class SpaceDetailComponent implements OnInit {
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      right: 'dayGridMonth,timeGridWeek,timeGridDay',
     },
     slotMinTime: '07:00:00',
     slotMaxTime: '22:00:00',
@@ -123,52 +123,50 @@ export class SpaceDetailComponent implements OnInit {
   loadSpace(id: number): void {
     this.loading.set(true);
     this.spacesService.getSpace(id).subscribe({
-      next: (space) => {
+      next: space => {
         this.space.set(space);
         this.loading.set(false);
       },
-      error: (err) => {
+      error: err => {
         console.error('Error loading space:', err);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudo cargar el espacio'
+          detail: 'No se pudo cargar el espacio',
         });
         this.loading.set(false);
         this.router.navigate(['/spaces']);
-      }
+      },
     });
   }
 
   loadReservations(spaceId: number): void {
     this.loadingReservations.set(true);
-    
+
     // Obtener reservaciones del próximo mes
     const fromDate = new Date();
     const toDate = new Date();
     toDate.setMonth(toDate.getMonth() + 1);
 
-    this.reservationsService.getSpaceReservations(
-      spaceId,
-      this.formatDate(fromDate),
-      this.formatDate(toDate)
-    ).subscribe({
-      next: (reservations) => {
-        this.reservations.set(reservations);
-        const events = this.mapReservationsToEvents(reservations);
-        this.calendarEvents.set(events);
-        // Actualizar eventos en el calendario
-        this.calendarOptions.update(options => ({
-          ...options,
-          events: events
-        }));
-        this.loadingReservations.set(false);
-      },
-      error: (err) => {
-        console.error('Error loading reservations:', err);
-        this.loadingReservations.set(false);
-      }
-    });
+    this.reservationsService
+      .getSpaceReservations(spaceId, this.formatDate(fromDate), this.formatDate(toDate))
+      .subscribe({
+        next: reservations => {
+          this.reservations.set(reservations);
+          const events = this.mapReservationsToEvents(reservations);
+          this.calendarEvents.set(events);
+          // Actualizar eventos en el calendario
+          this.calendarOptions.update(options => ({
+            ...options,
+            events: events,
+          }));
+          this.loadingReservations.set(false);
+        },
+        error: err => {
+          console.error('Error loading reservations:', err);
+          this.loadingReservations.set(false);
+        },
+      });
   }
 
   /**
@@ -179,32 +177,32 @@ export class SpaceDetailComponent implements OnInit {
     const startDate = event.start;
     const endDate = event.end;
     const status = event.extendedProps?.status || 'pending';
-    
+
     // Formatear fecha y hora
-    const dateOptions: Intl.DateTimeFormatOptions = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    const dateOptions: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     };
-    const timeOptions: Intl.DateTimeFormatOptions = { 
-      hour: '2-digit', 
+    const timeOptions: Intl.DateTimeFormatOptions = {
+      hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: false,
     };
-    
+
     const dateStr = startDate.toLocaleDateString('es-ES', dateOptions);
     const startTime = startDate.toLocaleTimeString('es-ES', timeOptions);
     const endTime = endDate ? endDate.toLocaleTimeString('es-ES', timeOptions) : '';
-    
+
     const statusLabels: Record<string, string> = {
       confirmed: 'Confirmada',
       pending: 'Pendiente',
-      cancelled: 'Cancelada'
+      cancelled: 'Cancelada',
     };
-    
+
     const tooltipText = `${dateStr}\n${startTime} - ${endTime}\nEstado: ${statusLabels[status] || status}`;
-    
+
     // Agregar atributo title para tooltip nativo
     info.el.setAttribute('title', tooltipText);
     info.el.style.cursor = 'pointer';
@@ -219,7 +217,7 @@ export class SpaceDetailComponent implements OnInit {
       // Colores según estado (consistente con /calendar)
       let backgroundColor: string;
       let borderColor: string;
-      
+
       switch (reservation.status) {
         case 'confirmed':
           backgroundColor = '#14b8a6'; // Teal
@@ -248,8 +246,8 @@ export class SpaceDetailComponent implements OnInit {
         textColor: '#ffffff',
         extendedProps: {
           status: reservation.status,
-          reservationId: reservation.id
-        }
+          reservationId: reservation.id,
+        },
       };
     });
   }
@@ -266,7 +264,7 @@ export class SpaceDetailComponent implements OnInit {
     this.messageService.add({
       severity: 'success',
       summary: 'Reservación Creada',
-      detail: '¡Tu reservación ha sido registrada exitosamente!'
+      detail: '¡Tu reservación ha sido registrada exitosamente!',
     });
     this.closeReservationModal();
     // Recargar reservaciones para actualizar calendario
@@ -280,19 +278,19 @@ export class SpaceDetailComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Espacio Ocupado',
-        detail: 'El espacio ya está ocupado en ese horario.'
+        detail: 'El espacio ya está ocupado en ese horario.',
       });
     } else {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'Ocurrió un error al crear la reservación.'
+        detail: 'Ocurrió un error al crear la reservación.',
       });
     }
   }
 
   // Handlers para FullCalendar
-  handleDateSelect(selectInfo: any): void {
+  handleDateSelect(_selectInfo: any): void {
     // Abrir modal de reservación con fecha preseleccionada
     this.openReservationModal();
   }
@@ -314,14 +312,14 @@ export class SpaceDetailComponent implements OnInit {
   handleEventClick(clickInfo: any): void {
     // Detener propagación para evitar que también se dispare dateClick
     clickInfo.jsEvent?.stopPropagation();
-    
+
     // Mostrar detalles de la reservación
     const status = clickInfo.event.extendedProps?.status;
     const title = clickInfo.event.title;
     this.messageService.add({
       severity: status === 'cancelled' ? 'warn' : 'info',
       summary: 'Reservación',
-      detail: `${title} - Estado: ${this.getStatusLabel(status)}`
+      detail: `${title} - Estado: ${this.getStatusLabel(status)}`,
     });
   }
 
@@ -331,19 +329,27 @@ export class SpaceDetailComponent implements OnInit {
 
   getStatusSeverity(status: string): 'success' | 'warn' | 'danger' | 'secondary' {
     switch (status) {
-      case 'confirmed': return 'success';
-      case 'pending': return 'warn';
-      case 'cancelled': return 'danger';
-      default: return 'secondary';
+      case 'confirmed':
+        return 'success';
+      case 'pending':
+        return 'warn';
+      case 'cancelled':
+        return 'danger';
+      default:
+        return 'secondary';
     }
   }
 
   getStatusLabel(status: string): string {
     switch (status) {
-      case 'confirmed': return 'Confirmada';
-      case 'pending': return 'Pendiente';
-      case 'cancelled': return 'Cancelada';
-      default: return status;
+      case 'confirmed':
+        return 'Confirmada';
+      case 'pending':
+        return 'Pendiente';
+      case 'cancelled':
+        return 'Cancelada';
+      default:
+        return status;
     }
   }
 }

@@ -26,10 +26,12 @@ import { AuthService } from '../../../../core/services/auth.service';
     PasswordModule,
     CardModule,
     MessageModule,
-    DividerModule
+    DividerModule,
   ],
   template: `
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-400 to-teal-600 dark:from-gray-800 dark:to-gray-900 p-4 transition-colors">
+    <div
+      class="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-400 to-teal-600 dark:from-gray-800 dark:to-gray-900 p-4 transition-colors"
+    >
       <p-card styleClass="w-full max-w-md shadow-2xl">
         <ng-template #header>
           <div class="text-center pt-6">
@@ -46,11 +48,13 @@ import { AuthService } from '../../../../core/services/auth.service';
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
           <!-- Email -->
           <div class="flex flex-col gap-2">
-            <label for="email" class="font-medium text-gray-700 dark:text-gray-300">Correo Electrónico</label>
-            <input 
+            <label for="email" class="font-medium text-gray-700 dark:text-gray-300"
+              >Correo Electrónico</label
+            >
+            <input
               id="email"
-              type="email" 
-              pInputText 
+              type="email"
+              pInputText
               formControlName="email"
               placeholder="correo@ejemplo.com"
               class="w-full"
@@ -68,8 +72,10 @@ import { AuthService } from '../../../../core/services/auth.service';
 
           <!-- Password -->
           <div class="flex flex-col gap-2">
-            <label for="password" class="font-medium text-gray-700 dark:text-gray-300">Contraseña</label>
-            <p-password 
+            <label for="password" class="font-medium text-gray-700 dark:text-gray-300"
+              >Contraseña</label
+            >
+            <p-password
               id="password"
               formControlName="password"
               [feedback]="false"
@@ -84,9 +90,9 @@ import { AuthService } from '../../../../core/services/auth.service';
           </div>
 
           <!-- Submit Button -->
-          <p-button 
+          <p-button
             type="submit"
-            label="Iniciar Sesión" 
+            label="Iniciar Sesión"
             icon="pi pi-sign-in"
             styleClass="w-full"
             [loading]="loading()"
@@ -98,8 +104,8 @@ import { AuthService } from '../../../../core/services/auth.service';
           <span class="text-gray-500 dark:text-gray-400 text-sm">¿No tienes cuenta?</span>
         </p-divider>
 
-        <p-button 
-          label="Crear cuenta" 
+        <p-button
+          label="Crear cuenta"
           icon="pi pi-user-plus"
           severity="secondary"
           [outlined]="true"
@@ -108,7 +114,7 @@ import { AuthService } from '../../../../core/services/auth.service';
         />
       </p-card>
     </div>
-  `
+  `,
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);
@@ -120,11 +126,15 @@ export class LoginComponent {
 
   loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]]
+    password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
-  get emailControl() { return this.loginForm.get('email'); }
-  get passwordControl() { return this.loginForm.get('password'); }
+  get emailControl() {
+    return this.loginForm.get('email');
+  }
+  get passwordControl() {
+    return this.loginForm.get('password');
+  }
 
   onSubmit(): void {
     if (this.loginForm.invalid) {
@@ -137,7 +147,7 @@ export class LoginComponent {
 
     const credentials = {
       email: this.loginForm.value.email,
-      password: this.loginForm.value.password
+      password: this.loginForm.value.password,
     };
 
     this.authService.login(credentials).subscribe({
@@ -145,7 +155,7 @@ export class LoginComponent {
         this.loading.set(false);
         this.router.navigate(['/spaces']);
       },
-      error: (err) => {
+      error: err => {
         this.loading.set(false);
         if (err.status === 401) {
           this.errorMessage.set('Credenciales incorrectas. Verifica tu correo y contraseña.');
@@ -154,7 +164,7 @@ export class LoginComponent {
         } else {
           this.errorMessage.set('Error al iniciar sesión. Intenta nuevamente.');
         }
-      }
+      },
     });
   }
 }

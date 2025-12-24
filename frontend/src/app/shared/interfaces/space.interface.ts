@@ -9,7 +9,7 @@ export interface Space {
   location: string | null;
   amenities: string[] | null;
   image_url: string | null;
-  images: string[] | null;  // Array de URLs de imágenes para el carousel
+  images: string[] | null; // Array de URLs de imágenes para el carousel
   is_active: boolean;
   created_at: string;
   updated_at: string;

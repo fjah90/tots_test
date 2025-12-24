@@ -47,27 +47,31 @@ export class ReservationsService {
       params = params.set('to_date', filters.to_date);
     }
 
-    return this.http.get<ApiResponse<Reservation[]>>(this.apiUrl, { params })
-      .pipe(
-        map(response => response.data),
-        tap(reservations => this.reservations.set(reservations)),
-        finalize(() => this.loading.set(false))
-      );
+    return this.http.get<ApiResponse<Reservation[]>>(this.apiUrl, { params }).pipe(
+      map(response => response.data),
+      tap(reservations => this.reservations.set(reservations)),
+      finalize(() => this.loading.set(false))
+    );
   }
 
   /**
    * Obtener reservaciones de un espacio específico (para calendario)
    */
-  getSpaceReservations(spaceId: number, fromDate?: string, toDate?: string): Observable<Reservation[]> {
+  getSpaceReservations(
+    spaceId: number,
+    fromDate?: string,
+    toDate?: string
+  ): Observable<Reservation[]> {
     let params = new HttpParams().set('space_id', spaceId.toString());
-    
+
     if (fromDate) params = params.set('from_date', fromDate);
     if (toDate) params = params.set('to_date', toDate);
 
-    return this.http.get<ApiResponse<Reservation[]>>(`${environment.apiUrl}/spaces/${spaceId}/reservations`, { params })
-      .pipe(
-        map(response => response.data)
-      );
+    return this.http
+      .get<
+        ApiResponse<Reservation[]>
+      >(`${environment.apiUrl}/spaces/${spaceId}/reservations`, { params })
+      .pipe(map(response => response.data));
   }
 
   /**
@@ -75,15 +79,14 @@ export class ReservationsService {
    */
   getCalendarReservations(spaceId?: number): Observable<Reservation[]> {
     let params = new HttpParams();
-    
+
     if (spaceId) {
       params = params.set('space_id', spaceId.toString());
     }
 
-    return this.http.get<ApiResponse<Reservation[]>>(`${environment.apiUrl}/calendar/reservations`, { params })
-      .pipe(
-        map(response => response.data)
-      );
+    return this.http
+      .get<ApiResponse<Reservation[]>>(`${environment.apiUrl}/calendar/reservations`, { params })
+      .pipe(map(response => response.data));
   }
 
   /**
@@ -93,14 +96,13 @@ export class ReservationsService {
     this.loading.set(true);
     this.error.set(null);
 
-    return this.http.post<ApiResponse<Reservation>>(this.apiUrl, payload)
-      .pipe(
-        map(response => response.data),
-        tap(reservation => {
-          this.reservations.update(list => [...list, reservation]);
-        }),
-        finalize(() => this.loading.set(false))
-      );
+    return this.http.post<ApiResponse<Reservation>>(this.apiUrl, payload).pipe(
+      map(response => response.data),
+      tap(reservation => {
+        this.reservations.update(list => [...list, reservation]);
+      }),
+      finalize(() => this.loading.set(false))
+    );
   }
 
   /**
@@ -112,62 +114,60 @@ export class ReservationsService {
     start_time: string;
     end_time: string;
     notes?: string;
-  }): Observable<{ message: string; data: { created: Reservation[]; failed: { date: string; reason: string }[] } }> {
+  }): Observable<{
+    message: string;
+    data: { created: Reservation[]; failed: { date: string; reason: string }[] };
+  }> {
     this.loading.set(true);
     this.error.set(null);
 
-    return this.http.post<{ message: string; data: { created: Reservation[]; failed: { date: string; reason: string }[] } }>(
-      `${this.apiUrl}/bulk`,
-      payload
-    ).pipe(
-      tap(response => {
-        if (response.data.created.length > 0) {
-          this.reservations.update(list => [...list, ...response.data.created]);
-        }
-      }),
-      finalize(() => this.loading.set(false))
-    );
+    return this.http
+      .post<{
+        message: string;
+        data: { created: Reservation[]; failed: { date: string; reason: string }[] };
+      }>(`${this.apiUrl}/bulk`, payload)
+      .pipe(
+        tap(response => {
+          if (response.data.created.length > 0) {
+            this.reservations.update(list => [...list, ...response.data.created]);
+          }
+        }),
+        finalize(() => this.loading.set(false))
+      );
   }
 
   /**
    * Actualizar reservación
    */
   updateReservation(id: number, payload: Partial<ReservationPayload>): Observable<Reservation> {
-    return this.http.put<ApiResponse<Reservation>>(`${this.apiUrl}/${id}`, payload)
-      .pipe(
-        map(response => response.data),
-        tap(updated => {
-          this.reservations.update(list => 
-            list.map(r => r.id === id ? updated : r)
-          );
-        })
-      );
+    return this.http.put<ApiResponse<Reservation>>(`${this.apiUrl}/${id}`, payload).pipe(
+      map(response => response.data),
+      tap(updated => {
+        this.reservations.update(list => list.map(r => (r.id === id ? updated : r)));
+      })
+    );
   }
 
   /**
    * Cancelar reservación
    */
   cancelReservation(id: number): Observable<Reservation> {
-    return this.http.patch<ApiResponse<Reservation>>(`${this.apiUrl}/${id}/cancel`, {})
-      .pipe(
-        map(response => response.data),
-        tap(cancelled => {
-          this.reservations.update(list =>
-            list.map(r => r.id === id ? cancelled : r)
-          );
-        })
-      );
+    return this.http.patch<ApiResponse<Reservation>>(`${this.apiUrl}/${id}/cancel`, {}).pipe(
+      map(response => response.data),
+      tap(cancelled => {
+        this.reservations.update(list => list.map(r => (r.id === id ? cancelled : r)));
+      })
+    );
   }
 
   /**
    * Eliminar reservación
    */
   deleteReservation(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(
-        tap(() => {
-          this.reservations.update(list => list.filter(r => r.id !== id));
-        })
-      );
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        this.reservations.update(list => list.filter(r => r.id !== id));
+      })
+    );
   }
 }

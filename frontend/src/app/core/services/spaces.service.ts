@@ -58,7 +58,7 @@ export class SpacesService {
    */
   getSpaces(filters?: SpaceFilters): Observable<Space[]> {
     this.loading.set(true);
-    
+
     let params = new HttpParams();
     if (filters?.capacity) {
       params = params.set('capacity', filters.capacity.toString());
@@ -70,12 +70,11 @@ export class SpacesService {
       params = params.set('is_active', filters.is_active ? '1' : '0');
     }
 
-    return this.http.get<ApiResponse<Space[]>>(this.apiUrl, { params })
-      .pipe(
-        map(response => response.data),
-        tap(spaces => this.spaces.set(spaces)),
-        finalize(() => this.loading.set(false))
-      );
+    return this.http.get<ApiResponse<Space[]>>(this.apiUrl, { params }).pipe(
+      map(response => response.data),
+      tap(spaces => this.spaces.set(spaces)),
+      finalize(() => this.loading.set(false))
+    );
   }
 
   /**
@@ -83,7 +82,7 @@ export class SpacesService {
    */
   getSpacesPaginated(filters?: SpaceFilters): Observable<PaginatedSpaces> {
     let params = new HttpParams();
-    
+
     if (filters?.capacity) {
       params = params.set('capacity', filters.capacity.toString());
     }
@@ -118,72 +117,63 @@ export class SpacesService {
       params = params.set('capacity_max', filters.capacity_max.toString());
     }
 
-    return this.http.get<PaginatedApiResponse<Space[]>>(this.apiUrl, { params })
-      .pipe(
-        map(response => ({
-          data: response.data,
-          meta: response.meta
-        }))
-      );
+    return this.http.get<PaginatedApiResponse<Space[]>>(this.apiUrl, { params }).pipe(
+      map(response => ({
+        data: response.data,
+        meta: response.meta,
+      }))
+    );
   }
 
   /**
    * Obtener un espacio por ID
    */
   getSpace(id: number): Observable<Space> {
-    return this.http.get<Space>(`${this.apiUrl}/${id}`)
-      .pipe(
-        tap(space => this.selectedSpace.set(space))
-      );
+    return this.http
+      .get<Space>(`${this.apiUrl}/${id}`)
+      .pipe(tap(space => this.selectedSpace.set(space)));
   }
 
   /**
    * Crear nuevo espacio (solo admin)
    */
   createSpace(payload: SpacePayload): Observable<Space> {
-    return this.http.post<ApiResponse<Space>>(this.apiUrl, payload)
-      .pipe(
-        map(response => response.data),
-        tap(space => {
-          this.spaces.update(spaces => [...spaces, space]);
-        })
-      );
+    return this.http.post<ApiResponse<Space>>(this.apiUrl, payload).pipe(
+      map(response => response.data),
+      tap(space => {
+        this.spaces.update(spaces => [...spaces, space]);
+      })
+    );
   }
 
   /**
    * Actualizar espacio (solo admin)
    */
   updateSpace(id: number, payload: Partial<SpacePayload>): Observable<Space> {
-    return this.http.put<ApiResponse<Space>>(`${this.apiUrl}/${id}`, payload)
-      .pipe(
-        map(response => response.data),
-        tap(updated => {
-          this.spaces.update(spaces => 
-            spaces.map(s => s.id === id ? updated : s)
-          );
-        })
-      );
+    return this.http.put<ApiResponse<Space>>(`${this.apiUrl}/${id}`, payload).pipe(
+      map(response => response.data),
+      tap(updated => {
+        this.spaces.update(spaces => spaces.map(s => (s.id === id ? updated : s)));
+      })
+    );
   }
 
   /**
    * Eliminar espacio (solo admin)
    */
   deleteSpace(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(
-        tap(() => {
-          this.spaces.update(spaces => spaces.filter(s => s.id !== id));
-        })
-      );
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        this.spaces.update(spaces => spaces.filter(s => s.id !== id));
+      })
+    );
   }
 
   /**
    * Verificar disponibilidad de un espacio
    */
   checkAvailability(id: number, start: string, end: string): Observable<{ available: boolean }> {
-    const params = new HttpParams()
-      .set('start_time', start)
-      .set('end_time', end);
+    const params = new HttpParams().set('start_time', start).set('end_time', end);
 
     return this.http.get<{ available: boolean }>(`${this.apiUrl}/${id}/availability`, { params });
   }

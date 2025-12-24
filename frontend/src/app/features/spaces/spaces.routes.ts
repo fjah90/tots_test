@@ -3,14 +3,14 @@ import { Routes } from '@angular/router';
 export const SPACES_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () => 
+    loadComponent: () =>
       import('./components/spaces-list/spaces-list.component').then(m => m.SpacesListComponent),
-    title: 'Espacios Disponibles'
+    title: 'Espacios Disponibles',
   },
   {
     path: ':id',
-    loadComponent: () => 
+    loadComponent: () =>
       import('./components/space-detail/space-detail.component').then(m => m.SpaceDetailComponent),
-    title: 'Detalle del Espacio'
-  }
+    title: 'Detalle del Espacio',
+  },
 ];

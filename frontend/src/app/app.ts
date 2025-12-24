@@ -2,7 +2,7 @@ import { Component, inject, computed, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './core/services/auth.service';
-import { ThemeService, Theme } from './core/services/theme.service';
+import { ThemeService } from './core/services/theme.service';
 
 // PrimeNG
 import { MenubarModule } from 'primeng/menubar';
@@ -27,10 +27,10 @@ import { RippleModule } from 'primeng/ripple';
     MenuModule,
     DrawerModule,
     TooltipModule,
-    RippleModule
+    RippleModule,
   ],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
 export class App {
   private authService = inject(AuthService);
@@ -42,7 +42,7 @@ export class App {
   readonly isAuthenticated = this.authService.isAuthenticated;
   readonly isAdmin = this.authService.isAdmin;
   readonly currentUser = this.authService.currentUser;
-  
+
   // Theme
   readonly selectedTheme = this.themeService.selectedTheme;
   readonly effectiveTheme = this.themeService.effectiveTheme;

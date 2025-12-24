@@ -38,8 +38,10 @@
   }
 
   .p-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+
     &:hover {
       transform: translateY(-4px);
     }
@@ -52,11 +54,11 @@
   .dark .p-card {
     background-color: #1f2937 !important; // gray-800
     border-color: #374151 !important; // gray-700
-    
+
     .p-card-body {
       background-color: #1f2937 !important;
     }
-    
+
     .p-card-footer {
       background-color: #1f2937 !important;
       border-color: #374151 !important;
@@ -98,17 +100,17 @@
     align-items: flex-start;
     align-content: flex-start;
   }
-  
+
   .p-slider {
     height: 6px !important;
     background: #e5e7eb !important;
     border-radius: 3px !important;
-    
+
     .p-slider-range {
       background: linear-gradient(90deg, #2dd4bf, #14b8a6) !important;
       border-radius: 3px !important;
     }
-    
+
     .p-slider-handle {
       width: 18px !important;
       height: 18px !important;
@@ -118,23 +120,25 @@
       background: #ffffff !important;
       border-radius: 50% !important;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-      transition: transform 0.15s ease, box-shadow 0.15s ease !important;
-      
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease !important;
+
       &:hover {
         transform: scale(1.15) !important;
         box-shadow: 0 4px 8px rgba(45, 212, 191, 0.3) !important;
       }
-      
+
       &:focus {
         box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2) !important;
       }
     }
   }
-  
+
   // Datepicker time inputs más anchos
   .p-datepicker {
     min-width: 100% !important;
-    
+
     .p-datepicker-input {
       width: 100% !important;
     }
@@ -144,7 +148,7 @@
   :host-context(.dark) .p-slider,
   .dark .p-slider {
     background: #374151 !important;
-    
+
     .p-slider-handle {
       background: #1f2937 !important;
       border-color: #2dd4bf !important;
@@ -179,7 +183,7 @@
         font-size: 0.75rem;
       }
     }
-    
+
     // Componente p-carousel
     p-carousel,
     .p-carousel {
@@ -262,7 +266,8 @@
         background: rgba(0, 0, 0, 0.8) !important;
       }
 
-      svg, .p-icon {
+      svg,
+      .p-icon {
         width: 0.875rem !important;
         height: 0.875rem !important;
       }

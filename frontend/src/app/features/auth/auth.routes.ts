@@ -4,18 +4,17 @@ export const AUTH_ROUTES: Routes = [
   {
     path: '',
     redirectTo: 'login',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'login',
-    loadComponent: () => 
-      import('./components/login/login.component').then(m => m.LoginComponent),
-    title: 'Iniciar Sesión'
+    loadComponent: () => import('./components/login/login.component').then(m => m.LoginComponent),
+    title: 'Iniciar Sesión',
   },
   {
     path: 'register',
-    loadComponent: () => 
+    loadComponent: () =>
       import('./components/register/register.component').then(m => m.RegisterComponent),
-    title: 'Registrarse'
-  }
+    title: 'Registrarse',
+  },
 ];

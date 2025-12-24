@@ -5,7 +5,9 @@
   <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white py-12 px-6">
     <div class="max-w-7xl mx-auto">
       <h1 class="text-4xl font-bold mb-2">Calendario de Disponibilidad</h1>
-      <p class="text-teal-100 text-lg">Visualiza la disponibilidad de todos los espacios en tiempo real</p>
+      <p class="text-teal-100 text-lg">
+        Visualiza la disponibilidad de todos los espacios en tiempo real
+      </p>
     </div>
   </div>
 
@@ -18,8 +20,8 @@
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Filtrar por espacio
           </label>
-          <p-select 
-            [options]="spaceOptions()" 
+          <p-select
+            [options]="spaceOptions()"
             [(ngModel)]="selectedSpaceId"
             (onChange)="onSpaceChange($event)"
             placeholder="Seleccionar espacio"
@@ -66,12 +68,10 @@
       <div class="flex items-start gap-3">
         <i class="pi pi-info-circle text-blue-500 text-xl mt-0.5"></i>
         <div>
-          <h3 class="font-medium text-blue-900 dark:text-blue-300">
-            ¿Cómo reservar?
-          </h3>
+          <h3 class="font-medium text-blue-900 dark:text-blue-300">¿Cómo reservar?</h3>
           <p class="text-blue-700 dark:text-blue-400 text-sm mt-1">
-            Haz clic en cualquier espacio del 
-            <a routerLink="/spaces" class="underline hover:text-blue-500">listado de espacios</a> 
+            Haz clic en cualquier espacio del
+            <a routerLink="/spaces" class="underline hover:text-blue-500">listado de espacios</a>
             para ver más detalles y realizar una reservación.
           </p>
         </div>

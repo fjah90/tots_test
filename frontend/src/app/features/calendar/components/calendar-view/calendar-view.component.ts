@@ -60,7 +60,7 @@ interface SpaceOption {
   ],
   providers: [MessageService],
   templateUrl: './calendar-view.component.html',
-  styleUrl: './calendar-view.component.scss'
+  styleUrl: './calendar-view.component.scss',
 })
 export class CalendarViewComponent implements OnInit {
   private router = inject(Router);
@@ -77,9 +77,7 @@ export class CalendarViewComponent implements OnInit {
 
   // Opciones del selector de espacios
   spaceOptions = computed<SpaceOption[]>(() => {
-    const options: SpaceOption[] = [
-      { label: 'Todos los espacios', value: null }
-    ];
+    const options: SpaceOption[] = [{ label: 'Todos los espacios', value: null }];
     this.spaces().forEach(space => {
       options.push({ label: space.name, value: space.id });
     });
@@ -90,11 +88,9 @@ export class CalendarViewComponent implements OnInit {
   filteredEvents = computed(() => {
     const reservations = this.allReservations();
     const spaceId = this.selectedSpaceId();
-    
-    const filtered = spaceId 
-      ? reservations.filter(r => r.space_id === spaceId)
-      : reservations;
-    
+
+    const filtered = spaceId ? reservations.filter(r => r.space_id === spaceId) : reservations;
+
     return this.mapReservationsToEvents(filtered);
   });
 
@@ -105,7 +101,7 @@ export class CalendarViewComponent implements OnInit {
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      right: 'dayGridMonth,timeGridWeek,timeGridDay',
     },
     slotMinTime: '07:00:00',
     slotMaxTime: '22:00:00',
@@ -133,13 +129,13 @@ export class CalendarViewComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Error loading spaces:', err);
-      }
+      },
     });
   }
 
   loadAllReservations(): void {
     this.loading.set(true);
-    
+
     // Usar endpoint público para obtener reservaciones del calendario
     this.reservationsService.getCalendarReservations().subscribe({
       next: (reservations: Reservation[]) => {
@@ -150,7 +146,7 @@ export class CalendarViewComponent implements OnInit {
       error: (err: any) => {
         console.error('Error loading reservations:', err);
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -163,18 +159,18 @@ export class CalendarViewComponent implements OnInit {
     const events = this.filteredEvents();
     this.calendarOptions.update(options => ({
       ...options,
-      events: events
+      events: events,
     }));
   }
 
   private mapReservationsToEvents(reservations: Reservation[]): CalendarEvent[] {
     return reservations.map(reservation => {
       const space = this.spaces().find(s => s.id === reservation.space_id);
-      
+
       // Colores según estado (consistente con la leyenda)
       let backgroundColor: string;
       let borderColor: string;
-      
+
       switch (reservation.status) {
         case 'confirmed':
           backgroundColor = '#14b8a6'; // Teal
@@ -204,8 +200,8 @@ export class CalendarViewComponent implements OnInit {
         extendedProps: {
           status: reservation.status,
           spaceName: space?.name || 'Desconocido',
-          spaceId: reservation.space_id
-        }
+          spaceId: reservation.space_id,
+        },
       };
     });
   }
@@ -219,32 +215,32 @@ export class CalendarViewComponent implements OnInit {
     const endDate = event.end;
     const status = event.extendedProps?.status || 'pending';
     const spaceName = event.extendedProps?.spaceName || event.title;
-    
+
     // Formatear fecha y hora
-    const dateOptions: Intl.DateTimeFormatOptions = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    const dateOptions: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     };
-    const timeOptions: Intl.DateTimeFormatOptions = { 
-      hour: '2-digit', 
+    const timeOptions: Intl.DateTimeFormatOptions = {
+      hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: false,
     };
-    
+
     const dateStr = startDate.toLocaleDateString('es-ES', dateOptions);
     const startTime = startDate.toLocaleTimeString('es-ES', timeOptions);
     const endTime = endDate ? endDate.toLocaleTimeString('es-ES', timeOptions) : '';
-    
+
     const statusLabels: Record<string, string> = {
       confirmed: 'Confirmada',
       pending: 'Pendiente',
-      cancelled: 'Cancelada'
+      cancelled: 'Cancelada',
     };
-    
+
     const tooltipText = `${spaceName}\n${dateStr}\n${startTime} - ${endTime}\nEstado: ${statusLabels[status] || status}`;
-    
+
     // Agregar atributo title para tooltip nativo
     info.el.setAttribute('title', tooltipText);
     info.el.style.cursor = 'pointer';
@@ -253,7 +249,7 @@ export class CalendarViewComponent implements OnInit {
   handleEventClick(clickInfo: any): void {
     const props = clickInfo.event.extendedProps;
     const spaceId = props?.spaceId;
-    
+
     if (spaceId) {
       // Navegar al detalle del espacio
       this.router.navigate(['/spaces', spaceId]);
@@ -262,10 +258,14 @@ export class CalendarViewComponent implements OnInit {
 
   getStatusLabel(status: string): string {
     switch (status) {
-      case 'confirmed': return 'Confirmada';
-      case 'pending': return 'Pendiente';
-      case 'cancelled': return 'Cancelada';
-      default: return status;
+      case 'confirmed':
+        return 'Confirmada';
+      case 'pending':
+        return 'Pendiente';
+      case 'cancelled':
+        return 'Cancelada';
+      default:
+        return status;
     }
   }
 }

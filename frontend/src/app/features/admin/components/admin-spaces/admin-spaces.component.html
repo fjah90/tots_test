@@ -6,11 +6,7 @@
         <h1 class="text-3xl font-bold">Administrar Espacios</h1>
         <p class="text-teal-100 mt-1">Gestiona los espacios disponibles para reservación</p>
       </div>
-      <p-button 
-        label="Nuevo Espacio" 
-        icon="pi pi-plus"
-        routerLink="/admin/spaces/new"
-      />
+      <p-button label="Nuevo Espacio" icon="pi pi-plus" routerLink="/admin/spaces/new" />
     </div>
   </div>
 
@@ -19,22 +15,23 @@
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6 transition-colors">
       <div class="flex flex-wrap gap-4">
         <div class="flex-1 min-w-[250px]">
-          <input type="text" 
-                 pInputText 
-                 placeholder="Buscar por nombre..."
-                 class="w-full"
-                 [(ngModel)]="searchTerm"
-                 (keyup.enter)="onSearch()" />
+          <input
+            type="text"
+            pInputText
+            placeholder="Buscar por nombre..."
+            class="w-full"
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="onSearch()"
+          />
         </div>
-        <p-button label="Buscar" 
-                  icon="pi pi-search" 
-                  (onClick)="onSearch()">
-        </p-button>
-        <p-button label="Limpiar" 
-                  icon="pi pi-times" 
-                  severity="secondary"
-                  [outlined]="true"
-                  (onClick)="searchTerm.set(''); loadSpaces()">
+        <p-button label="Buscar" icon="pi pi-search" (onClick)="onSearch()"> </p-button>
+        <p-button
+          label="Limpiar"
+          icon="pi pi-times"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="searchTerm.set(''); loadSpaces()"
+        >
         </p-button>
       </div>
     </div>
@@ -49,23 +46,25 @@
 
     <!-- MC-Table de @mckit/table -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow transition-colors">
-      <mc-table 
-        [columns]="columns" 
+      <mc-table
+        [columns]="columns"
         [response]="tableResponse()"
         [paginator]="true"
-        (onPage)="onPageChange($event)">
-        
+        (onPage)="onPageChange($event)"
+      >
         <!-- Template personalizado para columna Nombre -->
         <ng-template mcTdTemplate="name" let-space>
           <div class="flex items-center gap-3">
             @if (space.image_url) {
-              <img 
-                [src]="space.image_url" 
+              <img
+                [src]="space.image_url"
                 [alt]="space.name"
                 class="w-10 h-10 rounded-lg object-cover"
               />
             } @else {
-              <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center">
+              <div
+                class="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center"
+              >
                 <i class="pi pi-building text-white text-sm"></i>
               </div>
             }
@@ -102,7 +101,7 @@
 
         <!-- Template personalizado para columna Estado -->
         <ng-template mcTdTemplate="is_active" let-space>
-          <p-tag 
+          <p-tag
             [severity]="getStatusSeverity(space.is_active)"
             [value]="getStatusText(space.is_active)"
             [icon]="space.is_active ? 'pi pi-check' : 'pi pi-times'"
@@ -112,23 +111,23 @@
         <!-- Template personalizado para columna Acciones -->
         <ng-template mcTdTemplate="actions" let-space>
           <div class="flex gap-2">
-            <p-button 
-              icon="pi pi-pencil" 
+            <p-button
+              icon="pi pi-pencil"
               [routerLink]="['/admin/spaces', space.id, 'edit']"
-              severity="info" 
+              severity="info"
               [text]="true"
               pTooltip="Editar"
             />
-            <p-button 
-              icon="pi pi-eye" 
+            <p-button
+              icon="pi pi-eye"
               [routerLink]="['/spaces', space.id]"
-              severity="secondary" 
+              severity="secondary"
               [text]="true"
               pTooltip="Ver público"
             />
-            <p-button 
-              icon="pi pi-trash" 
-              severity="danger" 
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
               [text]="true"
               pTooltip="Eliminar"
               (onClick)="confirmDelete(space)"
@@ -140,8 +139,12 @@
 
     <!-- Estadísticas rápidas -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center gap-4 transition-colors">
-        <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center gap-4 transition-colors"
+      >
+        <div
+          class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center"
+        >
           <i class="pi pi-building text-2xl text-blue-600 dark:text-blue-400"></i>
         </div>
         <div>
@@ -149,9 +152,13 @@
           <p class="text-gray-500 dark:text-gray-400 text-sm">Total Espacios</p>
         </div>
       </div>
-      
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center gap-4 transition-colors">
-        <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+
+      <div
+        class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center gap-4 transition-colors"
+      >
+        <div
+          class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center"
+        >
           <i class="pi pi-check text-2xl text-green-600 dark:text-green-400"></i>
         </div>
         <div>
@@ -159,13 +166,19 @@
           <p class="text-gray-500 dark:text-gray-400 text-sm">Activos</p>
         </div>
       </div>
-      
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center gap-4 transition-colors">
-        <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+
+      <div
+        class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center gap-4 transition-colors"
+      >
+        <div
+          class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center"
+        >
           <i class="pi pi-times text-2xl text-red-600 dark:text-red-400"></i>
         </div>
         <div>
-          <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ getInactiveCount() }}</p>
+          <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            {{ getInactiveCount() }}
+          </p>
           <p class="text-gray-500 dark:text-gray-400 text-sm">Inactivos</p>
         </div>
       </div>

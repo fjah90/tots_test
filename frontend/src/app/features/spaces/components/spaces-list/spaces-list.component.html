@@ -5,7 +5,9 @@
   <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white py-12 px-6">
     <div class="max-w-7xl mx-auto">
       <h1 class="text-4xl font-bold mb-2">Encuentra tu Espacio Ideal</h1>
-      <p class="text-teal-100 text-lg">Reserva salas de reuniones, auditorios y espacios de trabajo</p>
+      <p class="text-teal-100 text-lg">
+        Reserva salas de reuniones, auditorios y espacios de trabajo
+      </p>
     </div>
   </div>
 
@@ -13,14 +15,13 @@
   <div class="max-w-7xl mx-auto px-6 -mt-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-colors">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
-        
         <!-- Búsqueda por texto -->
         <div class="flex flex-col gap-2 lg:col-span-3">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Buscar</label>
-          <input 
-            type="text" 
-            pInputText 
-            placeholder="Nombre, ubicación..." 
+          <input
+            type="text"
+            pInputText
+            placeholder="Nombre, ubicación..."
             [ngModel]="searchTerm()"
             (ngModelChange)="onSearchChange($event)"
             class="w-full"
@@ -31,10 +32,12 @@
         <div class="flex flex-col gap-2 lg:col-span-2">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
             Fecha
-            <i class="pi pi-info-circle ml-1 text-gray-400" 
-               pTooltip="Filtra espacios con disponibilidad en esta fecha"></i>
+            <i
+              class="pi pi-info-circle ml-1 text-gray-400"
+              pTooltip="Filtra espacios con disponibilidad en esta fecha"
+            ></i>
           </label>
-          <p-datepicker 
+          <p-datepicker
             [ngModel]="selectedDate()"
             (ngModelChange)="onDateChange($event)"
             [showIcon]="true"
@@ -49,10 +52,12 @@
         <div class="flex flex-col gap-2 lg:col-span-2">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
             Desde
-            <i class="pi pi-info-circle ml-1 text-gray-400" 
-               pTooltip="Hora de inicio del rango disponible"></i>
+            <i
+              class="pi pi-info-circle ml-1 text-gray-400"
+              pTooltip="Hora de inicio del rango disponible"
+            ></i>
           </label>
-          <p-datepicker 
+          <p-datepicker
             [ngModel]="selectedStartTime()"
             (ngModelChange)="onStartTimeChange($event)"
             [timeOnly]="true"
@@ -73,10 +78,12 @@
         <div class="flex flex-col gap-2 lg:col-span-2">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
             Hasta
-            <i class="pi pi-info-circle ml-1 text-gray-400" 
-               pTooltip="Hora de fin del rango disponible"></i>
+            <i
+              class="pi pi-info-circle ml-1 text-gray-400"
+              pTooltip="Hora de fin del rango disponible"
+            ></i>
           </label>
-          <p-datepicker 
+          <p-datepicker
             [ngModel]="selectedEndTime()"
             (ngModelChange)="onEndTimeChange($event)"
             [timeOnly]="true"
@@ -95,9 +102,9 @@
 
         <!-- Botón limpiar filtros -->
         <div class="flex flex-col justify-end lg:col-span-3">
-          <p-button 
-            label="Limpiar" 
-            icon="pi pi-filter-slash" 
+          <p-button
+            label="Limpiar"
+            icon="pi pi-filter-slash"
             severity="secondary"
             [outlined]="true"
             (click)="clearFilters()"
@@ -110,10 +117,11 @@
       <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
         <div class="flex flex-col sm:flex-row sm:items-center gap-4">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
-            Capacidad: {{ capacityRange()[0] }} - {{ capacityRange()[1] === 100 ? '100+' : capacityRange()[1] }} personas
+            Capacidad: {{ capacityRange()[0] }} -
+            {{ capacityRange()[1] === 100 ? '100+' : capacityRange()[1] }} personas
           </label>
           <div class="flex-1 max-w-lg">
-            <p-slider 
+            <p-slider
               [ngModel]="capacityRange()"
               (ngModelChange)="onCapacityChange($event)"
               [range]="true"
@@ -130,7 +138,8 @@
       <p-divider />
       <div class="flex justify-between items-center">
         <span class="text-gray-600 dark:text-gray-400">
-          <strong>{{ filteredSpaces().length }}</strong> de <strong>{{ totalItems() }}</strong> espacios
+          <strong>{{ filteredSpaces().length }}</strong> de
+          <strong>{{ totalItems() }}</strong> espacios
           @if (hasMore()) {
             <span class="text-sm text-gray-400"> (scroll para ver más)</span>
           }
@@ -148,39 +157,40 @@
     } @else if (filteredSpaces().length === 0) {
       <div class="text-center py-20">
         <i class="pi pi-inbox text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
-        <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">No se encontraron espacios</h3>
+        <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">
+          No se encontraron espacios
+        </h3>
         <p class="text-gray-500 dark:text-gray-500">Intenta ajustar los filtros de búsqueda</p>
-        <p-button 
-          label="Limpiar Filtros" 
-          icon="pi pi-refresh" 
+        <p-button
+          label="Limpiar Filtros"
+          icon="pi pi-refresh"
           class="mt-4"
-          (click)="clearFilters()" 
+          (click)="clearFilters()"
         />
       </div>
     } @else {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @for (space of filteredSpaces(); track space.id) {
-          <p-card styleClass="space-card hover:shadow-xl transition-shadow duration-300 dark:bg-gray-800">
+          <p-card
+            styleClass="space-card hover:shadow-xl transition-shadow duration-300 dark:bg-gray-800"
+          >
             <!-- Image Carousel or Single Image -->
             <ng-template #header>
               <div class="relative h-48 overflow-hidden group">
                 @if (getSpaceImages(space).length > 1) {
                   <!-- Multiple images: Carousel -->
                   <div class="space-image-carousel h-full">
-                    <p-carousel 
-                      [value]="getSpaceImages(space)" 
-                      [numVisible]="1" 
+                    <p-carousel
+                      [value]="getSpaceImages(space)"
+                      [numVisible]="1"
                       [numScroll]="1"
                       [circular]="true"
                       [showNavigators]="true"
                       [showIndicators]="false"
-                      [autoplayInterval]="0">
+                      [autoplayInterval]="0"
+                    >
                       <ng-template #item let-imageUrl>
-                        <img 
-                          [src]="imageUrl" 
-                          [alt]="space.name"
-                          class="carousel-image"
-                        />
+                        <img [src]="imageUrl" [alt]="space.name" class="carousel-image" />
                       </ng-template>
                     </p-carousel>
                     <!-- Indicador de cantidad de imágenes -->
@@ -191,18 +201,20 @@
                   </div>
                 } @else if (getSpaceImages(space).length === 1) {
                   <!-- Single image -->
-                  <img 
-                    [src]="getSpaceImages(space)[0]" 
+                  <img
+                    [src]="getSpaceImages(space)[0]"
                     [alt]="space.name"
                     class="w-full h-full object-cover"
                   />
                 } @else {
                   <!-- No image: placeholder -->
-                  <div class="w-full h-full bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center">
+                  <div
+                    class="w-full h-full bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center"
+                  >
                     <i class="pi pi-building text-white text-5xl"></i>
                   </div>
                 }
-                <p-tag 
+                <p-tag
                   [value]="space.is_active ? 'Disponible' : 'No Disponible'"
                   [severity]="space.is_active ? 'success' : 'danger'"
                   styleClass="absolute top-3 right-3 z-10"
@@ -213,8 +225,10 @@
             <!-- Content - Estructura fija -->
             <div class="card-content">
               <!-- Título - altura fija -->
-              <h3 class="card-title text-xl font-bold text-gray-800 dark:text-gray-100">{{ space.name }}</h3>
-              
+              <h3 class="card-title text-xl font-bold text-gray-800 dark:text-gray-100">
+                {{ space.name }}
+              </h3>
+
               <!-- Descripción - altura fija con 2 líneas -->
               <p class="card-description text-gray-600 dark:text-gray-400 text-sm">
                 {{ space.description || 'Sin descripción disponible' }}
@@ -250,16 +264,16 @@
             <!-- Footer -->
             <ng-template #footer>
               <div class="flex gap-2">
-                <p-button 
-                  label="Ver Detalles" 
-                  icon="pi pi-eye" 
+                <p-button
+                  label="Ver Detalles"
+                  icon="pi pi-eye"
                   severity="secondary"
                   [outlined]="true"
                   [routerLink]="['/spaces', space.id]"
                   class="flex-1"
                 />
-                <p-button 
-                  label="Reservar" 
+                <p-button
+                  label="Reservar"
                   icon="pi pi-calendar-plus"
                   (click)="openReservationModal(space)"
                   class="flex-1"
@@ -291,7 +305,7 @@
 </div>
 
 <!-- Reservation Dialog Modal -->
-<p-dialog 
+<p-dialog
   [header]="'Reservar: ' + (selectedSpace()?.name || '')"
   [(visible)]="showReservationDialogVisible"
   [modal]="true"
@@ -305,9 +319,9 @@
     <app-reservation-form
       [space]="selectedSpace()!"
       [preselectedDate]="selectedDate()"
-      (success)="onReservationSuccess()"
-      (error)="onReservationError($event)"
-      (cancel)="closeReservationModal()"
+      (reservationSuccess)="onReservationSuccess()"
+      (reservationError)="onReservationError($event)"
+      (reservationCancel)="closeReservationModal()"
     />
   }
 </p-dialog>

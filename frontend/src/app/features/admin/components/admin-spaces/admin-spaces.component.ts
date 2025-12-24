@@ -36,7 +36,7 @@ import { Space } from '../../../../shared/interfaces';
     TooltipModule,
     // MC-Kit Components
     MCTable,
-    MCTdTemplateDirective
+    MCTdTemplateDirective,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './admin-spaces.component.html',
@@ -50,7 +50,7 @@ export class AdminSpacesComponent implements OnInit {
   spaces = signal<Space[]>([]);
   loading = signal(false);
   searchTerm = signal('');
-  
+
   // Paginación para MC-Table
   currentPage = signal(0);
   rowsPerPage = signal(10);
@@ -67,12 +67,12 @@ export class AdminSpacesComponent implements OnInit {
     const allData = this.spaces();
     const page = this.currentPage();
     const perPage = this.rowsPerPage();
-    
+
     // Calcular datos paginados
     const start = page * perPage;
     const end = start + perPage;
     const paginatedData = allData.slice(start, end);
-    
+
     const response = new MCListResponse<Space>();
     response.data = paginatedData;
     response.total = allData.length;
@@ -85,35 +85,35 @@ export class AdminSpacesComponent implements OnInit {
    * Usando MCColumn de @mckit/core
    */
   columns: MCColumn[] = [
-    { 
-      field: 'name', 
-      title: 'Nombre', 
+    {
+      field: 'name',
+      title: 'Nombre',
       isSortable: true,
-      isShow: true
+      isShow: true,
     },
-    { 
-      field: 'capacity', 
-      title: 'Capacidad', 
+    {
+      field: 'capacity',
+      title: 'Capacidad',
       isSortable: true,
-      isShow: true
+      isShow: true,
     },
-    { 
-      field: 'location', 
-      title: 'Ubicación', 
+    {
+      field: 'location',
+      title: 'Ubicación',
       isSortable: true,
-      isShow: true
+      isShow: true,
     },
-    { 
-      field: 'is_active', 
-      title: 'Estado', 
+    {
+      field: 'is_active',
+      title: 'Estado',
       isSortable: true,
-      isShow: true
+      isShow: true,
     },
-    { 
-      field: 'actions', 
-      title: 'Acciones', 
-      isShow: true
-    }
+    {
+      field: 'actions',
+      title: 'Acciones',
+      isShow: true,
+    },
   ];
 
   ngOnInit(): void {
@@ -123,25 +123,25 @@ export class AdminSpacesComponent implements OnInit {
   loadSpaces(): void {
     this.loading.set(true);
     this.spacesService.getSpaces().subscribe({
-      next: (spaces) => {
+      next: spaces => {
         this.spaces.set(spaces);
         this.loading.set(false);
       },
-      error: (error) => {
+      error: _error => {
         this.loading.set(false);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudieron cargar los espacios'
+          detail: 'No se pudieron cargar los espacios',
         });
-      }
+      },
     });
   }
 
   onSearch(): void {
     const search = this.searchTerm();
     this.spacesService.getSpaces({ search }).subscribe({
-      next: (spaces) => this.spaces.set(spaces)
+      next: spaces => this.spaces.set(spaces),
     });
   }
 
@@ -153,7 +153,7 @@ export class AdminSpacesComponent implements OnInit {
       acceptLabel: 'Sí, eliminar',
       rejectLabel: 'Cancelar',
       acceptButtonStyleClass: 'p-button-danger',
-      accept: () => this.deleteSpace(space.id)
+      accept: () => this.deleteSpace(space.id),
     });
   }
 
@@ -163,7 +163,7 @@ export class AdminSpacesComponent implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',
-          detail: 'Espacio eliminado correctamente'
+          detail: 'Espacio eliminado correctamente',
         });
         this.loadSpaces();
       },
@@ -171,14 +171,14 @@ export class AdminSpacesComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudo eliminar el espacio'
+          detail: 'No se pudo eliminar el espacio',
         });
-      }
+      },
     });
   }
 
-  onRowSelect(event: any): void {
-    console.log('Espacio seleccionado:', event.data);
+  onRowSelect(_event: any): void {
+    // Row selection handler - can be extended for detail view
   }
 
   /**

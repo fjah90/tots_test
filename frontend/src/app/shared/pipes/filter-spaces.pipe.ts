@@ -15,10 +15,9 @@ export interface SpaceFilterCriteria {
 @Pipe({
   name: 'filterSpaces',
   standalone: true,
-  pure: true
+  pure: true,
 })
 export class FilterSpacesPipe implements PipeTransform {
-
   transform(spaces: Space[] | null, criteria: SpaceFilterCriteria): Space[] {
     if (!spaces || spaces.length === 0) {
       return [];
@@ -28,11 +27,11 @@ export class FilterSpacesPipe implements PipeTransform {
       // Filtro por búsqueda de texto
       if (criteria.search) {
         const searchTerm = criteria.search.toLowerCase();
-        const matchesSearch = 
+        const matchesSearch =
           space.name.toLowerCase().includes(searchTerm) ||
           space.description?.toLowerCase().includes(searchTerm) ||
           space.location?.toLowerCase().includes(searchTerm);
-        
+
         if (!matchesSearch) return false;
       }
 

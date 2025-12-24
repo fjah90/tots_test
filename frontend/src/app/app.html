@@ -9,43 +9,59 @@
 
       <!-- Desktop Navigation - Centro -->
       <div class="hidden md:flex items-center gap-10">
-        <a routerLink="/spaces" 
-           routerLinkActive="text-white"
-           class="text-gray-400 hover:text-white transition-colors text-sm font-medium tracking-wide">
+        <a
+          routerLink="/spaces"
+          routerLinkActive="text-white"
+          class="text-gray-400 hover:text-white transition-colors text-sm font-medium tracking-wide"
+        >
           Espacios
         </a>
 
-        <a routerLink="/calendar" 
-           routerLinkActive="text-white"
-           class="text-gray-400 hover:text-white transition-colors text-sm font-medium tracking-wide">
+        <a
+          routerLink="/calendar"
+          routerLinkActive="text-white"
+          class="text-gray-400 hover:text-white transition-colors text-sm font-medium tracking-wide"
+        >
           Calendario
         </a>
-        
+
         @if (isAuthenticated()) {
-          <a routerLink="/my-reservations" 
-             routerLinkActive="text-white"
-             class="text-gray-400 hover:text-white transition-colors text-sm font-medium tracking-wide">
+          <a
+            routerLink="/my-reservations"
+            routerLinkActive="text-white"
+            class="text-gray-400 hover:text-white transition-colors text-sm font-medium tracking-wide"
+          >
             Mis Reservaciones
           </a>
         }
 
         @if (isAdmin()) {
           <div class="relative group">
-            <button class="text-gray-400 hover:text-white transition-colors text-sm font-medium tracking-wide flex items-center gap-1">
+            <button
+              class="text-gray-400 hover:text-white transition-colors text-sm font-medium tracking-wide flex items-center gap-1"
+            >
               Admin
               <i class="pi pi-chevron-down text-xs"></i>
             </button>
-            <div class="absolute top-full left-0 mt-2 bg-gray-800 rounded-lg shadow-lg py-2 min-w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-              <a routerLink="/admin/spaces" 
-                 class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors">
+            <div
+              class="absolute top-full left-0 mt-2 bg-gray-800 rounded-lg shadow-lg py-2 min-w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
+            >
+              <a
+                routerLink="/admin/spaces"
+                class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors"
+              >
                 <i class="pi pi-building mr-2"></i>Espacios
               </a>
-              <a routerLink="/admin/reservations" 
-                 class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors">
+              <a
+                routerLink="/admin/reservations"
+                class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors"
+              >
                 <i class="pi pi-calendar mr-2"></i>Reservaciones
               </a>
-              <a routerLink="/admin/stats" 
-                 class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors">
+              <a
+                routerLink="/admin/stats"
+                class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors"
+              >
                 <i class="pi pi-chart-bar mr-2"></i>Estadísticas
               </a>
             </div>
@@ -56,26 +72,31 @@
       <!-- Right side: Theme + Social icons + Auth -->
       <div class="flex items-center gap-4">
         <!-- Theme Toggle -->
-        <button 
+        <button
           (click)="cycleTheme()"
           [pTooltip]="themeTooltip()"
           tooltipPosition="bottom"
-          class="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">
+          class="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+        >
           <i [class]="themeIcon()"></i>
         </button>
 
         <!-- Social Icons - Desktop -->
         <div class="hidden md:flex items-center gap-3">
-          <a href="https://github.com/fjah90" 
-             target="_blank" 
-             rel="noopener noreferrer"
-             class="text-gray-400 hover:text-white transition-colors">
+          <a
+            href="https://github.com/fjah90"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-gray-400 hover:text-white transition-colors"
+          >
             <i class="pi pi-github text-lg"></i>
           </a>
-          <a href="https://www.linkedin.com/in/fjah90" 
-             target="_blank" 
-             rel="noopener noreferrer"
-             class="text-gray-400 hover:text-white transition-colors">
+          <a
+            href="https://www.linkedin.com/in/fjah90"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-gray-400 hover:text-white transition-colors"
+          >
             <i class="pi pi-linkedin text-lg"></i>
           </a>
         </div>
@@ -89,29 +110,35 @@
             <span class="text-gray-400 text-sm">
               {{ currentUser()?.name }}
             </span>
-            <button 
+            <button
               (click)="logout()"
-              class="text-gray-400 hover:text-white transition-colors text-sm font-medium">
+              class="text-gray-400 hover:text-white transition-colors text-sm font-medium"
+            >
               Salir
             </button>
           </div>
         } @else {
-          <a routerLink="/login" 
-             class="hidden md:block text-gray-400 hover:text-white transition-colors text-sm font-medium">
+          <a
+            routerLink="/login"
+            class="hidden md:block text-gray-400 hover:text-white transition-colors text-sm font-medium"
+          >
             Iniciar Sesión
           </a>
           <a routerLink="/register" class="hidden md:block">
-            <button class="bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+            <button
+              class="bg-teal-500 hover:bg-teal-400 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            >
               Registrarse
             </button>
           </a>
         }
 
         <!-- Mobile menu button -->
-        <button 
+        <button
           class="md:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors"
           (click)="toggleMobileMenu()"
-          aria-label="Abrir menú">
+          aria-label="Abrir menú"
+        >
           <i class="pi pi-bars text-xl text-gray-300"></i>
         </button>
       </div>
@@ -120,15 +147,14 @@
 </header>
 
 <!-- Mobile Drawer Menu -->
-<p-drawer [(visible)]="mobileMenuVisible" 
-          [showCloseIcon]="false"
-          styleClass="w-72 dark-drawer">
+<p-drawer [(visible)]="mobileMenuVisible" [showCloseIcon]="false" styleClass="w-72 dark-drawer">
   <ng-template #header>
     <div class="flex items-center justify-between w-full">
       <img src="logo-white.svg" alt="SpaceBook" class="h-7 w-auto" />
-      <button 
+      <button
         (click)="closeMobileMenu()"
-        class="p-2 rounded-lg hover:bg-gray-700 transition-colors">
+        class="p-2 rounded-lg hover:bg-gray-700 transition-colors"
+      >
         <i class="pi pi-times text-xl text-gray-400"></i>
       </button>
     </div>
@@ -137,48 +163,60 @@
   <div class="flex flex-col h-full">
     <!-- Navigation Links -->
     <div class="flex flex-col gap-1 mt-6">
-      <a routerLink="/spaces" 
-         (click)="closeMobileMenu()"
-         routerLinkActive="text-white"
-         class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors text-lg font-medium">
+      <a
+        routerLink="/spaces"
+        (click)="closeMobileMenu()"
+        routerLinkActive="text-white"
+        class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors text-lg font-medium"
+      >
         <span>Espacios</span>
       </a>
 
-      <a routerLink="/calendar" 
-         (click)="closeMobileMenu()"
-         routerLinkActive="text-white"
-         class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors text-lg font-medium">
+      <a
+        routerLink="/calendar"
+        (click)="closeMobileMenu()"
+        routerLinkActive="text-white"
+        class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors text-lg font-medium"
+      >
         <span>Calendario</span>
       </a>
 
       @if (isAuthenticated()) {
-        <a routerLink="/my-reservations" 
-           (click)="closeMobileMenu()"
-           routerLinkActive="text-white"
-           class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors text-lg font-medium">
+        <a
+          routerLink="/my-reservations"
+          (click)="closeMobileMenu()"
+          routerLinkActive="text-white"
+          class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors text-lg font-medium"
+        >
           <span>Mis Reservaciones</span>
         </a>
       }
 
       @if (isAdmin()) {
-        <a routerLink="/admin/spaces" 
-           (click)="closeMobileMenu()"
-           routerLinkActive="text-white"
-           class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors text-lg font-medium">
+        <a
+          routerLink="/admin/spaces"
+          (click)="closeMobileMenu()"
+          routerLinkActive="text-white"
+          class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors text-lg font-medium"
+        >
           <span>Gestionar Espacios</span>
         </a>
-        
-        <a routerLink="/admin/reservations" 
-           (click)="closeMobileMenu()"
-           routerLinkActive="text-white"
-           class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors text-lg font-medium">
+
+        <a
+          routerLink="/admin/reservations"
+          (click)="closeMobileMenu()"
+          routerLinkActive="text-white"
+          class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors text-lg font-medium"
+        >
           <span>Reservaciones</span>
         </a>
-        
-        <a routerLink="/admin/stats" 
-           (click)="closeMobileMenu()"
-           routerLinkActive="text-white"
-           class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors text-lg font-medium">
+
+        <a
+          routerLink="/admin/stats"
+          (click)="closeMobileMenu()"
+          routerLinkActive="text-white"
+          class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors text-lg font-medium"
+        >
           <span>Estadísticas</span>
         </a>
       }
@@ -194,21 +232,24 @@
           <p class="text-white font-medium">{{ currentUser()?.name }}</p>
           <p class="text-gray-500 text-sm">{{ currentUser()?.email }}</p>
         </div>
-        <button 
+        <button
           (click)="logout()"
-          class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors w-full text-left text-lg font-medium">
+          class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors w-full text-left text-lg font-medium"
+        >
           <span>Cerrar Sesión</span>
         </button>
       } @else {
-        <a routerLink="/login" 
-           (click)="closeMobileMenu()"
-           class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors text-lg font-medium">
+        <a
+          routerLink="/login"
+          (click)="closeMobileMenu()"
+          class="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors text-lg font-medium"
+        >
           <span>Iniciar Sesión</span>
         </a>
-        <a routerLink="/register" 
-           (click)="closeMobileMenu()"
-           class="block mx-4">
-          <button class="w-full bg-teal-500 hover:bg-teal-400 text-white font-medium py-3 px-4 rounded-lg transition-colors">
+        <a routerLink="/register" (click)="closeMobileMenu()" class="block mx-4">
+          <button
+            class="w-full bg-teal-500 hover:bg-teal-400 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+          >
             Registrarse
           </button>
         </a>
@@ -217,16 +258,20 @@
 
     <!-- Social Icons -->
     <div class="flex items-center gap-4 px-4 pb-6">
-      <a href="https://github.com/fjah90" 
-         target="_blank" 
-         rel="noopener noreferrer"
-         class="text-gray-400 hover:text-white transition-colors">
+      <a
+        href="https://github.com/fjah90"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-gray-400 hover:text-white transition-colors"
+      >
         <i class="pi pi-github text-xl"></i>
       </a>
-      <a href="https://www.linkedin.com/in/fjah90" 
-         target="_blank" 
-         rel="noopener noreferrer"
-         class="text-gray-400 hover:text-white transition-colors">
+      <a
+        href="https://www.linkedin.com/in/fjah90"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-gray-400 hover:text-white transition-colors"
+      >
         <i class="pi pi-linkedin text-xl"></i>
       </a>
     </div>
@@ -242,7 +287,6 @@
 <footer class="bg-gray-900 text-white py-12">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-      
       <!-- Logo y descripción -->
       <div class="flex flex-col items-center md:items-start gap-3">
         <img src="logo-white.svg" alt="SpaceBook" class="h-8 w-auto" />
@@ -257,16 +301,20 @@
         <i class="pi pi-heart-fill text-teal-500"></i>
         <span class="text-gray-500 text-sm">por</span>
         <span class="text-teal-400 font-medium">Fernando Aponte</span>
-        <a href="https://github.com/fjah90" 
-           target="_blank" 
-           rel="noopener noreferrer"
-           class="text-gray-400 hover:text-teal-400 transition-colors">
+        <a
+          href="https://github.com/fjah90"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-gray-400 hover:text-teal-400 transition-colors"
+        >
           <i class="pi pi-github text-lg"></i>
         </a>
-        <a href="https://www.linkedin.com/in/fjah90" 
-           target="_blank" 
-           rel="noopener noreferrer"
-           class="text-gray-400 hover:text-teal-400 transition-colors">
+        <a
+          href="https://www.linkedin.com/in/fjah90"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-gray-400 hover:text-teal-400 transition-colors"
+        >
           <i class="pi pi-linkedin text-lg"></i>
         </a>
       </div>

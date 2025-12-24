@@ -28,47 +28,43 @@ export class AuthService {
    * Registrar nuevo usuario
    */
   register(payload: RegisterPayload): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, payload)
-      .pipe(
-        tap(response => this.handleAuthResponse(response))
-      );
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/auth/register`, payload)
+      .pipe(tap(response => this.handleAuthResponse(response)));
   }
 
   /**
    * Iniciar sesión
    */
   login(credentials: LoginCredentials): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials)
-      .pipe(
-        tap(response => this.handleAuthResponse(response))
-      );
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials)
+      .pipe(tap(response => this.handleAuthResponse(response)));
   }
 
   /**
    * Cerrar sesión
    */
   logout(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/logout`, {})
-      .pipe(
-        tap(() => this.clearAuth()),
-        catchError(() => {
-          this.clearAuth();
-          return of(null);
-        })
-      );
+    return this.http.post(`${this.apiUrl}/auth/logout`, {}).pipe(
+      tap(() => this.clearAuth()),
+      catchError(() => {
+        this.clearAuth();
+        return of(null);
+      })
+    );
   }
 
   /**
    * Obtener perfil del usuario actual
    */
   getProfile(): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/auth/user`)
-      .pipe(
-        tap(user => {
-          this.currentUserSignal.set(user);
-          localStorage.setItem(USER_KEY, JSON.stringify(user));
-        })
-      );
+    return this.http.get<User>(`${this.apiUrl}/auth/user`).pipe(
+      tap(user => {
+        this.currentUserSignal.set(user);
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+      })
+    );
   }
 
   /**

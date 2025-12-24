@@ -44,11 +44,11 @@ import { ReservationFormComponent } from '../reservation-form/reservation-form.c
     CarouselModule,
     TooltipModule,
     // Custom
-    ReservationFormComponent
+    ReservationFormComponent,
   ],
   providers: [MessageService],
   templateUrl: './spaces-list.component.html',
-  styleUrl: './spaces-list.component.scss'
+  styleUrl: './spaces-list.component.scss',
 })
 export class SpacesListComponent implements OnInit {
   private spacesService = inject(SpacesService);
@@ -58,13 +58,13 @@ export class SpacesListComponent implements OnInit {
   spaces = signal<Space[]>([]);
   loading = signal(false);
   loadingMore = signal(false);
-  
+
   // Paginación para infinite scroll
   currentPage = signal(1);
   perPage = 12; // Elementos por página
   totalItems = signal(0);
   hasMore = signal(true);
-  
+
   // Filtros
   searchTerm = signal('');
   capacityRange = signal<number[]>([0, 100]);
@@ -72,7 +72,7 @@ export class SpacesListComponent implements OnInit {
   selectedStartTime = signal<Date | null>(null);
   selectedEndTime = signal<Date | null>(null);
   minDate = new Date(); // No permitir fechas pasadas
-  
+
   // Modal de reserva
   showReservationDialogVisible = false;
   selectedSpace = signal<Space | null>(null);
@@ -91,7 +91,7 @@ export class SpacesListComponent implements OnInit {
     // Verificar si estamos cerca del final de la página
     const scrollPosition = window.innerHeight + window.scrollY;
     const threshold = document.documentElement.scrollHeight - 300;
-    
+
     if (scrollPosition >= threshold && !this.loadingMore() && this.hasMore()) {
       this.loadMoreSpaces();
     }
@@ -153,12 +153,12 @@ export class SpacesListComponent implements OnInit {
    */
   onSearchChange(value: string): void {
     this.searchTerm.set(value);
-    
+
     // Cancelar timeout anterior
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);
     }
-    
+
     // Debounce de 400ms para no hacer muchas peticiones
     this.searchTimeout = setTimeout(() => {
       this.loadSpaces();
@@ -170,12 +170,12 @@ export class SpacesListComponent implements OnInit {
    */
   onCapacityChange(range: number[]): void {
     this.capacityRange.set(range);
-    
+
     // Cancelar timeout anterior
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);
     }
-    
+
     // Debounce de 300ms para el slider
     this.searchTimeout = setTimeout(() => {
       this.loadSpaces();
@@ -188,10 +188,10 @@ export class SpacesListComponent implements OnInit {
     this.spaces.set([]);
     this.hasMore.set(true);
 
-    const filters: any = { 
+    const filters: any = {
       is_active: true,
       page: 1,
-      per_page: this.perPage
+      per_page: this.perPage,
     };
 
     // Agregar filtro de búsqueda por texto
@@ -215,9 +215,9 @@ export class SpacesListComponent implements OnInit {
       // Enviar timezone del navegador para conversión correcta en backend
       filters.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     }
-    
+
     this.spacesService.getSpacesPaginated(filters).subscribe({
-      next: (response) => {
+      next: response => {
         this.spaces.set(response.data);
         if (response.meta) {
           this.totalItems.set(response.meta.total);
@@ -227,15 +227,15 @@ export class SpacesListComponent implements OnInit {
         }
         this.loading.set(false);
       },
-      error: (err) => {
+      error: err => {
         console.error('Error loading spaces:', err);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudieron cargar los espacios'
+          detail: 'No se pudieron cargar los espacios',
         });
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -244,14 +244,14 @@ export class SpacesListComponent implements OnInit {
    */
   loadMoreSpaces(): void {
     if (this.loadingMore() || !this.hasMore()) return;
-    
+
     this.loadingMore.set(true);
     const nextPage = this.currentPage() + 1;
 
     const filters: any = {
       is_active: true,
       page: nextPage,
-      per_page: this.perPage
+      per_page: this.perPage,
     };
 
     // Mantener filtro de búsqueda por texto
@@ -274,13 +274,13 @@ export class SpacesListComponent implements OnInit {
       filters.available_end_time = this.formatTimeForApi(this.selectedEndTime()!);
       filters.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     }
-    
+
     this.spacesService.getSpacesPaginated(filters).subscribe({
-      next: (response) => {
+      next: response => {
         // Agregar nuevos espacios a los existentes
         this.spaces.update(current => [...current, ...response.data]);
         this.currentPage.set(nextPage);
-        
+
         if (response.meta) {
           this.totalItems.set(response.meta.total);
           this.hasMore.set(response.meta.current_page < response.meta.last_page);
@@ -289,10 +289,10 @@ export class SpacesListComponent implements OnInit {
         }
         this.loadingMore.set(false);
       },
-      error: (err) => {
+      error: err => {
         console.error('Error loading more spaces:', err);
         this.loadingMore.set(false);
-      }
+      },
     });
   }
 
@@ -310,7 +310,7 @@ export class SpacesListComponent implements OnInit {
     this.messageService.add({
       severity: 'success',
       summary: 'Reservación Creada',
-      detail: '¡Tu reservación ha sido registrada exitosamente!'
+      detail: '¡Tu reservación ha sido registrada exitosamente!',
     });
     this.closeReservationModal();
   }
@@ -321,7 +321,7 @@ export class SpacesListComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Espacio Ocupado',
-        detail: 'El espacio ya está ocupado en ese horario. Por favor selecciona otro horario.'
+        detail: 'El espacio ya está ocupado en ese horario. Por favor selecciona otro horario.',
       });
     } else if (error.status === 422) {
       // Errores de validación
@@ -329,13 +329,13 @@ export class SpacesListComponent implements OnInit {
       this.messageService.add({
         severity: 'warn',
         summary: 'Datos Inválidos',
-        detail: message
+        detail: message,
       });
     } else {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'Ocurrió un error al crear la reservación. Intenta nuevamente.'
+        detail: 'Ocurrió un error al crear la reservación. Intenta nuevamente.',
       });
     }
   }

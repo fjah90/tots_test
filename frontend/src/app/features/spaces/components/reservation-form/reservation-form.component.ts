@@ -1,6 +1,22 @@
-import { Component, Input, Output, EventEmitter, inject, signal, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  inject,
+  signal,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+  FormsModule,
+} from '@angular/forms';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -31,10 +47,10 @@ import { Space } from '../../../../shared/interfaces';
     MessageModule,
     CheckboxModule,
     TagModule,
-    TooltipModule
+    TooltipModule,
   ],
   templateUrl: './reservation-form.component.html',
-  styleUrl: './reservation-form.component.scss'
+  styleUrl: './reservation-form.component.scss',
 })
 export class ReservationFormComponent implements OnInit, OnChanges {
   private fb = inject(FormBuilder);
@@ -46,9 +62,9 @@ export class ReservationFormComponent implements OnInit, OnChanges {
   @Input() preselectedDate: Date | null = null;
 
   // Outputs
-  @Output() success = new EventEmitter<void>();
-  @Output() error = new EventEmitter<any>();
-  @Output() cancel = new EventEmitter<void>();
+  @Output() reservationSuccess = new EventEmitter<void>();
+  @Output() reservationError = new EventEmitter<any>();
+  @Output() reservationCancel = new EventEmitter<void>();
 
   // Estado
   loading = signal(false);
@@ -82,11 +98,11 @@ export class ReservationFormComponent implements OnInit, OnChanges {
 
   private initForm(): void {
     const defaultDate = this.preselectedDate || new Date();
-    
+
     // Hora por defecto: próxima hora completa
     const defaultStartTime = new Date();
     defaultStartTime.setHours(defaultStartTime.getHours() + 1, 0, 0, 0);
-    
+
     const defaultEndTime = new Date(defaultStartTime);
     defaultEndTime.setHours(defaultEndTime.getHours() + 1);
 
@@ -96,7 +112,7 @@ export class ReservationFormComponent implements OnInit, OnChanges {
       startTime: [defaultStartTime, Validators.required],
       endTime: [defaultEndTime, Validators.required],
       eventName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
-      notes: ['']
+      notes: [''],
     });
   }
 
@@ -105,7 +121,7 @@ export class ReservationFormComponent implements OnInit, OnChanges {
     this.errorMessage.set(null);
     this.successMessage.set(null);
     this.failedDates.set([]);
-    
+
     if (this.multiDateMode()) {
       // Inicializar con la fecha actual seleccionada
       const currentDate = this.reservationForm.get('date')?.value;
@@ -132,7 +148,10 @@ export class ReservationFormComponent implements OnInit, OnChanges {
     // Validar que hora fin sea mayor a hora inicio
     const startTime = formValue.startTime as Date;
     const endTime = formValue.endTime as Date;
-    if (endTime.getHours() * 60 + endTime.getMinutes() <= startTime.getHours() * 60 + startTime.getMinutes()) {
+    if (
+      endTime.getHours() * 60 + endTime.getMinutes() <=
+      startTime.getHours() * 60 + startTime.getMinutes()
+    ) {
       this.errorMessage.set('La hora de fin debe ser mayor a la hora de inicio');
       return;
     }
@@ -159,24 +178,24 @@ export class ReservationFormComponent implements OnInit, OnChanges {
       space_id: this.space.id,
       start_time: this.formatDateTime(startDateTime),
       end_time: this.formatDateTime(endDateTime),
-      notes: formValue.eventName + (formValue.notes ? ` - ${formValue.notes}` : '')
+      notes: formValue.eventName + (formValue.notes ? ` - ${formValue.notes}` : ''),
     };
 
     this.reservationsService.createReservation(payload).subscribe({
       next: () => {
         this.loading.set(false);
-        this.success.emit();
+        this.reservationSuccess.emit();
       },
-      error: (err) => {
+      error: err => {
         this.loading.set(false);
         this.handleError(err);
-      }
+      },
     });
   }
 
   private submitBulkReservation(formValue: any): void {
     const dates: Date[] = formValue.dates || [];
-    
+
     if (dates.length === 0) {
       this.errorMessage.set('Selecciona al menos una fecha');
       this.loading.set(false);
@@ -188,36 +207,38 @@ export class ReservationFormComponent implements OnInit, OnChanges {
       dates: dates.map(d => this.formatDate(d)),
       start_time: this.formatTime(formValue.startTime),
       end_time: this.formatTime(formValue.endTime),
-      notes: formValue.eventName + (formValue.notes ? ` - ${formValue.notes}` : '')
+      notes: formValue.eventName + (formValue.notes ? ` - ${formValue.notes}` : ''),
     };
 
     this.reservationsService.createBulkReservations(payload).subscribe({
-      next: (response) => {
+      next: response => {
         this.loading.set(false);
-        
+
         if (response.data.failed.length > 0) {
           this.failedDates.set(response.data.failed);
         }
-        
+
         if (response.data.created.length > 0) {
           this.successMessage.set(response.message);
           // Si todas fueron exitosas, cerrar el modal
           if (response.data.failed.length === 0) {
-            setTimeout(() => this.success.emit(), 1500);
+            setTimeout(() => this.reservationSuccess.emit(), 1500);
           }
         }
       },
-      error: (err) => {
+      error: err => {
         this.loading.set(false);
         if (err.status === 409) {
-          this.errorMessage.set(err.error?.message || 'Todas las fechas seleccionadas están ocupadas');
+          this.errorMessage.set(
+            err.error?.message || 'Todas las fechas seleccionadas están ocupadas'
+          );
           if (err.error?.data?.failed) {
             this.failedDates.set(err.error.data.failed);
           }
         } else {
           this.handleError(err);
         }
-      }
+      },
     });
   }
 
@@ -232,13 +253,13 @@ export class ReservationFormComponent implements OnInit, OnChanges {
     } else {
       this.errorMessage.set('Ocurrió un error inesperado. Por favor intenta de nuevo.');
     }
-    
+
     // Emitir error al componente padre para manejo adicional
-    this.error.emit(err);
+    this.reservationError.emit(err);
   }
 
   onCancel(): void {
-    this.cancel.emit();
+    this.reservationCancel.emit();
   }
 
   private combineDateAndTime(date: Date, time: Date): Date {
@@ -255,7 +276,7 @@ export class ReservationFormComponent implements OnInit, OnChanges {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = '00';
-    
+
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
@@ -275,9 +296,19 @@ export class ReservationFormComponent implements OnInit, OnChanges {
   }
 
   // Getters para validación en template
-  get dateControl() { return this.reservationForm.get('date'); }
-  get datesControl() { return this.reservationForm.get('dates'); }
-  get startTimeControl() { return this.reservationForm.get('startTime'); }
-  get endTimeControl() { return this.reservationForm.get('endTime'); }
-  get eventNameControl() { return this.reservationForm.get('eventName'); }
+  get dateControl() {
+    return this.reservationForm.get('date');
+  }
+  get datesControl() {
+    return this.reservationForm.get('dates');
+  }
+  get startTimeControl() {
+    return this.reservationForm.get('startTime');
+  }
+  get endTimeControl() {
+    return this.reservationForm.get('endTime');
+  }
+  get eventNameControl() {
+    return this.reservationForm.get('eventName');
+  }
 }

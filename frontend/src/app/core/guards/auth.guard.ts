@@ -15,16 +15,16 @@ export const authGuard: CanActivateFn = (route, state) => {
 
   // Guardar URL intentada para redireccionar después del login
   router.navigate(['/auth/login'], {
-    queryParams: { returnUrl: state.url }
+    queryParams: { returnUrl: state.url },
   });
-  
+
   return false;
 };
 
 /**
  * Guard para proteger rutas que requieren rol de admin
  */
-export const adminGuard: CanActivateFn = (route, state) => {
+export const adminGuard: CanActivateFn = (_route, _state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
@@ -46,7 +46,7 @@ export const adminGuard: CanActivateFn = (route, state) => {
  * Guard para rutas de invitados (login/register)
  * Redirige a home si ya está autenticado
  */
-export const guestGuard: CanActivateFn = (route, state) => {
+export const guestGuard: CanActivateFn = (_route, _state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 

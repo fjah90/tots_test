@@ -10,6 +10,6 @@ import { CommonModule } from '@angular/common';
       <h1 class="text-2xl font-bold">Nueva Reservación</h1>
       <p class="text-gray-600">TODO: Implementar formulario de reservación</p>
     </div>
-  `
+  `,
 })
 export class ReservationFormComponent {}

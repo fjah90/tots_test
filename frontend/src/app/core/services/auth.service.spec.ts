@@ -14,12 +14,7 @@ describe('AuthService', () => {
     localStorage.clear();
 
     TestBed.configureTestingModule({
-      providers: [
-        AuthService,
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideRouter([]),
-      ],
+      providers: [AuthService, provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
 
     service = TestBed.inject(AuthService);
@@ -61,7 +56,7 @@ describe('AuthService', () => {
         message: 'Login exitoso',
       };
 
-      service.login({ email: 'test@example.com', password: 'password123' }).subscribe((response) => {
+      service.login({ email: 'test@example.com', password: 'password123' }).subscribe(response => {
         expect(response.token).toBe('mock-token-123');
         expect(response.user.email).toBe('test@example.com');
       });
@@ -124,7 +119,7 @@ describe('AuthService', () => {
         password_confirmation: 'password123',
       };
 
-      service.register(payload).subscribe((response) => {
+      service.register(payload).subscribe(response => {
         expect(response.user.name).toBe('New User');
       });
 
@@ -168,9 +163,14 @@ describe('AuthService', () => {
 
   describe('getProfile()', () => {
     it('should fetch and update user profile', () => {
-      const mockUser = { id: 1, name: 'Profile User', email: 'profile@example.com', role: 'user' as const };
+      const mockUser = {
+        id: 1,
+        name: 'Profile User',
+        email: 'profile@example.com',
+        role: 'user' as const,
+      };
 
-      service.getProfile().subscribe((user) => {
+      service.getProfile().subscribe(user => {
         expect(user.name).toBe('Profile User');
       });
 
