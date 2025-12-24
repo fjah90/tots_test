@@ -1,0 +1,63 @@
+# ============================================================================
+# SpaceBook - Docker Compose para Desarrollo Local
+# ============================================================================
+
+services:
+  # ==========================================================================
+  # Backend API - Laravel (Development)
+  # ==========================================================================
+  spacebook-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: spacebook-api-dev
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+    volumes:
+      - ./backend:/var/www/html
+      - /var/www/html/vendor
+    networks:
+      - spacebook-network-dev
+
+  # ==========================================================================
+  # Frontend - Angular (Development)
+  # ==========================================================================
+  spacebook-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: spacebook-frontend-dev
+    restart: unless-stopped
+    ports:
+      - "4200:80"
+    depends_on:
+      - spacebook-api
+    networks:
+      - spacebook-network-dev
+
+  # ==========================================================================
+  # Nginx Reverse Proxy (Development)
+  # ==========================================================================
+  spacebook-nginx:
+    image: nginx:alpine
+    container_name: spacebook-nginx-dev
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/dev/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - spacebook-api
+      - spacebook-frontend
+    networks:
+      - spacebook-network-dev
+
+networks:
+  spacebook-network-dev:
+    driver: bridge
+    name: spacebook-network-dev

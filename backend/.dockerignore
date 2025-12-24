@@ -1,0 +1,46 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Dependencies (will be installed in container)
+/vendor
+
+# Testing
+/tests
+.phpunit.result.cache
+phpunit.xml
+
+# Node modules (if any)
+/node_modules
+package-lock.json
+
+# Environment files (use production env)
+.env
+.env.local
+.env.*.local
+
+# Storage (will be mounted as volume)
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+docker/
+
+# Documentation
+*.md
+docs/
+
+# Other
+.editorconfig
+.styleci.yml

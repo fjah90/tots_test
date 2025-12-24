@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+.angular/
+
+# Environment files
+.env
+.env.local
+*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Compiled files
+*.pyc
+*.pyo
+
+# Laravel specific
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+!storage/logs/.gitkeep
+!storage/framework/cache/.gitkeep
+!storage/framework/sessions/.gitkeep
+!storage/framework/views/.gitkeep
+!bootstrap/cache/.gitkeep
+
+# Testing
+coverage/
+.phpunit.result.cache
+
+# SQLite database (development)
+*.sqlite
+
+# ============================================================================
+# Production/VPS files (DO NOT COMMIT - contain sensitive info)
+# ============================================================================
+deploy.ps1
+deploy.sh
+deploy-fast.ps1
+docker-compose.yml
+docker/nginx/vps/
+DOCKER.md
+backend/.env.production
+frontend/src/environments/environment.production.ts
