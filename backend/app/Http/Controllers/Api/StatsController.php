@@ -40,8 +40,17 @@ class StatsController extends Controller
             ->get(['id', 'name', 'reservations_count']);
 
         // Reservaciones por mes (últimos 6 meses)
+        // Detectar el driver de base de datos para usar la función correcta
+        $driver = DB::connection()->getDriverName();
+        $monthExpression = match ($driver) {
+            'sqlite' => "strftime('%Y-%m', created_at)",
+            'mysql', 'mariadb' => "DATE_FORMAT(created_at, '%Y-%m')",
+            'pgsql' => "TO_CHAR(created_at, 'YYYY-MM')",
+            default => "strftime('%Y-%m', created_at)",
+        };
+
         $reservationsByMonth = Reservation::select(
-            DB::raw("strftime('%Y-%m', created_at) as month"),
+            DB::raw("$monthExpression as month"),
             DB::raw('count(*) as count')
         )
             ->where('created_at', '>=', now()->subMonths(6))
@@ -155,8 +164,17 @@ class StatsController extends Controller
             ->pluck('count', 'status');
 
         // Reservaciones por mes (últimos 6 meses)
+        // Detectar el driver de base de datos para usar la función correcta
+        $driver = DB::connection()->getDriverName();
+        $monthExpression = match ($driver) {
+            'sqlite' => "strftime('%Y-%m', created_at)",
+            'mysql', 'mariadb' => "DATE_FORMAT(created_at, '%Y-%m')",
+            'pgsql' => "TO_CHAR(created_at, 'YYYY-MM')",
+            default => "strftime('%Y-%m', created_at)",
+        };
+
         $reservationsByMonth = Reservation::select(
-            DB::raw("strftime('%Y-%m', created_at) as month"),
+            DB::raw("$monthExpression as month"),
             DB::raw('count(*) as count')
         )
             ->where('created_at', '>=', now()->subMonths(6))
